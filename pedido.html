@@ -1,1 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido de Uniforme - VôleiTerapia</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">
+            Vôlei<span>Terapia</span>
+        </div>
+        <p>Pedido de Uniforme</p>
+    </header>
+
+    <div class="container">
+
+        <div class="card">
+            <h1>Solicitação de Uniforme</h1>
+            
+            <label for="responsavel">Nome do responsável</label>
+            <input type="text" id="responsavel" placeholder="Digite seu nome completo">
+        </div>
+
+        <div class="card">
+            <h2>Adicionar uniforme</h2>
+            <button class="btn btn-black" onclick="abrirItem()">
+                + ADICIONAR ITEM
+            </button>
+        </div>
+
+        <div id="configuracao" class="card" style="display:none;">
+            <h2>Configurar item</h2>
+
+            <label for="tipo">Tipo de peça</label>
+            <select id="tipo">
+                <option value="oficial">Camisa oficial de jogo</option>
+                <option value="adicional">Camisa adicional</option>
+            </select>
+
+            <label for="tipoUniforme">Tipo de uniforme</label>
+            <select id="tipoUniforme">
+                <option value="comum">Uniforme comum</option>
+                <option value="libero">Uniforme de líbero</option>
+            </select>
+
+            <label>Categoria</label>
+            <div class="dashboard">
+                <button class="btn" onclick="selecionarCategoria('Masculino')">Masculino</button>
+                <button class="btn" onclick="selecionarCategoria('Feminino')">Feminino</button>
+            </div>
+
+            <label for="publico">Público</label>
+            <select id="publico">
+                <option value="adulto">Adulto</option>
+                <option value="infantil">Infantil</option>
+            </select>
+
+            <div id="produtos"></div>
+
+            <label for="quantidade">Quantidade</label>
+            <input id="quantidade" type="number" value="1" min="1" step="1">
+
+            <label for="nomePersonalizado">Nome para personalização</label>
+            <input type="text" id="nomePersonalizado" placeholder="Nome na camisa">
+
+            <label>Número da camisa</label>
+            <div id="mapaNumero" class="dashboard"></div>
+
+            <button class="btn" onclick="adicionarItemPedido()">
+                Adicionar ao pedido
+            </button>
+        </div>
+
+        <div class="card">
+            <h2>Itens do pedido</h2>
+            <div id="listaItens" class="lista">
+                Nenhum item adicionado.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Resumo do pedido</h2>
+            <div id="resumo" class="numero-card">
+                Nenhum pedido.
+            </div>
+        </div>
+
+        <button class="btn" onclick="finalizarPedido()">
+            FINALIZAR PEDIDO
+        </button>
+
+    </div>
+
+    <footer>
+        VôleiTerapia - Guariba SP
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
