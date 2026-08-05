@@ -1,1 +1,134 @@
+*{
+    box-sizing:border-box;
+    font-family:Arial, sans-serif;
+}
 
+body{
+    margin:0;
+    background:#f3f3f3;
+    color:#222;
+}
+
+header{
+    background:#000;
+    color:white;
+    padding:25px;
+    text-align:center;
+}
+
+.logo{
+    font-size:34px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#ff007f;
+}
+
+.container{
+    max-width:900px;
+    margin:30px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:18px;
+    margin-bottom:20px;
+    box-shadow:0 3px 10px #0002;
+}
+
+h1,h2{
+    text-align:center;
+}
+
+h2{
+    color:#ff007f;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+    margin-top:8px;
+}
+
+label{
+    font-weight:bold;
+    display:block;
+    margin-top:15px;
+}
+
+button{
+    border:none;
+    border-radius:30px;
+    padding:15px 25px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+}
+
+.btn{
+    background:#ff007f;
+    color:white;
+    width:100%;
+    margin-top:20px;
+}
+
+.btn-black{
+    background:#000;
+    color:white;
+}
+
+.lista{
+    background:white;
+    padding:15px;
+    border-radius:15px;
+}
+
+.item{
+    border-left:5px solid #ff007f;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fafafa;
+    border-radius:10px;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:15px;
+}
+
+.numero-card{
+    background:#000;
+    color:white;
+    padding:20px;
+    border-radius:15px;
+    text-align:center;
+}
+
+.numero-card span{
+    display:block;
+    font-size:30px;
+    color:#ff007f;
+}
+
+footer{
+    background:#000;
+    color:white;
+    text-align:center;
+    padding:20px;
+    margin-top:40px;
+}
+
+
+@media(max-width:600px){
+
+.dashboard{
+    grid-template-columns:1fr;
+}
+
+}
