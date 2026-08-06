@@ -1,5 +1,4 @@
-console.log("SCRIPT VÔLEI TERAPIA CARREGOU");
-alert("SCRIPT VÔLEI TERAPIA CARREGOU");
+
 //
 let pedido=[];
 let categoriaSelecionada="";
