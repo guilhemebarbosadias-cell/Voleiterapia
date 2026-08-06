@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -41,7 +42,7 @@ Responsável pelo pedido
 Nome completo
 </label>
 
-<input 
+<input
 id="responsavel"
 type="text"
 placeholder="Digite seu nome">
@@ -57,7 +58,7 @@ Adicionar uniforme
 </h2>
 
 
-<button 
+<button
 class="btn btn-black"
 onclick="abrirItem()">
 
@@ -70,18 +71,62 @@ onclick="abrirItem()">
 
 
 
-
-<div 
+<div
 id="configuracao"
 class="area"
 style="display:none;">
-
 
 
 <h2>
 Configurar jogador
 </h2>
 
+
+<label>
+Tipo de uniforme
+</label>
+
+
+<div class="opcoes">
+
+
+<div
+class="opcao"
+onclick="selecionarUniforme('Oficial',this)">
+
+Uniforme Oficial
+
+</div>
+
+
+<div
+class="opcao"
+onclick="selecionarUniforme('Libero',this)">
+
+Uniforme Líbero
+
+</div>
+
+
+<div
+class="opcao"
+onclick="selecionarUniforme('Adicional Oficial',this)">
+
+Adicional Oficial
+
+</div>
+
+
+<div
+class="opcao"
+onclick="selecionarUniforme('Adicional Libero',this)">
+
+Adicional Líbero
+
+</div>
+
+
+</div>
 
 
 <label>
@@ -92,7 +137,7 @@ Categoria
 <div class="opcoes">
 
 
-<div 
+<div
 class="opcao"
 onclick="selecionarCategoria('Masculino',this)">
 
@@ -102,7 +147,7 @@ Masculino
 
 
 
-<div 
+<div
 class="opcao"
 onclick="selecionarCategoria('Feminino',this)">
 
@@ -112,12 +157,7 @@ Feminino
 
 
 </div>
-
-
-
-
 <div id="produtos"></div>
-
 
 
 
@@ -126,12 +166,10 @@ Nome para personalização
 </label>
 
 
-<input 
+<input
 id="nomePersonalizado"
 type="text"
 placeholder="Nome na camisa">
-
-
 
 
 
@@ -140,7 +178,7 @@ Número da camisa
 </label>
 
 
-<div 
+<div
 id="mapaNumero"
 class="numero">
 
@@ -157,14 +195,18 @@ Adicionar ao pedido
 </button>
 
 
-</div><div class="card">
+</div>
+
+
+
+<div class="card">
 
 <h2>
 Itens do pedido
 </h2>
 
 
-<div 
+<div
 id="listaItens"
 class="area">
 
@@ -174,10 +216,6 @@ Nenhum item adicionado.
 
 
 </div>
-
-
-
-
 <div class="card">
 
 
@@ -186,7 +224,7 @@ Resumo do pedido
 </h2>
 
 
-<div 
+<div
 id="resumo"
 class="resumo">
 
