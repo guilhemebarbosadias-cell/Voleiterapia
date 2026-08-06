@@ -107,54 +107,50 @@ button{
     color:white;
 }
 
-/* --- BOTÕES DE SELEÇÃO (MASCULINO / FEMININO) --- */
-button.opcao {
-    background-color: #ff007f !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 12px !important;
-    padding: 12px 24px !important;
-    font-size: 16px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    margin: 5px 8px 10px 0 !important;
-    display: inline-block !important;
+/* --- BLOCO DAS OPÇÕES (MASCULINO / FEMININO) --- */
+.opcoes{
+display:flex;
+gap:10px;
+margin-top:10px;
 }
 
-button.opcao.ativo {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+.opcao{
+flex:1;
+padding:15px;
+background:#ff007f;
+color:white;
+text-align:center;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+font-size:16px;
+transition:0.2s;
 }
 
-/* --- MAPA DE NÚMEROS (GRADE COMPACTA) --- */
-#mapaNumero {
-    display: grid !important;
-    grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)) !important;
-    gap: 8px !important;
-    max-height: 220px !important;
-    overflow-y: auto !important;
-    padding: 10px !important;
-    background: #fafafa !important;
-    border: 1px solid #ddd !important;
-    border-radius: 12px !important;
-    margin-top: 10px !important;
+.opcao.ativo{
+background:#000;
+color:white;
 }
 
-#mapaNumero button {
-    background-color: #ff007f !important;
-    color: #ffffff !important;
-    border: none !important;
-    border-radius: 8px !important;
-    padding: 10px 2px !important;
-    font-size: 14px !important;
-    font-weight: bold !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    width: 100% !important;
-    margin: 0 !important;
+/* --- BLOCO DO MAPA DE NÚMEROS --- */
+.numero{
+display:grid;
+grid-template-columns:repeat(8,1fr);
+gap:6px;
+margin-top:10px;
 }
 
-#mapaNumero button.ativo {
-    background-color: #000000 !important;
-    color: #ffffff !important;
+.numero button{
+padding:8px 5px;
+border:0;
+border-radius:8px;
+background:#ff007f;
+color:white;
+font-weight:bold;
+cursor:pointer;
+}
+
+.numero button.ativo{
+background:#000;
+color:white;
 }
