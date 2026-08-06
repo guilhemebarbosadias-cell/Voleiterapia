@@ -1,5 +1,3 @@
-
-//
 let pedido=[];
 let categoriaSelecionada="";
 let numeroSelecionado="";
@@ -19,7 +17,6 @@ gerarMapaNumeros();
 }
 
 function selecionarCategoria(categoria,botao){
-
 categoriaSelecionada=categoria;
 
 document.querySelectorAll(".opcao").forEach(btn=>{
@@ -29,12 +26,13 @@ btn.classList.remove("ativo");
 botao.classList.add("ativo");
 
 mostrarOpcoesUniforme();
-
 }
 
 function mostrarOpcoesUniforme(){
 
 let area=document.getElementById("produtos");
+
+let html="";
 
 let tamanho=`
 <label>Tamanho da camisa</label>
@@ -47,8 +45,6 @@ let tamanho=`
 <option>XGG</option>
 </select>
 `;
-
-let html="";
 
 if(categoriaSelecionada==="Masculino"){
 
@@ -79,6 +75,7 @@ ${tamanho}
 
 }
 
+
 if(categoriaSelecionada==="Feminino"){
 
 html=`
@@ -88,10 +85,8 @@ html=`
 <label>Modelo da camisa</label>
 
 <select id="modeloCamisa">
-
 <option>Baby Look</option>
 <option>Camisa tradicional feminina</option>
-
 </select>
 
 ${tamanho}
@@ -99,10 +94,8 @@ ${tamanho}
 <label>Adicionar peça inferior?</label>
 
 <select id="usaInferior" onchange="mostrarInferior()">
-
 <option value="nao">Não</option>
 <option value="sim">Sim</option>
-
 </select>
 
 <div id="inferior"></div>
@@ -116,7 +109,6 @@ ${tamanho}
 area.innerHTML=html;
 
 }
-
 
 function mostrarInferior(){
 
@@ -132,9 +124,7 @@ return;
 
 }
 
-
 let html="";
-
 
 if(categoriaSelecionada==="Masculino"){
 
@@ -165,7 +155,6 @@ Calção masculino
 `;
 
 }
-
 
 if(categoriaSelecionada==="Feminino"){
 
@@ -206,11 +195,9 @@ Short Suplex
 
 }
 
-
 area.innerHTML=html;
 
 }
-
 
 function gerarMapaNumeros(){
 
@@ -248,7 +235,9 @@ mapa.appendChild(botao);
 
 }
 
-  function calcularValor(){
+}
+
+function calcularValor(){
 
 let total=valores.camisa;
 
@@ -279,7 +268,6 @@ total+=valores.shortSuplex;
 return total;
 
 }
-
 
 function adicionarItemPedido(){
 
@@ -355,7 +343,6 @@ limparItem();
 
 }
 
-
 function mostrarPedido(){
 
 let lista=document.getElementById("listaItens");
@@ -422,7 +409,6 @@ mostrarResumo(total);
 
 }
 
-
 function mostrarResumo(total){
 
 let resumo=document.getElementById("resumo");
@@ -461,7 +447,6 @@ R$ ${parcela.toFixed(2)}
 
 }
 
-
 function limparItem(){
 
 document.getElementById("nomePersonalizado").value="";
@@ -475,7 +460,6 @@ btn.classList.remove("ativo");
 });
 
 }
-
 
 function gerarCodigoPedido(){
 
@@ -492,7 +476,6 @@ numero
 return "VT"+numero;
 
 }
-
 
 function finalizarPedido(){
 
@@ -531,5 +514,4 @@ alert(
 "Pedido "+codigo+" salvo com sucesso!"
 );
 
-}
 }
