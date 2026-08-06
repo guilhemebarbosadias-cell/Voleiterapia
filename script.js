@@ -3,6 +3,9 @@ let categoriaSelecionada="";
 let numeroSelecionado="";
 let itemAtual={};
 
+// URL do Google Apps Script integrada
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
+
 const valores={
 camisa:75,
 calcaoMasc:35,
@@ -490,28 +493,63 @@ return;
 
 let codigo=gerarCodigoPedido();
 
+let dataAtual = new Date().toLocaleDateString("pt-BR");
 
-let dados={
+let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
 
-codigo:codigo,
+// Pega o nome do responsável direto do input do formulário (substitua "nomeResponsavel" se o ID no HTML for diferente)
+let campoResponsavel = document.getElementById("nomeResponsavel");
+let nomeResponsavelFinal = campoResponsavel ? campoResponsavel.value.trim() : "Não informado";
 
-data:
-new Date()
-.toLocaleDateString("pt-BR"),
+let itensFormatados = pedido.map(item => ({
+  nome: item.nome,
+  numero: item.numero,
+  categoria: item.categoria,
+  modeloCamisa: item.modelo,
+  tamanho: item.tamanhoCamisa,
+  pecaInferior: item.inferior,
+  tamanhoInferior: item.tamanhoInferior || "N/A",
+  valor: item.valor,
+  produto: "Camisa / " + item.inferior
+}));
 
-itens:pedido
-
+let dadosEnvio = {
+  idPedido: codigo,
+  data: dataAtual,
+  responsavel: nomeResponsavelFinal,
+  quantidade: pedido.length,
+  valorTotal: valorTotalGeral,
+  parcelas: "3x de R$ " + (valorTotalGeral / 3).toFixed(2),
+  pago: "Não",
+  itens: itensFormatados
 };
 
+let dadosLocal={
+codigo: codigo,
+data: dataAtual,
+itens: pedido
+};
 
 localStorage.setItem(
 codigo,
-JSON.stringify(dados)
+JSON.stringify(dadosLocal)
 );
 
-
-alert(
-"Pedido "+codigo+" salvo com sucesso!"
-);
+// Envio com mode: "no-cors" para evitar o bloqueio do navegador
+fetch(URL_APPS_SCRIPT, {
+  method: "POST",
+  mode: "no-cors",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify(dadosEnvio)
+})
+.then(() => {
+  alert("Pedido " + codigo + " finalizado e enviado com sucesso!");
+})
+.catch(error => {
+  console.error("Erro ao enviar:", error);
+  alert("Pedido " + codigo + " salvo localmente.");
+});
 
 }
