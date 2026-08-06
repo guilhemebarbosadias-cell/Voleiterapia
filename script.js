@@ -4,7 +4,7 @@ let numeroSelecionado="";
 let itemAtual={};
 
 // URL do Google Apps Script integrada
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbz-g-SQiEtGnCXlFMQ6FrfA9ga6ktaZecUfJQyNz_24OsVG5Aeaqiot9jcz3hC8QeHZ/exec"
+const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbx8f4qCMipm3WqyVCrlZXho1BcKu732xIESzkZTufgpQJtw-WIuJ4_cTfoKf_8GXpiV/exec"
 const valores={
 camisa:75,
 calcaoMasc:35,
