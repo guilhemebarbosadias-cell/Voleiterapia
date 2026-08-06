@@ -1,292 +1,537 @@
 // VÔLEI TERAPIA
 // SISTEMA DE PEDIDOS DE UNIFORME
-// SCRIPT V2 - PARTE 1/2
+// SCRIPT V3 - PARTE 1/2
 
-let pedidoAtual={
-codigo:"",
-responsavel:"",
-data:"",
-itens:[]
-};
-
-let itemAtual={};
+let pedido=[];
 let categoriaSelecionada="";
+let numeroSelecionado="";
+let itemAtual={};
 
-function gerarCodigoPedido(){
-let numero=localStorage.getItem("numeroVT")||0;
-numero++;
-localStorage.setItem("numeroVT",numero);
-return "VT"+numero;
-}
-
-function iniciarPedido(){
-pedidoAtual={
-codigo:gerarCodigoPedido(),
-responsavel:"",
-data:new Date().toLocaleDateString("pt-BR"),
-itens:[]
+const valores={
+camisa:75,
+calcaoMasc:35,
+calcaoFem:35,
+shortDoll:30,
+shortSuplex:35
 };
-return pedidoAtual.codigo;
-}
 
 function abrirItem(){
 document.getElementById("configuracao").style.display="block";
-
-if(!pedidoAtual.codigo){
-iniciarPedido();
-}
-
-gerarNumeros();
+gerarMapaNumeros();
 }
 
 function selecionarCategoria(categoria,botao){
+
 categoriaSelecionada=categoria;
 
-document.querySelectorAll(".dashboard .btn").forEach(btn=>{
-btn.classList.remove("selecionado");
+document.querySelectorAll(".opcao").forEach(btn=>{
+btn.classList.remove("ativo");
 });
 
-if(botao){
-botao.classList.add("selecionado");
+botao.classList.add("ativo");
+
+mostrarOpcoesUniforme();
+
 }
 
-atualizarInformacoes();
-}
+function mostrarOpcoesUniforme(){
 
-function atualizarInformacoes(){
-let produtos=document.getElementById("produtos");
+let area=document.getElementById("produtos");
 
-let tipo=document.getElementById("tipo").value;
-let uniforme=document.getElementById("tipoUniforme").value;
-let publico=document.getElementById("publico").value;
-
-produtos.innerHTML=`
-<p><strong>Categoria:</strong> ${categoriaSelecionada||"Não selecionada"}</p>
-<p><strong>Peça:</strong> ${tipo}</p>
-<p><strong>Modelo:</strong> ${uniforme}</p>
-<p><strong>Público:</strong> ${publico}</p>
+let tamanho=`
+<label>Tamanho da camisa</label>
+<select id="tamanhoCamisa">
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+<option>XGG</option>
+</select>
 `;
+
+let html="";
+
+if(categoriaSelecionada==="Masculino"){
+
+html=`
+
+<div class="card">
+
+<label>Modelo da camisa</label>
+
+<select id="modeloCamisa">
+<option>Camisa masculina</option>
+</select>
+
+${tamanho}
+
+<label>Adicionar calção?</label>
+
+<select id="usaInferior" onchange="mostrarInferior()">
+<option value="nao">Não</option>
+<option value="sim">Sim</option>
+</select>
+
+<div id="inferior"></div>
+
+</div>
+
+`;
+
 }
 
-function gerarNumeros(){
+if(categoriaSelecionada==="Feminino"){
+
+html=`
+
+<div class="card">
+
+<label>Modelo da camisa</label>
+
+<select id="modeloCamisa">
+
+<option>Baby Look</option>
+<option>Camisa tradicional feminina</option>
+
+</select>
+
+${tamanho}
+
+<label>Adicionar peça inferior?</label>
+
+<select id="usaInferior" onchange="mostrarInferior()">
+
+<option value="nao">Não</option>
+<option value="sim">Sim</option>
+
+</select>
+
+<div id="inferior"></div>
+
+</div>
+
+`;
+
+}
+
+area.innerHTML=html;
+
+}
+
+
+function mostrarInferior(){
+
+let area=document.getElementById("inferior");
+
+let usa=document.getElementById("usaInferior").value;
+
+if(usa==="nao"){
+
+area.innerHTML="";
+
+return;
+
+}
+
+
+let html="";
+
+
+if(categoriaSelecionada==="Masculino"){
+
+html=`
+
+<label>Tipo de calção</label>
+
+<select id="tipoInferior">
+
+<option value="calcaoMasc">
+Calção masculino
+</option>
+
+</select>
+
+<label>Tamanho do calção</label>
+
+<select id="tamanhoInferior">
+
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+
+</select>
+
+`;
+
+}
+
+
+if(categoriaSelecionada==="Feminino"){
+
+html=`
+
+<label>Tipo de peça</label>
+
+<select id="tipoInferior">
+
+<option value="calcaoFem">
+Calção feminino
+</option>
+
+<option value="shortDoll">
+Short Doll
+</option>
+
+<option value="shortSuplex">
+Short Suplex
+</option>
+
+</select>
+
+
+<label>Tamanho</label>
+
+<select id="tamanhoInferior">
+
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+
+</select>
+
+`;
+
+}
+
+
+area.innerHTML=html;
+
+}
+
+
+function gerarMapaNumeros(){
+
 let mapa=document.getElementById("mapaNumero");
 
 mapa.innerHTML="";
 
+
 for(let i=0;i<=99;i++){
+
+let numero=i.toString().padStart(2,"0");
+
 let botao=document.createElement("button");
 
 botao.type="button";
-botao.className="btn";
-botao.innerText=i;
+botao.innerText=numero;
+
 
 botao.onclick=function(){
-selecionarNumero(i);
+
+document.querySelectorAll("#mapaNumero button")
+.forEach(btn=>{
+btn.classList.remove("ativo");
+});
+
+
+botao.classList.add("ativo");
+
+numeroSelecionado=numero;
+
 };
 
+
 mapa.appendChild(botao);
-}
-}
 
-function selecionarNumero(numero){
-itemAtual.numero=numero;
-
-document.querySelectorAll("#mapaNumero .btn").forEach(btn=>{
-btn.classList.remove("selecionado");
-
-if(Number(btn.innerText)===numero){
-btn.classList.add("selecionado");
-}
-});
 }
 
-function criarItem(){
+  function calcularValor(){
+
+let total=valores.camisa;
+
+let usa=document.getElementById("usaInferior");
+
+if(usa && usa.value==="sim"){
+
+let tipo=document.getElementById("tipoInferior").value;
+
+if(tipo==="calcaoMasc"){
+total+=valores.calcaoMasc;
+}
+
+if(tipo==="calcaoFem"){
+total+=valores.calcaoFem;
+}
+
+if(tipo==="shortDoll"){
+total+=valores.shortDoll;
+}
+
+if(tipo==="shortSuplex"){
+total+=valores.shortSuplex;
+}
+
+}
+
+return total;
+
+}
+
+
+function adicionarItemPedido(){
 
 let nome=document.getElementById("nomePersonalizado").value.trim();
 
-let tamanho=document.getElementById("tamanhoCamisa")?.value||"";
-
-let tamanhoShort=document.getElementById("tamanhoShort")?.value||"";
-
-let short=document.getElementById("usaShort")?.checked||false;
-
-let item={
-id:pedidoAtual.codigo+"-"+String(pedidoAtual.itens.length+1).padStart(2,"0"),
-nome:nome.toUpperCase()||"SEM NOME",
-numero:itemAtual.numero,
-categoria:categoriaSelecionada,
-tipo:document.getElementById("tipo").value,
-modelo:document.getElementById("tipoUniforme").value,
-publico:document.getElementById("publico").value,
-tamanhoCamisa:tamanho,
-short:short,
-tamanhoShort:tamanhoShort
-};
-
-return item;
-}// VÔLEI TERAPIA
-// SISTEMA DE PEDIDOS DE UNIFORME
-// SCRIPT V2 - PARTE 2/2
-
-function adicionarItemPedido(){
-let responsavel=document.getElementById("responsavel").value.trim();
-
-if(!responsavel){
-alert("Informe o responsável pelo pedido.");
-document.getElementById("responsavel").focus();
+if(categoriaSelecionada===""){
+alert("Selecione masculino ou feminino.");
 return;
 }
 
-if(!categoriaSelecionada){
-alert("Selecione a categoria.");
-return;
-}
-
-if(itemAtual.numero===undefined){
+if(numeroSelecionado===""){
 alert("Selecione o número.");
 return;
 }
 
-let item=criarItem();
+if(nome===""){
+alert("Digite o nome para personalização.");
+return;
+}
 
-pedidoAtual.responsavel=responsavel;
 
-pedidoAtual.itens.push(item);
+let item={
+
+id:pedido.length+1,
+
+nome:nome.toUpperCase(),
+
+categoria:categoriaSelecionada,
+
+numero:numeroSelecionado,
+
+modelo:
+document.getElementById("modeloCamisa")
+.value,
+
+tamanhoCamisa:
+document.getElementById("tamanhoCamisa")
+.value,
+
+inferior:"Nenhum",
+
+tamanhoInferior:"",
+
+valor:calcularValor()
+
+};
+
+
+let usa=document.getElementById("usaInferior");
+
+
+if(usa && usa.value==="sim"){
+
+item.inferior=
+document.getElementById("tipoInferior")
+.options[
+document.getElementById("tipoInferior").selectedIndex
+].text;
+
+
+item.tamanhoInferior=
+document.getElementById("tamanhoInferior")
+.value;
+
+}
+
+
+pedido.push(item);
 
 mostrarPedido();
 
 limparItem();
+
 }
+
 
 function mostrarPedido(){
-let lista=document.getElementById("listaItens");
 
-if(pedidoAtual.itens.length===0){
-lista.innerHTML="Nenhum item adicionado.";
-return;
-}
+let lista=document.getElementById("listaItens");
 
 lista.innerHTML="";
 
-pedidoAtual.itens.forEach(item=>{
+
+let total=0;
+
+
+pedido.forEach((item,index)=>{
+
+total+=item.valor;
+
 
 lista.innerHTML+=`
-<div class="item">
-<strong>${item.id}</strong><br>
-Nome: ${item.nome}<br>
-Número: ${item.numero}<br>
-Categoria: ${item.categoria}<br>
-Modelo: ${item.modelo}<br>
-Tamanho camisa: ${item.tamanhoCamisa||"Não informado"}<br>
-Short: ${item.short?"Sim":"Não"}
-${item.short?`<br>Tamanho short: ${item.tamanhoShort||"Não informado"}`:""}
+
+<div class="card">
+
+<strong>
+Jogador ${index+1}
+</strong>
+
+<p>
+Nome: ${item.nome}
+</p>
+
+<p>
+Número: ${item.numero}
+</p>
+
+<p>
+Categoria: ${item.categoria}
+</p>
+
+<p>
+Camisa:
+${item.modelo}
+</p>
+
+<p>
+Tamanho:
+${item.tamanhoCamisa}
+</p>
+
+<p>
+Peça inferior:
+${item.inferior}
+</p>
+
+<p>
+Valor:
+R$ ${item.valor.toFixed(2)}
+</p>
+
 </div>
+
 `;
 
 });
 
-mostrarResumo();
+
+mostrarResumo(total);
+
 }
 
-function mostrarResumo(){
+
+function mostrarResumo(total){
+
 let resumo=document.getElementById("resumo");
 
+
+let parcela=total/3;
+
+
 resumo.innerHTML=`
-Pedido: ${pedidoAtual.codigo||"Novo"}<br>
-Responsável: ${pedidoAtual.responsavel}<br>
-Quantidade de itens: ${pedidoAtual.itens.length}
+
+VÔLEI TERAPIA
+
+<br><br>
+
+Quantidade de jogadores:
+${pedido.length}
+
+<br><br>
+
+Valor total:
+<strong>
+R$ ${total.toFixed(2)}
+</strong>
+
+<br><br>
+
+Pagamento:
+
+3 parcelas de:
+
+<strong>
+R$ ${parcela.toFixed(2)}
+</strong>
+
 `;
+
 }
+
 
 function limparItem(){
+
 document.getElementById("nomePersonalizado").value="";
 
-itemAtual={};
+numeroSelecionado="";
 
-document.querySelectorAll("#mapaNumero .btn").forEach(btn=>{
-btn.classList.remove("selecionado");
+
+document.querySelectorAll("#mapaNumero button")
+.forEach(btn=>{
+btn.classList.remove("ativo");
 });
+
 }
 
-function salvarPedido(){
 
-if(!pedidoAtual.codigo){
-iniciarPedido();
-}
+function gerarCodigoPedido(){
+
+let numero=
+localStorage.getItem("codigoVT") || 0;
+
+numero++;
 
 localStorage.setItem(
-pedidoAtual.codigo,
-JSON.stringify(pedidoAtual)
+"codigoVT",
+numero
 );
 
-}
-
-function exportarHyper(){
-
-let texto="";
-
-texto+="PEDIDO "+pedidoAtual.codigo+"\n";
-texto+="VÔLEI TERAPIA\n";
-texto+="====================\n\n";
-
-texto+="CAMISAS\n\n";
-
-pedidoAtual.itens.forEach(item=>{
-
-texto+=item.id+"\n";
-texto+="Modelo: "+item.modelo+"\n";
-texto+="Nome: "+item.nome+"\n";
-texto+="Número: "+item.numero+"\n";
-texto+="Tamanho: "+item.tamanhoCamisa+"\n";
-texto+="--------------------\n";
-
-});
-
-texto+="\nSHORTS\n\n";
-
-pedidoAtual.itens.forEach(item=>{
-
-if(item.short){
-
-texto+=item.id+"\n";
-texto+="Número: "+item.numero+"\n";
-texto+="Tamanho: "+item.tamanhoShort+"\n";
-texto+="--------------------\n";
+return "VT"+numero;
 
 }
 
-});
-
-return texto;
-
-}
 
 function finalizarPedido(){
 
-if(pedidoAtual.itens.length===0){
-alert("Adicione itens antes de finalizar.");
+if(pedido.length===0){
+
+alert("Adicione pelo menos um jogador.");
+
 return;
-}
-
-salvarPedido();
-
-let texto=exportarHyper();
-
-navigator.clipboard.writeText(texto)
-.then(()=>{
-
-alert(
-"Pedido "+pedidoAtual.codigo+" salvo e copiado!"
-);
-
-})
-.catch(()=>{
-
-alert(
-"Pedido salvo. Não foi possível copiar automaticamente."
-);
-
-});
 
 }
 
+
+let codigo=gerarCodigoPedido();
+
+
+let dados={
+
+codigo:codigo,
+
+data:
+new Date()
+.toLocaleDateString("pt-BR"),
+
+itens:pedido
+
+};
+
+
+localStorage.setItem(
+codigo,
+JSON.stringify(dados)
+);
+
+
+alert(
+"Pedido "+codigo+" salvo com sucesso!"
+);
+
+}
+}
