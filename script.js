@@ -1,6 +1,4 @@
-// VÔLEI TERAPIA
-// SISTEMA DE PEDIDOS DE UNIFORME
-// SCRIPT V3 - PARTE 1/2
+console.log("SCRIPT VÔLEI TERAPIA CARREGOU");
 
 let pedido=[];
 let categoriaSelecionada="";
