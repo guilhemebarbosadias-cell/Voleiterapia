@@ -203,10 +203,6 @@ function mostrarOpcoesUniforme(){
     let html = "";
 
 
-    // ==================================================
-    // MASCULINO
-    // ==================================================
-
     if(categoriaSelecionada === "Masculino"){
 
         html = `
@@ -256,10 +252,6 @@ function mostrarOpcoesUniforme(){
 
     }
 
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
 
     if(categoriaSelecionada === "Feminino"){
 
@@ -343,10 +335,6 @@ function mostrarInferior(){
     let html = "";
 
 
-    // ==================================================
-    // MASCULINO
-    // ==================================================
-
     if(categoriaSelecionada === "Masculino"){
 
         html = `
@@ -382,10 +370,6 @@ function mostrarInferior(){
 
     }
 
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
 
     if(categoriaSelecionada === "Feminino"){
 
@@ -468,10 +452,6 @@ function gerarMapaNumeros(){
         let bloqueado = false;
 
 
-        // ==================================================
-        // BLOQUEIO SOMENTE PARA UNIFORME OFICIAL
-        // ==================================================
-
         if(uniformeSelecionado === "Oficial"){
 
             if(categoriaSelecionada === "Masculino"){
@@ -492,10 +472,6 @@ function gerarMapaNumeros(){
         }
 
 
-        // ==================================================
-        // VISUAL DO NÚMERO BLOQUEADO
-        // ==================================================
-
         if(bloqueado){
 
             botao.disabled = true;
@@ -506,10 +482,6 @@ function gerarMapaNumeros(){
 
         }
 
-
-        // ==================================================
-        // SELECIONAR NÚMERO
-        // ==================================================
 
         botao.onclick = function(){
 
@@ -564,30 +536,22 @@ function calcularValor(){
 
 
         if(tipo === "calcaoMasc"){
-
             total += valores.calcaoMasc;
-
         }
 
 
         if(tipo === "calcaoFem"){
-
             total += valores.calcaoFem;
-
         }
 
 
         if(tipo === "shortDoll"){
-
             total += valores.shortDoll;
-
         }
 
 
         if(tipo === "shortSuplex"){
-
             total += valores.shortSuplex;
-
         }
 
     }
@@ -604,142 +568,166 @@ function calcularValor(){
 
 function adicionarItemPedido(){
 
-    let campoNome =
-        document.getElementById("nomePersonalizado");
+    try{
+
+        let campoNome =
+            document.getElementById("nomePersonalizado");
 
 
-    let nome =
-        campoNome ?
-        campoNome.value.trim() :
-        "";
+        let nome =
+            campoNome
+                ? campoNome.value.trim()
+                : "";
 
 
-    if(uniformeSelecionado === ""){
+        if(uniformeSelecionado === ""){
 
-        alert("Selecione Oficial ou Adicional.");
+            alert("Selecione Oficial ou Adicional.");
 
-        return;
-
-    }
-
-
-    if(funcaoSelecionada === ""){
-
-        alert("Selecione Normal ou Líbero.");
-
-        return;
-
-    }
-
-
-    if(categoriaSelecionada === ""){
-
-        alert("Selecione Masculino ou Feminino.");
-
-        return;
-
-    }
-
-
-    if(numeroSelecionado === ""){
-
-        alert("Selecione o número.");
-
-        return;
-
-    }
-
-
-    if(nome === ""){
-
-        alert("Digite o nome.");
-
-        return;
-
-    }
-
-
-    let modelo =
-        document.getElementById("modeloCamisa");
-
-
-    let tamanhoCamisa =
-        document.getElementById("tamanhoCamisa");
-
-
-    if(!modelo || !tamanhoCamisa){
-
-        alert("Selecione a categoria novamente.");
-
-        return;
-
-    }
-
-
-    let item = {
-
-        id: pedido.length + 1,
-
-        nome: nome.toUpperCase(),
-
-        uniforme: uniformeSelecionado,
-
-        funcao: funcaoSelecionada,
-
-        categoria: categoriaSelecionada,
-
-        numero: numeroSelecionado,
-
-        modelo: modelo.value,
-
-        tamanhoCamisa: tamanhoCamisa.value,
-
-        inferior: "Nenhum",
-
-        tamanhoInferior: "N/A",
-
-        valor: calcularValor()
-
-    };
-
-
-    let usa =
-        document.getElementById("usaInferior");
-
-
-    if(usa && usa.value === "sim"){
-
-        let tipoInferior =
-            document.getElementById("tipoInferior");
-
-
-        let tamanhoInferior =
-            document.getElementById("tamanhoInferior");
-
-
-        if(tipoInferior && tamanhoInferior){
-
-            item.inferior =
-                tipoInferior.options[
-                    tipoInferior.selectedIndex
-                ].text;
-
-
-            item.tamanhoInferior =
-                tamanhoInferior.value;
+            return;
 
         }
 
+
+        if(funcaoSelecionada === ""){
+
+            alert("Selecione Normal ou Líbero.");
+
+            return;
+
+        }
+
+
+        if(categoriaSelecionada === ""){
+
+            alert("Selecione Masculino ou Feminino.");
+
+            return;
+
+        }
+
+
+        if(numeroSelecionado === ""){
+
+            alert("Selecione o número.");
+
+            return;
+
+        }
+
+
+        if(nome === ""){
+
+            alert("Digite o nome.");
+
+            return;
+
+        }
+
+
+        let modeloCamisa =
+            document.getElementById("modeloCamisa");
+
+
+        let tamanhoCamisa =
+            document.getElementById("tamanhoCamisa");
+
+
+        if(!modeloCamisa){
+
+            alert("Selecione a categoria novamente.");
+
+            return;
+
+        }
+
+
+        if(!tamanhoCamisa){
+
+            alert("Selecione o tamanho da camisa.");
+
+            return;
+
+        }
+
+
+        let item = {
+
+            id: pedido.length + 1,
+
+            nome: nome.toUpperCase(),
+
+            uniforme: uniformeSelecionado,
+
+            funcao: funcaoSelecionada,
+
+            categoria: categoriaSelecionada,
+
+            numero: numeroSelecionado,
+
+            modelo: modeloCamisa.value,
+
+            tamanhoCamisa: tamanhoCamisa.value,
+
+            inferior: "Nenhum",
+
+            tamanhoInferior: "N/A",
+
+            valor: calcularValor()
+
+        };
+
+
+        let usaInferior =
+            document.getElementById("usaInferior");
+
+
+        if(
+            usaInferior &&
+            usaInferior.value === "sim"
+        ){
+
+            let tipoInferior =
+                document.getElementById("tipoInferior");
+
+
+            let tamanhoInferior =
+                document.getElementById("tamanhoInferior");
+
+
+            if(tipoInferior && tamanhoInferior){
+
+                item.inferior =
+                    tipoInferior.options[
+                        tipoInferior.selectedIndex
+                    ].text;
+
+
+                item.tamanhoInferior =
+                    tamanhoInferior.value;
+
+            }
+
+        }
+
+
+        pedido.push(item);
+
+
+        mostrarPedido();
+
+
+        limparItem();
+
+
+    }catch(error){
+
+        alert(
+            "Erro ao adicionar o uniforme: " +
+            error.message
+        );
+
     }
-
-
-    pedido.push(item);
-
-
-    mostrarPedido();
-
-
-    limparItem();
 
 }
 
@@ -776,51 +764,41 @@ function mostrarPedido(){
                 Jogador ${index + 1}
             </strong>
 
-
             <p>
                 Nome: ${item.nome}
             </p>
-
 
             <p>
                 Número: ${item.numero}
             </p>
 
-
             <p>
                 Uniforme: ${item.uniforme}
             </p>
-
 
             <p>
                 Função: ${item.funcao}
             </p>
 
-
             <p>
                 Categoria: ${item.categoria}
             </p>
-
 
             <p>
                 Camisa: ${item.modelo}
             </p>
 
-
             <p>
                 Tamanho: ${item.tamanhoCamisa}
             </p>
-
 
             <p>
                 Peça inferior: ${item.inferior}
             </p>
 
-
             <p>
                 Tamanho inferior: ${item.tamanhoInferior}
             </p>
-
 
             <p>
                 Valor:
@@ -862,16 +840,12 @@ function mostrarResumo(total){
             VÔLEI TERAPIA
         </strong>
 
-
         <br><br>
-
 
         Quantidade de uniformes:
         ${pedido.length}
 
-
         <br><br>
-
 
         Valor total:
 
@@ -879,15 +853,11 @@ function mostrarResumo(total){
             R$ ${total.toFixed(2)}
         </strong>
 
-
         <br><br>
-
 
         Pagamento:
 
-
         <br>
-
 
         3 parcelas de:
 
@@ -1078,10 +1048,6 @@ async function finalizarPedido(){
         );
 
 
-        // ==================================================
-        // RESETAR PEDIDO PARA UM NOVO PEDIDO
-        // ==================================================
-
         pedido = [];
 
         categoriaSelecionada = "";
@@ -1144,10 +1110,6 @@ async function finalizarPedido(){
                 btn.classList.remove("ativo");
 
             });
-
-
-        numeroSelecionado = "";
-
 
     }catch(error){
 
