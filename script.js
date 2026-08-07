@@ -136,7 +136,7 @@ function mostrarOpcoesUniforme() {
                 <select id="modeloCamisa">
 
                     <option>
-                        Camisa masculina
+                        Camisa
                     </option>
 
                 </select>
@@ -189,7 +189,7 @@ function mostrarOpcoesUniforme() {
                     </option>
 
                     <option>
-                        Camisa tradicional feminina
+                        Camisa
                     </option>
 
                 </select>
