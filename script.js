@@ -5,7 +5,6 @@ let uniformeSelecionado = "";
 let funcaoSelecionada = "";
 let numeroSelecionado = "";
 
-let numerosBloqueadosMasculino = [];
 let numerosBloqueadosFeminino = [];
 
 
@@ -33,29 +32,27 @@ const valores = {
 
 
 // ======================================================
-// BUSCAR NÚMEROS OFICIAIS NA PLANILHA
+// BUSCAR NÚMEROS FEMININOS
 // ======================================================
 
 async function buscarNumerosOficiais(){
 
     try{
 
-        let resposta = await fetch(URL_APPS_SCRIPT);
+        const resposta =
+            await fetch(URL_APPS_SCRIPT);
 
-        let dados = await resposta.json();
+        const dados =
+            await resposta.json();
 
 
         if(dados.result === "success"){
-
-            numerosBloqueadosMasculino =
-                dados.masculino || [];
 
             numerosBloqueadosFeminino =
                 dados.feminino || [];
 
         }else{
 
-            numerosBloqueadosMasculino = [];
             numerosBloqueadosFeminino = [];
 
         }
@@ -64,11 +61,10 @@ async function buscarNumerosOficiais(){
     }catch(error){
 
         console.error(
-            "Erro ao buscar números oficiais:",
+            "Erro ao buscar números femininos:",
             error
         );
 
-        numerosBloqueadosMasculino = [];
         numerosBloqueadosFeminino = [];
 
     }
@@ -82,7 +78,9 @@ async function buscarNumerosOficiais(){
 
 async function abrirItem(){
 
-    document.getElementById("configuracao").style.display = "block";
+    document.getElementById(
+        "configuracao"
+    ).style.display = "block";
 
 
     await buscarNumerosOficiais();
@@ -103,7 +101,9 @@ function selecionarUniforme(tipo, botao){
 
 
     document
-        .querySelectorAll(".grupoUniforme .opcao")
+        .querySelectorAll(
+            ".grupoUniforme .opcao"
+        )
         .forEach(btn => {
 
             btn.classList.remove("ativo");
@@ -129,7 +129,9 @@ function selecionarFuncao(funcao, botao){
 
 
     document
-        .querySelectorAll(".grupoFuncao .opcao")
+        .querySelectorAll(
+            ".grupoFuncao .opcao"
+        )
         .forEach(btn => {
 
             btn.classList.remove("ativo");
@@ -152,7 +154,9 @@ function selecionarCategoria(categoria, botao){
 
 
     document
-        .querySelectorAll(".grupoCategoria .opcao")
+        .querySelectorAll(
+            ".grupoCategoria .opcao"
+        )
         .forEach(btn => {
 
             btn.classList.remove("ativo");
@@ -177,7 +181,8 @@ function selecionarCategoria(categoria, botao){
 
 function mostrarOpcoesUniforme(){
 
-    let area = document.getElementById("produtos");
+    let area =
+        document.getElementById("produtos");
 
 
     let tamanho = `
@@ -202,6 +207,10 @@ function mostrarOpcoesUniforme(){
 
     let html = "";
 
+
+    // ==================================================
+    // MASCULINO
+    // ==================================================
 
     if(categoriaSelecionada === "Masculino"){
 
@@ -229,6 +238,7 @@ function mostrarOpcoesUniforme(){
                 Adicionar calção?
             </label>
 
+
             <select
                 id="usaInferior"
                 onchange="mostrarInferior()">
@@ -252,6 +262,10 @@ function mostrarOpcoesUniforme(){
 
     }
 
+
+    // ==================================================
+    // FEMININO
+    // ==================================================
 
     if(categoriaSelecionada === "Feminino"){
 
@@ -282,6 +296,7 @@ function mostrarOpcoesUniforme(){
             <label>
                 Adicionar peça inferior?
             </label>
+
 
             <select
                 id="usaInferior"
@@ -318,9 +333,14 @@ function mostrarOpcoesUniforme(){
 
 function mostrarInferior(){
 
-    let area = document.getElementById("inferior");
+    let area =
+        document.getElementById("inferior");
 
-    let usa = document.getElementById("usaInferior").value;
+
+    let usa =
+        document.getElementById(
+            "usaInferior"
+        ).value;
 
 
     if(usa === "nao"){
@@ -334,6 +354,10 @@ function mostrarInferior(){
 
     let html = "";
 
+
+    // ==================================================
+    // MASCULINO
+    // ==================================================
 
     if(categoriaSelecionada === "Masculino"){
 
@@ -370,6 +394,10 @@ function mostrarInferior(){
 
     }
 
+
+    // ==================================================
+    // FEMININO
+    // ==================================================
 
     if(categoriaSelecionada === "Feminino"){
 
@@ -421,12 +449,16 @@ function mostrarInferior(){
 
 
 // ======================================================
-// MAPA DE NÚMEROS COM BLOQUEIO POR CATEGORIA
+// MAPA DE NÚMEROS
+// BLOQUEIO SOMENTE FEMININO + OFICIAL
 // ======================================================
 
 function gerarMapaNumeros(){
 
-    let mapa = document.getElementById("mapaNumero");
+    let mapa =
+        document.getElementById(
+            "mapaNumero"
+        );
 
 
     if(!mapa) return;
@@ -437,10 +469,12 @@ function gerarMapaNumeros(){
 
     for(let i = 0; i <= 99; i++){
 
-        let numero = i.toString().padStart(2,"0");
+        let numero =
+            i.toString().padStart(2,"0");
 
 
-        let botao = document.createElement("button");
+        let botao =
+            document.createElement("button");
 
 
         botao.type = "button";
@@ -452,36 +486,48 @@ function gerarMapaNumeros(){
         let bloqueado = false;
 
 
-        if(uniformeSelecionado === "Oficial"){
+        // ==================================================
+        // SOMENTE FEMININO OFICIAL
+        // ==================================================
 
-            if(categoriaSelecionada === "Masculino"){
+        if(
+            uniformeSelecionado === "Oficial" &&
+            categoriaSelecionada === "Feminino"
+        ){
 
-                bloqueado =
-                    numerosBloqueadosMasculino.includes(numero);
-
-            }
-
-
-            if(categoriaSelecionada === "Feminino"){
-
-                bloqueado =
-                    numerosBloqueadosFeminino.includes(numero);
-
-            }
+            bloqueado =
+                numerosBloqueadosFeminino
+                    .includes(numero);
 
         }
 
+
+        // ==================================================
+        // VISUAL BLOQUEADO
+        // ==================================================
 
         if(bloqueado){
 
             botao.disabled = true;
 
-            botao.classList.add("bloqueado");
+            botao.classList.add(
+                "bloqueado"
+            );
 
             botao.style.opacity = "0.35";
 
+            botao.style.filter =
+                "grayscale(100%)";
+
+            botao.style.cursor =
+                "not-allowed";
+
         }
 
+
+        // ==================================================
+        // SELECIONAR NÚMERO
+        // ==================================================
 
         botao.onclick = function(){
 
@@ -493,10 +539,14 @@ function gerarMapaNumeros(){
 
 
             document
-                .querySelectorAll("#mapaNumero button")
+                .querySelectorAll(
+                    "#mapaNumero button"
+                )
                 .forEach(btn => {
 
-                    btn.classList.remove("ativo");
+                    btn.classList.remove(
+                        "ativo"
+                    );
 
                 });
 
@@ -522,17 +572,25 @@ function gerarMapaNumeros(){
 
 function calcularValor(){
 
-    let total = valores.camisa;
+    let total =
+        valores.camisa;
 
 
     let usa =
-        document.getElementById("usaInferior");
+        document.getElementById(
+            "usaInferior"
+        );
 
 
-    if(usa && usa.value === "sim"){
+    if(
+        usa &&
+        usa.value === "sim"
+    ){
 
         let tipo =
-            document.getElementById("tipoInferior").value;
+            document.getElementById(
+                "tipoInferior"
+            ).value;
 
 
         if(tipo === "calcaoMasc"){
@@ -568,166 +626,189 @@ function calcularValor(){
 
 function adicionarItemPedido(){
 
-    try{
-
-        let campoNome =
-            document.getElementById("nomePersonalizado");
-
-
-        let nome =
-            campoNome
-                ? campoNome.value.trim()
-                : "";
+    let campoNome =
+        document.getElementById(
+            "nomePersonalizado"
+        );
 
 
-        if(uniformeSelecionado === ""){
-
-            alert("Selecione Oficial ou Adicional.");
-
-            return;
-
-        }
+    let nome =
+        campoNome ?
+        campoNome.value.trim() :
+        "";
 
 
-        if(funcaoSelecionada === ""){
+    if(uniformeSelecionado === ""){
 
-            alert("Selecione Normal ou Líbero.");
+        alert(
+            "Selecione Oficial ou Adicional."
+        );
 
-            return;
+        return;
 
-        }
-
-
-        if(categoriaSelecionada === ""){
-
-            alert("Selecione Masculino ou Feminino.");
-
-            return;
-
-        }
+    }
 
 
-        if(numeroSelecionado === ""){
+    if(funcaoSelecionada === ""){
 
-            alert("Selecione o número.");
+        alert(
+            "Selecione Normal ou Líbero."
+        );
 
-            return;
+        return;
 
-        }
-
-
-        if(nome === ""){
-
-            alert("Digite o nome.");
-
-            return;
-
-        }
+    }
 
 
-        let modeloCamisa =
-            document.getElementById("modeloCamisa");
+    if(categoriaSelecionada === ""){
+
+        alert(
+            "Selecione Masculino ou Feminino."
+        );
+
+        return;
+
+    }
 
 
-        let tamanhoCamisa =
-            document.getElementById("tamanhoCamisa");
+    if(numeroSelecionado === ""){
+
+        alert(
+            "Selecione o número."
+        );
+
+        return;
+
+    }
 
 
-        if(!modeloCamisa){
+    if(nome === ""){
 
-            alert("Selecione a categoria novamente.");
+        alert(
+            "Digite o nome."
+        );
 
-            return;
+        return;
 
-        }
-
-
-        if(!tamanhoCamisa){
-
-            alert("Selecione o tamanho da camisa.");
-
-            return;
-
-        }
+    }
 
 
-        let item = {
-
-            id: pedido.length + 1,
-
-            nome: nome.toUpperCase(),
-
-            uniforme: uniformeSelecionado,
-
-            funcao: funcaoSelecionada,
-
-            categoria: categoriaSelecionada,
-
-            numero: numeroSelecionado,
-
-            modelo: modeloCamisa.value,
-
-            tamanhoCamisa: tamanhoCamisa.value,
-
-            inferior: "Nenhum",
-
-            tamanhoInferior: "N/A",
-
-            valor: calcularValor()
-
-        };
+    let modelo =
+        document.getElementById(
+            "modeloCamisa"
+        );
 
 
-        let usaInferior =
-            document.getElementById("usaInferior");
+    let tamanhoCamisa =
+        document.getElementById(
+            "tamanhoCamisa"
+        );
+
+
+    if(
+        !modelo ||
+        !tamanhoCamisa
+    ){
+
+        alert(
+            "Selecione a categoria novamente."
+        );
+
+        return;
+
+    }
+
+
+    let item = {
+
+        id:
+            pedido.length + 1,
+
+        nome:
+            nome.toUpperCase(),
+
+        uniforme:
+            uniformeSelecionado,
+
+        funcao:
+            funcaoSelecionada,
+
+        categoria:
+            categoriaSelecionada,
+
+        numero:
+            numeroSelecionado,
+
+        modelo:
+            modelo.value,
+
+        tamanhoCamisa:
+            tamanhoCamisa.value,
+
+        inferior:
+            "Nenhum",
+
+        tamanhoInferior:
+            "N/A",
+
+        valor:
+            calcularValor()
+
+    };
+
+
+    let usa =
+        document.getElementById(
+            "usaInferior"
+        );
+
+
+    if(
+        usa &&
+        usa.value === "sim"
+    ){
+
+        let tipoInferior =
+            document.getElementById(
+                "tipoInferior"
+            );
+
+
+        let tamanhoInferior =
+            document.getElementById(
+                "tamanhoInferior"
+            );
 
 
         if(
-            usaInferior &&
-            usaInferior.value === "sim"
+            tipoInferior &&
+            tamanhoInferior
         ){
 
-            let tipoInferior =
-                document.getElementById("tipoInferior");
+            item.inferior =
+                tipoInferior
+                    .options[
+                        tipoInferior
+                            .selectedIndex
+                    ]
+                    .text;
 
 
-            let tamanhoInferior =
-                document.getElementById("tamanhoInferior");
-
-
-            if(tipoInferior && tamanhoInferior){
-
-                item.inferior =
-                    tipoInferior.options[
-                        tipoInferior.selectedIndex
-                    ].text;
-
-
-                item.tamanhoInferior =
-                    tamanhoInferior.value;
-
-            }
+            item.tamanhoInferior =
+                tamanhoInferior.value;
 
         }
 
-
-        pedido.push(item);
-
-
-        mostrarPedido();
-
-
-        limparItem();
-
-
-    }catch(error){
-
-        alert(
-            "Erro ao adicionar o uniforme: " +
-            error.message
-        );
-
     }
+
+
+    pedido.push(item);
+
+
+    mostrarPedido();
+
+
+    limparItem();
 
 }
 
@@ -739,7 +820,9 @@ function adicionarItemPedido(){
 function mostrarPedido(){
 
     let lista =
-        document.getElementById("listaItens");
+        document.getElementById(
+            "listaItens"
+        );
 
 
     if(!lista) return;
@@ -751,65 +834,70 @@ function mostrarPedido(){
     let total = 0;
 
 
-    pedido.forEach((item,index)=>{
+    pedido.forEach(
+        function(item,index){
 
-        total += item.valor;
+            total += item.valor;
 
 
-        lista.innerHTML += `
+            lista.innerHTML += `
 
-        <div class="card">
+            <div class="card">
 
-            <strong>
-                Jogador ${index + 1}
-            </strong>
+                <strong>
+                    Jogador ${index + 1}
+                </strong>
 
-            <p>
-                Nome: ${item.nome}
-            </p>
+                <p>
+                    Nome: ${item.nome}
+                </p>
 
-            <p>
-                Número: ${item.numero}
-            </p>
+                <p>
+                    Número: ${item.numero}
+                </p>
 
-            <p>
-                Uniforme: ${item.uniforme}
-            </p>
+                <p>
+                    Uniforme: ${item.uniforme}
+                </p>
 
-            <p>
-                Função: ${item.funcao}
-            </p>
+                <p>
+                    Função: ${item.funcao}
+                </p>
 
-            <p>
-                Categoria: ${item.categoria}
-            </p>
+                <p>
+                    Categoria: ${item.categoria}
+                </p>
 
-            <p>
-                Camisa: ${item.modelo}
-            </p>
+                <p>
+                    Camisa: ${item.modelo}
+                </p>
 
-            <p>
-                Tamanho: ${item.tamanhoCamisa}
-            </p>
+                <p>
+                    Tamanho:
+                    ${item.tamanhoCamisa}
+                </p>
 
-            <p>
-                Peça inferior: ${item.inferior}
-            </p>
+                <p>
+                    Peça inferior:
+                    ${item.inferior}
+                </p>
 
-            <p>
-                Tamanho inferior: ${item.tamanhoInferior}
-            </p>
+                <p>
+                    Tamanho inferior:
+                    ${item.tamanhoInferior}
+                </p>
 
-            <p>
-                Valor:
-                R$ ${item.valor.toFixed(2)}
-            </p>
+                <p>
+                    Valor:
+                    R$ ${item.valor.toFixed(2)}
+                </p>
 
-        </div>
+            </div>
 
-        `;
+            `;
 
-    });
+        }
+    );
 
 
     mostrarResumo(total);
@@ -824,7 +912,9 @@ function mostrarPedido(){
 function mostrarResumo(total){
 
     let resumo =
-        document.getElementById("resumo");
+        document.getElementById(
+            "resumo"
+        );
 
 
     if(!resumo) return;
@@ -871,13 +961,15 @@ function mostrarResumo(total){
 
 
 // ======================================================
-// LIMPAR CAMPOS DO ITEM
+// LIMPAR ITEM
 // ======================================================
 
 function limparItem(){
 
     let campoNome =
-        document.getElementById("nomePersonalizado");
+        document.getElementById(
+            "nomePersonalizado"
+        );
 
 
     if(campoNome){
@@ -891,10 +983,14 @@ function limparItem(){
 
 
     document
-        .querySelectorAll("#mapaNumero button")
+        .querySelectorAll(
+            "#mapaNumero button"
+        )
         .forEach(btn => {
 
-            btn.classList.remove("ativo");
+            btn.classList.remove(
+                "ativo"
+            );
 
         });
 
@@ -908,7 +1004,9 @@ function limparItem(){
 function gerarCodigoPedido(){
 
     let numero =
-        localStorage.getItem("codigoVT") || 0;
+        localStorage.getItem(
+            "codigoVT"
+        ) || 0;
 
 
     numero++;
@@ -933,7 +1031,9 @@ async function finalizarPedido(){
 
     if(pedido.length === 0){
 
-        alert("Adicione pelo menos um uniforme.");
+        alert(
+            "Adicione pelo menos um uniforme."
+        );
 
         return;
 
@@ -945,18 +1045,23 @@ async function finalizarPedido(){
 
 
     let dataAtual =
-        new Date().toLocaleDateString("pt-BR");
+        new Date().toLocaleDateString(
+            "pt-BR"
+        );
 
 
     let valorTotalGeral =
         pedido.reduce(
-            (acc,item) => acc + item.valor,
+            (acc,item) =>
+                acc + item.valor,
             0
         );
 
 
     let campoResponsavel =
-        document.getElementById("responsavel");
+        document.getElementById(
+            "responsavel"
+        );
 
 
     let nomeResponsavel =
@@ -967,50 +1072,66 @@ async function finalizarPedido(){
 
     if(nomeResponsavel === ""){
 
-        nomeResponsavel = "Não informado";
+        nomeResponsavel =
+            "Não informado";
 
     }
 
 
     let dadosEnvio = {
 
-        idPedido: codigo,
+        idPedido:
+            codigo,
 
-        data: dataAtual,
+        data:
+            dataAtual,
 
-        responsavel: nomeResponsavel,
+        responsavel:
+            nomeResponsavel,
 
-        quantidade: pedido.length,
+        quantidade:
+            pedido.length,
 
-        valorTotal: valorTotalGeral,
+        valorTotal:
+            valorTotalGeral,
 
         parcelas:
             "3x de R$ " +
-            (valorTotalGeral / 3).toFixed(2),
+            (
+                valorTotalGeral / 3
+            ).toFixed(2),
 
-        pago: "Não",
+        pago:
+            "Não",
 
-        itens: pedido
+        itens:
+            pedido
 
     };
 
 
     let dadosLocal = {
 
-        codigo: codigo,
+        codigo:
+            codigo,
 
-        responsavel: nomeResponsavel,
+        responsavel:
+            nomeResponsavel,
 
-        data: dataAtual,
+        data:
+            dataAtual,
 
-        itens: pedido
+        itens:
+            pedido
 
     };
 
 
     localStorage.setItem(
         codigo,
-        JSON.stringify(dadosLocal)
+        JSON.stringify(
+            dadosLocal
+        )
     );
 
 
@@ -1022,9 +1143,11 @@ async function finalizarPedido(){
 
             {
 
-                method: "POST",
+                method:
+                    "POST",
 
-                mode: "no-cors",
+                mode:
+                    "no-cors",
 
                 headers: {
 
@@ -1034,7 +1157,9 @@ async function finalizarPedido(){
                 },
 
                 body:
-                    JSON.stringify(dadosEnvio)
+                    JSON.stringify(
+                        dadosEnvio
+                    )
 
             }
 
@@ -1048,6 +1173,10 @@ async function finalizarPedido(){
         );
 
 
+        // ==================================================
+        // RESETAR PEDIDO
+        // ==================================================
+
         pedido = [];
 
         categoriaSelecionada = "";
@@ -1060,45 +1189,51 @@ async function finalizarPedido(){
 
 
         let lista =
-            document.getElementById("listaItens");
+            document.getElementById(
+                "listaItens"
+            );
 
 
         if(lista){
 
-            lista.innerHTML = "";
+            lista.innerHTML =
+                "Nenhum item adicionado.";
 
         }
 
 
         let resumo =
-            document.getElementById("resumo");
+            document.getElementById(
+                "resumo"
+            );
 
 
         if(resumo){
 
-            resumo.innerHTML = "";
+            resumo.innerHTML =
+                "Nenhum pedido.";
 
         }
 
 
         let configuracao =
-            document.getElementById("configuracao");
+            document.getElementById(
+                "configuracao"
+            );
 
 
         if(configuracao){
 
-            configuracao.style.display = "none";
+            configuracao.style.display =
+                "none";
 
         }
 
 
-        let campoResponsavel =
-            document.getElementById("responsavel");
-
-
         if(campoResponsavel){
 
-            campoResponsavel.value = "";
+            campoResponsavel.value =
+                "";
 
         }
 
@@ -1107,9 +1242,15 @@ async function finalizarPedido(){
             .querySelectorAll(".opcao")
             .forEach(btn => {
 
-                btn.classList.remove("ativo");
+                btn.classList.remove(
+                    "ativo"
+                );
 
             });
+
+
+        numeroSelecionado = "";
+
 
     }catch(error){
 
