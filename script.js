@@ -227,8 +227,44 @@ function adicionarItemPedido() {
     };
 
     pedido.push(item);
-    alert("Item adicionado com sucesso!");
+    
+    // Atualiza a interface do pedido e resumo
+    mostrarPedido();
+    
+    let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
+    if (typeof mostrarResumo === "function") {
+        mostrarResumo(valorTotalGeral);
+    }
+
     limparItem();
+}
+
+function mostrarPedido() {
+    let listaArea = document.getElementById("listaPedido");
+    if (!listaArea) return;
+
+    let html = "";
+    pedido.forEach((item, index) => {
+        html += `
+        <div class="item-pedido-card">
+            <p><strong>#${item.numero}</strong> - ${item.nome}</p>
+            <p>Uniforme: ${item.uniforme} (${item.corUniforme}) - ${item.categoria}</p>
+            <p>Camisa: ${item.modelo} (Tam: ${item.tamanhoCamisa}) | Inferior: ${item.inferior} (Tam: ${item.tamanhoInferior})</p>
+            <p><strong>R$ ${item.valor.toFixed(2)}</strong></p>
+            <button type="button" onclick="removerItem(${index})">Remover</button>
+        </div>`;
+    });
+
+    listaArea.innerHTML = html;
+}
+
+function removerItem(index) {
+    pedido.splice(index, 1);
+    mostrarPedido();
+    let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
+    if (typeof mostrarResumo === "function") {
+        mostrarResumo(valorTotalGeral);
+    }
 }
 
 function limparItem() {
@@ -308,3 +344,4 @@ function finalizarPedido() {
         alert("Pedido salvo localmente.");
     });
 }
+
