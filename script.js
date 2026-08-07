@@ -6,7 +6,7 @@ let funcaoSelecionada = "";
 let numeroSelecionado = "";
 
 
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
+const URL_APPS_SCRIPT = "https://script.google.com/macros/library/d/1uSf2z3nxidqRk9EccX32maaNp8UYkENU3o62_B89fT0_ubnfsYX1_UtI/6";
 
 
 const valores = {
