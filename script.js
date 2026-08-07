@@ -368,14 +368,16 @@ function gerarMapaNumeros() {
         if (bloqueado) {
 
 
-            botao.disabled = true;
+    botao.disabled = true;
 
 
-            botao.classList.add("bloqueado");
+    botao.classList.add("bloqueado");
+
+
+    botao.style.opacity = "0.35";
 
 
         }
-
 
 
         botao.onclick = function () {
