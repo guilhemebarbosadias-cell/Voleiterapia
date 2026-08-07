@@ -1,347 +1,844 @@
-let pedido = [];
-let categoriaSelecionada = "";
-let uniformeSelecionado = "";
-let corUniformeSelecionada = "";
-let numeroSelecionado = "";
+let pedido=[];
+let categoriaSelecionada="";
+let uniformeSelecionado="";
+let corUniformeSelecionada="";
+let numeroSelecionado="";
 
-const URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
+const URL_APPS_SCRIPT="https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
-const valores = {
-    camisa: 75,
-    calcaoMasc: 35,
-    calcaoFem: 35,
-    shortDoll: 30,
-    shortSuplex: 35
+const valores={
+camisa:75,
+calcaoMasc:35,
+calcaoFem:35,
+shortDoll:30,
+shortSuplex:35
 };
 
-function abrirItem() {
-    document.getElementById("configuracao").style.display = "block";
-    gerarMapaNumeros();
+function abrirItem(){
+document.getElementById("configuracao").style.display="block";
+gerarMapaNumeros();
 }
 
-function selecionarUniforme(tipo, botao) {
-    uniformeSelecionado = tipo;
-    document.querySelectorAll(".opcao").forEach(btn => btn.classList.remove("ativo"));
-    botao.classList.add("ativo");
+function selecionarUniforme(tipo,botao){
+uniformeSelecionado=tipo;
+
+document.querySelectorAll(".tipoUniforme .opcao")
+.forEach(btn=>{
+btn.classList.remove("ativo");
+});
+
+botao.classList.add("ativo");
 }
 
-function selecionarCor(cor, botao) {
-    corUniformeSelecionada = cor;
-    document.querySelectorAll(".opcao").forEach(btn => btn.classList.remove("ativo"));
-    botao.classList.add("ativo");
+function selecionarCor(cor,botao){
+corUniformeSelecionada=cor;
+
+document.querySelectorAll(".corUniforme .opcao")
+.forEach(btn=>{
+btn.classList.remove("ativo");
+});
+
+botao.classList.add("ativo");
 }
 
-function selecionarCategoria(categoria, botao) {
-    categoriaSelecionada = categoria;
-    document.querySelectorAll(".opcao").forEach(btn => btn.classList.remove("ativo"));
-    botao.classList.add("ativo");
-    mostrarOpcoesUniforme();
+function selecionarCategoria(categoria,botao){
+categoriaSelecionada=categoria;
+
+document.querySelectorAll(".categoria .opcao")
+.forEach(btn=>{
+btn.classList.remove("ativo");
+});
+
+botao.classList.add("ativo");
+
+mostrarOpcoesUniforme();
 }
 
-function mostrarOpcoesUniforme() {
-    let area = document.getElementById("produtos");
-    let tamanho = `
-    <label>Tamanho da camisa</label>
-    <select id="tamanhoCamisa">
-        <option>PP</option>
-        <option>P</option>
-        <option>M</option>
-        <option>G</option>
-        <option>GG</option>
-        <option>XGG</option>
-    </select>`;
+function mostrarOpcoesUniforme(){
 
-    let html = "";
+let area=document.getElementById("produtos");
 
-    if (categoriaSelecionada === "Masculino") {
-        html = `
-        <div class="card">
-            <label>Modelo da camisa</label>
-            <select id="modeloCamisa">
-                <option>Camisa masculina</option>
-            </select>
-            ${tamanho}
-            <label>Adicionar calção?</label>
-            <select id="usaInferior" onchange="mostrarInferior()">
-                <option value="nao">Não</option>
-                <option value="sim">Sim</option>
-            </select>
-            <div id="inferior"></div>
-        </div>`;
-    }
+let tamanho=`
+<label>Tamanho da camisa</label>
 
-    if (categoriaSelecionada === "Feminino") {
-        html = `
-        <div class="card">
-            <label>Modelo da camisa</label>
-            <select id="modeloCamisa">
-                <option>Baby Look</option>
-                <option>Camisa tradicional feminina</option>
-            </select>
-            ${tamanho}
-            <label>Adicionar peça inferior?</label>
-            <select id="usaInferior" onchange="mostrarInferior()">
-                <option value="nao">Não</option>
-                <option value="sim">Sim</option>
-            </select>
-            <div id="inferior"></div>
-        </div>`;
-    }
+<select id="tamanhoCamisa">
 
-    area.innerHTML = html;
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+<option>XGG</option>
+
+</select>
+`;
+
+let html="";
+
+if(categoriaSelecionada==="Masculino"){
+
+html=`
+
+<div class="card">
+
+<label>Modelo da camisa</label>
+
+<select id="modeloCamisa">
+
+<option>Camisa masculina</option>
+
+</select>
+
+${tamanho}
+
+
+<label>Adicionar calção?</label>
+
+<select id="usaInferior" onchange="mostrarInferior()">
+
+<option value="nao">Não</option>
+<option value="sim">Sim</option>
+
+</select>
+
+
+<div id="inferior"></div>
+
+</div>
+
+`;
+
 }
 
-function mostrarInferior() {
-    let area = document.getElementById("inferior");
-    let usa = document.getElementById("usaInferior").value;
 
-    if (usa === "nao") {
-        area.innerHTML = "";
-        return;
-    }
+if(categoriaSelecionada==="Feminino"){
 
-    let html = "";
+html=`
 
-    if (categoriaSelecionada === "Masculino") {
-        html = `
-        <label>Tipo de calção</label>
-        <select id="tipoInferior">
-            <option value="calcaoMasc">Calção masculino</option>
-        </select>
-        <label>Tamanho do calção</label>
-        <select id="tamanhoInferior">
-            <option>PP</option>
-            <option>P</option>
-            <option>M</option>
-            <option>G</option>
-            <option>GG</option>
-        </select>`;
-    }
+<div class="card">
 
-    if (categoriaSelecionada === "Feminino") {
-        html = `
-        <label>Tipo de peça</label>
-        <select id="tipoInferior">
-            <option value="calcaoFem">Calção feminino</option>
-            <option value="shortDoll">Short Doll</option>
-            <option value="shortSuplex">Short Suplex</option>
-        </select>
-        <label>Tamanho</label>
-        <select id="tamanhoInferior">
-            <option>PP</option>
-            <option>P</option>
-            <option>M</option>
-            <option>G</option>
-            <option>GG</option>
-        </select>`;
-    }
+<label>Modelo da camisa</label>
 
-    area.innerHTML = html;
+<select id="modeloCamisa">
+
+<option>Baby Look</option>
+<option>Camisa tradicional feminina</option>
+
+</select>
+
+${tamanho}
+
+
+<label>Adicionar peça inferior?</label>
+
+<select id="usaInferior" onchange="mostrarInferior()">
+
+<option value="nao">Não</option>
+<option value="sim">Sim</option>
+
+</select>
+
+
+<div id="inferior"></div>
+
+</div>
+
+`;
+
 }
 
-function gerarMapaNumeros() {
-    let mapa = document.getElementById("mapaNumero");
-    if (!mapa) return;
-    mapa.innerHTML = "";
 
-    for (let i = 0; i <= 99; i++) {
-        let numero = i.toString().padStart(2, "0");
-        let botao = document.createElement("button");
-        botao.type = "button";
-        botao.innerText = numero;
+area.innerHTML=html;
 
-        botao.onclick = function () {
-            if (botao.classList.contains("bloqueado")) {
-                return;
-            }
-            document.querySelectorAll("#mapaNumero button").forEach(btn => btn.classList.remove("ativo"));
-            botao.classList.add("ativo");
-            numeroSelecionado = numero;
-        };
-
-        mapa.appendChild(botao);
-    }
 }
 
-function calcularValor() {
-    let total = valores.camisa;
-    let usa = document.getElementById("usaInferior");
 
-    if (usa && usa.value === "sim") {
-        let tipo = document.getElementById("tipoInferior").value;
-        if (tipo === "calcaoMasc") total += valores.calcaoMasc;
-        if (tipo === "calcaoFem") total += valores.calcaoFem;
-        if (tipo === "shortDoll") total += valores.shortDoll;
-        if (tipo === "shortSuplex") total += valores.shortSuplex;
-    }
+function mostrarInferior(){
 
-    return total;
+let area=document.getElementById("inferior");
+
+let usa=document.getElementById("usaInferior").value;
+
+
+if(usa==="nao"){
+
+area.innerHTML="";
+
+return;
+
 }
 
-function adicionarItemPedido() {
-    let nome = document.getElementById("nomePersonalizado").value.trim();
 
-    if (uniformeSelecionado === "") {
-        alert("Selecione o tipo de uniforme.");
-        return;
-    }
+let html="";
 
-    if (corUniformeSelecionada === "") {
-        alert("Selecione a cor do uniforme.");
-        return;
-    }
 
-    if (categoriaSelecionada === "") {
-        alert("Selecione masculino ou feminino.");
-        return;
-    }
+if(categoriaSelecionada==="Masculino"){
 
-    if (numeroSelecionado === "") {
-        alert("Selecione o número.");
-        return;
-    }
+html=`
 
-    if (nome === "") {
-        alert("Digite o nome para personalização.");
-        return;
-    }
+<label>Tipo de calção</label>
 
-    let modeloCamisaEl = document.getElementById("modeloCamisa");
-    let tamanhoCamisaEl = document.getElementById("tamanhoCamisa");
-    let usaInferiorEl = document.getElementById("usaInferior");
-    let tipoInferiorEl = document.getElementById("tipoInferior");
-    let tamanhoInferiorEl = document.getElementById("tamanhoInferior");
+<select id="tipoInferior">
 
-    let item = {
-        id: pedido.length + 1,
-        nome: nome.toUpperCase(),
-        uniforme: uniformeSelecionado,
-        corUniforme: corUniformeSelecionada,
-        categoria: categoriaSelecionada,
-        numero: numeroSelecionado,
-        modelo: modeloCamisaEl ? modeloCamisaEl.value : "",
-        tamanhoCamisa: tamanhoCamisaEl ? tamanhoCamisaEl.value : "",
-        inferior: (usaInferiorEl && usaInferiorEl.value === "sim" && tipoInferiorEl) ? tipoInferiorEl.value : "Nenhum",
-        tamanhoInferior: (usaInferiorEl && usaInferiorEl.value === "sim" && tamanhoInferiorEl) ? tamanhoInferiorEl.value : "N/A",
-        valor: calcularValor()
-    };
+<option value="calcaoMasc">
+Calção masculino
+</option>
 
-    pedido.push(item);
-    
-    // Atualiza a interface do pedido e resumo
-    mostrarPedido();
-    
-    let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
-    if (typeof mostrarResumo === "function") {
-        mostrarResumo(valorTotalGeral);
-    }
+</select>
 
-    limparItem();
+
+<label>Tamanho do calção</label>
+
+<select id="tamanhoInferior">
+
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+
+</select>
+
+`;
+
 }
 
-function mostrarPedido() {
-    let listaArea = document.getElementById("listaPedido");
-    if (!listaArea) return;
 
-    let html = "";
-    pedido.forEach((item, index) => {
-        html += `
-        <div class="item-pedido-card">
-            <p><strong>#${item.numero}</strong> - ${item.nome}</p>
-            <p>Uniforme: ${item.uniforme} (${item.corUniforme}) - ${item.categoria}</p>
-            <p>Camisa: ${item.modelo} (Tam: ${item.tamanhoCamisa}) | Inferior: ${item.inferior} (Tam: ${item.tamanhoInferior})</p>
-            <p><strong>R$ ${item.valor.toFixed(2)}</strong></p>
-            <button type="button" onclick="removerItem(${index})">Remover</button>
-        </div>`;
-    });
+if(categoriaSelecionada==="Feminino"){
 
-    listaArea.innerHTML = html;
+html=`
+
+<label>Tipo de peça</label>
+
+<select id="tipoInferior">
+
+<option value="calcaoFem">
+Calção feminino
+</option>
+
+<option value="shortDoll">
+Short Doll
+</option>
+
+<option value="shortSuplex">
+Short Suplex
+</option>
+
+</select>
+
+
+<label>Tamanho</label>
+
+<select id="tamanhoInferior">
+
+<option>PP</option>
+<option>P</option>
+<option>M</option>
+<option>G</option>
+<option>GG</option>
+
+</select>
+
+`;
+
 }
 
-function removerItem(index) {
-    pedido.splice(index, 1);
-    mostrarPedido();
-    let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
-    if (typeof mostrarResumo === "function") {
-        mostrarResumo(valorTotalGeral);
-    }
+
+area.innerHTML=html;
+
+}
+function gerarMapaNumeros(){
+
+let mapa=document.getElementById("mapaNumero");
+
+if(!mapa){
+return;
 }
 
-function limparItem() {
-    document.getElementById("nomePersonalizado").value = "";
-    numeroSelecionado = "";
-    document.querySelectorAll("#mapaNumero button").forEach(btn => {
-        btn.classList.remove("ativo");
-    });
+mapa.innerHTML="";
+
+
+for(let i=0;i<=99;i++){
+
+let numero=i.toString().padStart(2,"0");
+
+let botao=document.createElement("button");
+
+botao.type="button";
+
+botao.innerText=numero;
+
+
+botao.onclick=function(){
+
+if(botao.classList.contains("bloqueado")){
+return;
 }
 
-function gerarCodigoPedido() {
-    let numero = localStorage.getItem("codigoVT") || 0;
-    numero++;
-    localStorage.setItem("codigoVT", numero);
-    return "VT" + numero;
+
+document.querySelectorAll("#mapaNumero button")
+.forEach(btn=>{
+btn.classList.remove("ativo");
+});
+
+
+botao.classList.add("ativo");
+
+numeroSelecionado=numero;
+
+};
+
+
+mapa.appendChild(botao);
+
 }
 
-function finalizarPedido() {
-    if (pedido.length === 0) {
-        alert("Adicione pelo menos um jogador.");
-        return;
-    }
-
-    let codigo = gerarCodigoPedido();
-    let dataAtual = new Date().toLocaleDateString("pt-BR");
-    let valorTotalGeral = pedido.reduce((acc, curr) => acc + curr.valor, 0);
-
-    let campoResponsavel = document.getElementById("responsavel");
-    let nomeResponsavelFinal = campoResponsavel ? campoResponsavel.value.trim() : "Não informado";
-
-    let itensFormatados = pedido.map(item => ({
-        nome: item.nome,
-        numero: item.numero,
-        uniforme: item.uniforme,
-        corUniforme: item.corUniforme,
-        categoria: item.categoria,
-        modeloCamisa: item.modelo,
-        tamanho: item.tamanhoCamisa,
-        pecaInferior: item.inferior,
-        tamanhoInferior: item.tamanhoInferior,
-        valor: item.valor,
-        produto: "Camisa / " + item.inferior
-    }));
-
-    let dadosEnvio = {
-        idPedido: codigo,
-        data: dataAtual,
-        responsavel: nomeResponsavelFinal,
-        quantidade: pedido.length,
-        valorTotal: valorTotalGeral,
-        parcelas: "3x de R$ " + (valorTotalGeral / 3).toFixed(2),
-        pago: "Não",
-        itens: itensFormatados
-    };
-
-    let dadosLocal = {
-        codigo: codigo,
-        data: dataAtual,
-        itens: pedido
-    };
-
-    localStorage.setItem(codigo, JSON.stringify(dadosLocal));
-
-    fetch(URL_APPS_SCRIPT, {
-        method: "POST",
-        mode: "no-cors",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(dadosEnvio)
-    })
-    .then(() => {
-        alert("Pedido " + codigo + " finalizado e enviado com sucesso!");
-    })
-    .catch(error => {
-        console.error("Erro ao enviar:", error);
-        alert("Pedido salvo localmente.");
-    });
 }
 
+
+
+function calcularValor(){
+
+let total=valores.camisa;
+
+
+let usa=document.getElementById("usaInferior");
+
+
+if(usa && usa.value==="sim"){
+
+
+let tipo=document.getElementById("tipoInferior").value;
+
+
+if(tipo==="calcaoMasc"){
+total+=valores.calcaoMasc;
+}
+
+
+if(tipo==="calcaoFem"){
+total+=valores.calcaoFem;
+}
+
+
+if(tipo==="shortDoll"){
+total+=valores.shortDoll;
+}
+
+
+if(tipo==="shortSuplex"){
+total+=valores.shortSuplex;
+}
+
+
+}
+
+
+return total;
+
+}
+
+
+
+function adicionarItemPedido(){
+
+let nome=document
+.getElementById("nomePersonalizado")
+.value
+.trim();
+
+
+if(uniformeSelecionado===""){
+
+alert("Selecione o tipo de uniforme.");
+
+return;
+
+}
+
+
+if(corUniformeSelecionada===""){
+
+alert("Selecione a cor do uniforme.");
+
+return;
+
+}
+
+
+if(categoriaSelecionada===""){
+
+alert("Selecione masculino ou feminino.");
+
+return;
+
+}
+
+
+if(numeroSelecionado===""){
+
+alert("Selecione o número.");
+
+return;
+
+}
+
+
+if(nome===""){
+
+alert("Digite o nome para personalização.");
+
+return;
+
+}
+
+
+
+let item={
+
+
+id:pedido.length+1,
+
+
+nome:nome.toUpperCase(),
+
+
+uniforme:uniformeSelecionado,
+
+
+corUniforme:corUniformeSelecionada,
+
+
+categoria:categoriaSelecionada,
+
+
+numero:numeroSelecionado,
+
+
+modelo:
+document.getElementById("modeloCamisa")
+?
+document.getElementById("modeloCamisa").value
+:
+"",
+
+
+tamanhoCamisa:
+document.getElementById("tamanhoCamisa")
+?
+document.getElementById("tamanhoCamisa").value
+:
+"",
+
+
+inferior:"Nenhum",
+
+
+tamanhoInferior:"N/A",
+
+
+valor:calcularValor()
+
+
+};
+
+
+
+let usa=document.getElementById("usaInferior");
+
+
+if(usa && usa.value==="sim"){
+
+
+item.inferior=
+document.getElementById("tipoInferior")
+.options[
+document.getElementById("tipoInferior").selectedIndex
+]
+.text;
+
+
+item.tamanhoInferior=
+document.getElementById("tamanhoInferior")
+.value;
+
+
+}
+
+
+
+pedido.push(item);
+
+
+mostrarPedido();
+
+
+}
+
+
+
+function mostrarPedido(){
+
+
+let lista=document.getElementById("listaItens");
+
+
+if(!lista){
+return;
+}
+
+
+lista.innerHTML="";
+
+
+let total=0;
+
+
+
+pedido.forEach((item,index)=>{
+
+
+total+=item.valor;
+
+
+lista.innerHTML+=`
+
+<div class="card">
+
+<strong>
+Jogador ${index+1}
+</strong>
+
+
+<p>
+Nome:
+${item.nome}
+</p>
+
+
+<p>
+Número:
+${item.numero}
+</p>
+
+
+<p>
+Uniforme:
+${item.uniforme}
+</p>
+
+
+<p>
+Cor:
+${item.corUniforme}
+</p>
+
+
+<p>
+Categoria:
+${item.categoria}
+</p>
+
+
+<p>
+Camisa:
+${item.modelo}
+</p>
+
+
+<p>
+Tamanho:
+${item.tamanhoCamisa}
+</p>
+
+
+<p>
+Peça inferior:
+${item.inferior}
+</p>
+
+
+<p>
+Valor:
+R$ ${item.valor.toFixed(2)}
+</p>
+
+
+</div>
+
+`;
+
+});
+
+
+mostrarResumo(total);
+
+}
+
+
+
+function mostrarResumo(total){
+
+
+let resumo=document.getElementById("resumo");
+
+
+if(!resumo){
+return;
+}
+
+
+let parcela=total/3;
+
+
+resumo.innerHTML=`
+
+Quantidade de uniformes:
+<strong>
+${pedido.length}
+</strong>
+
+
+<br><br>
+
+
+Valor total:
+<strong>
+R$ ${total.toFixed(2)}
+</strong>
+
+
+<br><br>
+
+
+Pagamento:
+
+<br>
+
+3 parcelas de:
+
+<strong>
+R$ ${parcela.toFixed(2)}
+</strong>
+
+`;
+
+}
+function gerarCodigoPedido(){
+
+let numero=
+localStorage.getItem("codigoVT") || 0;
+
+
+numero++;
+
+
+localStorage.setItem(
+"codigoVT",
+numero
+);
+
+
+return "VT"+numero;
+
+}
+
+
+
+function finalizarPedido(){
+
+
+if(pedido.length===0){
+
+
+alert("Adicione pelo menos um item ao pedido.");
+
+
+return;
+
+}
+
+
+
+let codigo=gerarCodigoPedido();
+
+
+let dataAtual=
+new Date()
+.toLocaleDateString("pt-BR");
+
+
+
+let valorTotalGeral=
+pedido.reduce(
+(acc,item)=>acc+item.valor,
+0
+);
+
+
+
+let campoResponsavel=
+document.getElementById("responsavel");
+
+
+
+let nomeResponsavelFinal=
+campoResponsavel &&
+campoResponsavel.value.trim()!=="" ?
+campoResponsavel.value.trim()
+:
+"Não informado";
+
+
+
+let itensFormatados=
+pedido.map(item=>({
+
+
+idPedido:codigo,
+
+
+nome:item.nome,
+
+
+numero:item.numero,
+
+
+uniforme:item.uniforme,
+
+
+corUniforme:item.corUniforme,
+
+
+categoria:item.categoria,
+
+
+modeloCamisa:item.modelo,
+
+
+tamanho:item.tamanhoCamisa,
+
+
+pecaInferior:item.inferior,
+
+
+tamanhoInferior:item.tamanhoInferior,
+
+
+valor:item.valor
+
+
+}));
+
+
+
+let dadosEnvio={
+
+
+idPedido:codigo,
+
+
+data:dataAtual,
+
+
+responsavel:nomeResponsavelFinal,
+
+
+quantidade:pedido.length,
+
+
+valorTotal:valorTotalGeral,
+
+
+parcelas:
+"3x de R$ "+
+(valorTotalGeral/3).toFixed(2),
+
+
+pago:"Não",
+
+
+itens:itensFormatados
+
+
+};
+
+
+
+
+let dadosLocal={
+
+
+codigo:codigo,
+
+
+data:dataAtual,
+
+
+responsavel:nomeResponsavelFinal,
+
+
+itens:pedido
+
+
+};
+
+
+
+localStorage.setItem(
+
+codigo,
+
+JSON.stringify(dadosLocal)
+
+);
+
+
+
+
+fetch(URL_APPS_SCRIPT,{
+
+method:"POST",
+
+mode:"no-cors",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify(dadosEnvio)
+
+})
+
+
+.then(()=>{
+
+
+alert(
+"Pedido "+codigo+" enviado com sucesso!"
+);
+
+
+})
+
+
+.catch(error=>{
+
+
+console.error(
+"Erro no envio:",
+error
+);
+
+
+alert(
+"Pedido salvo localmente."
+);
+
+
+});
+
+
+}
