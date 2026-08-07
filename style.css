@@ -161,7 +161,7 @@ color:white;
 }
 /* Números já usados no uniforme oficial */
 .numero button.bloqueado {
-    opacity: 0.35;
+    opacity: 0.35 !important;
     cursor: not-allowed;
     filter: grayscale(100%);
 }
