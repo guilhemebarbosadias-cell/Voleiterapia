@@ -1,13 +1,9 @@
-// ======================================================
-// URL DO GOOGLE APPS SCRIPT
-// ======================================================
-
 const URL_APPS_SCRIPT =
 "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
 
 // ======================================================
-// DADOS
+// DADOS DO ADMIN
 // ======================================================
 
 let pedidos = [];
@@ -15,91 +11,24 @@ let itens = [];
 
 
 // ======================================================
-// NORMALIZAR TEXTO
-// Ajuda a reconhecer cabeçalhos da planilha
-// mesmo com espaços, acentos ou maiúsculas.
-// ======================================================
-
-function normalizarTexto(texto) {
-
-    return String(texto || "")
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
-
-}
-
-
-// ======================================================
-// PEGAR VALOR DE UM OBJETO
-// Aceita diferentes nomes de coluna.
-// ======================================================
-
-function pegarValor(objeto, nomes) {
-
-    if (!objeto) return "";
-
-    const chaves =
-        Object.keys(objeto);
-
-    for (let nome of nomes) {
-
-        const procurado =
-            normalizarTexto(nome);
-
-        for (let chave of chaves) {
-
-            if (
-                normalizarTexto(chave)
-                === procurado
-            ) {
-
-                return objeto[chave];
-
-            }
-
-        }
-
-    }
-
-    return "";
-
-}
-
-
-// ======================================================
-// CARREGAR DADOS DO ADMIN
+// CARREGAR DADOS
 // ======================================================
 
 async function carregarDados() {
 
     try {
 
-        // IMPORTANTE:
-        // Agora pedimos explicitamente os dados
-        // administrativos.
-
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT +
-                "?acao=admin"
-            );
-
+        const resposta = await fetch(
+            URL_APPS_SCRIPT + "?acao=admin"
+        );
 
         if (!resposta.ok) {
-
             throw new Error(
-                "Erro HTTP: " +
-                resposta.status
+                "Erro HTTP: " + resposta.status
             );
-
         }
 
-
-        const dados =
-            await resposta.json();
-
+        const dados = await resposta.json();
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
@@ -107,28 +36,24 @@ async function carregarDados() {
         );
 
 
-        if (
-            dados.result !== "success"
-        ) {
+        if (dados.result !== "success") {
 
             throw new Error(
                 dados.message ||
-                "O Apps Script não retornou sucesso."
+                "Não foi possível carregar os dados."
             );
 
         }
 
 
-        pedidos =
-            Array.isArray(dados.pedidos)
-                ? dados.pedidos
-                : [];
+        pedidos = Array.isArray(dados.pedidos)
+            ? dados.pedidos
+            : [];
 
 
-        itens =
-            Array.isArray(dados.itens)
-                ? dados.itens
-                : [];
+        itens = Array.isArray(dados.itens)
+            ? dados.itens
+            : [];
 
 
         atualizarResumo();
@@ -147,6 +72,138 @@ async function carregarDados() {
         );
 
     }
+
+}
+
+
+// ======================================================
+// NORMALIZAR TEXTO
+// ======================================================
+
+function normalizarTexto(valor) {
+
+    if (
+        valor === null ||
+        valor === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(valor)
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+}
+
+
+// ======================================================
+// PEGAR VALOR DE VÁRIOS NOMES POSSÍVEIS
+// ======================================================
+
+function pegarValor(objeto, nomes) {
+
+    if (!objeto) {
+        return "";
+    }
+
+
+    const chaves =
+        Object.keys(objeto);
+
+
+    for (
+        let i = 0;
+        i < nomes.length;
+        i++
+    ) {
+
+        const procurado =
+            normalizarTexto(nomes[i]);
+
+
+        for (
+            let j = 0;
+            j < chaves.length;
+            j++
+        ) {
+
+            if (
+                normalizarTexto(chaves[j]) ===
+                procurado
+            ) {
+
+                return objeto[chaves[j]];
+
+            }
+
+        }
+
+    }
+
+
+    return "";
+
+}
+
+
+// ======================================================
+// CONVERTER VALOR PARA NÚMERO
+// ======================================================
+
+function converterNumero(valor) {
+
+    if (
+        valor === null ||
+        valor === undefined ||
+        valor === ""
+    ) {
+
+        return 0;
+
+    }
+
+
+    if (typeof valor === "number") {
+
+        return valor;
+
+    }
+
+
+    let texto =
+        String(valor)
+            .trim()
+            .replace("R$", "")
+            .trim();
+
+
+    // Caso esteja no formato brasileiro:
+    // 1.250,50
+
+    if (
+        texto.includes(",")
+    ) {
+
+        texto =
+            texto
+                .replace(/\./g, "")
+                .replace(",", ".");
+
+    }
+
+
+    const numero =
+        Number(texto);
+
+
+    return isNaN(numero)
+        ? 0
+        : numero;
 
 }
 
@@ -181,6 +238,10 @@ function atualizarResumo() {
         );
 
 
+    // --------------------------------------------------
+    // QUANTIDADES
+    // --------------------------------------------------
+
     if (totalPedidos) {
 
         totalPedidos.innerText =
@@ -197,7 +258,12 @@ function atualizarResumo() {
     }
 
 
+    // --------------------------------------------------
+    // VALORES
+    // --------------------------------------------------
+
     let total = 0;
+
     let pendente = 0;
 
 
@@ -205,39 +271,39 @@ function atualizarResumo() {
         function(pedido) {
 
             const valor =
-                Number(
+                converterNumero(
                     pegarValor(
                         pedido,
                         [
-                            "Valor Total",
                             "valorTotal",
-                            "valor"
+                            "valor total",
+                            "valor",
+                            "total"
                         ]
                     )
-                ) || 0;
+                );
 
 
             total += valor;
 
 
-            const pago =
-                String(
+            const pagamento =
+                normalizarTexto(
                     pegarValor(
                         pedido,
                         [
-                            "Pago",
                             "pago",
-                            "Pagamento"
+                            "pagamento",
+                            "situacao",
+                            "situação"
                         ]
                     )
-                )
-                .trim()
-                .toLowerCase();
+                );
 
 
             if (
-                pago !== "sim" &&
-                pago !== "pago"
+                pagamento !== "sim" &&
+                pagamento !== "pago"
             ) {
 
                 pendente += valor;
@@ -278,7 +344,9 @@ function mostrarPedidos() {
         );
 
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
 
     if (pedidos.length === 0) {
@@ -286,9 +354,7 @@ function mostrarPedidos() {
         area.innerHTML = `
 
             <div class="empty">
-
                 Nenhum pedido encontrado.
-
             </div>
 
         `;
@@ -304,13 +370,14 @@ function mostrarPedidos() {
     pedidos.forEach(
         function(pedido, index) {
 
-            const responsavel =
+            const codigo =
                 pegarValor(
                     pedido,
                     [
-                        "Responsável",
-                        "Responsavel",
-                        "Nome"
+                        "idPedido",
+                        "id pedido",
+                        "pedido",
+                        "codigo"
                     ]
                 );
 
@@ -319,39 +386,56 @@ function mostrarPedidos() {
                 pegarValor(
                     pedido,
                     [
-                        "Data"
+                        "data",
+                        "data do pedido"
+                    ]
+                );
+
+
+            const responsavel =
+                pegarValor(
+                    pedido,
+                    [
+                        "responsavel",
+                        "responsável",
+                        "nome",
+                        "cliente"
                     ]
                 );
 
 
             const quantidade =
-                pegarValor(
-                    pedido,
-                    [
-                        "Quantidade",
-                        "Qtd"
-                    ]
+                converterNumero(
+                    pegarValor(
+                        pedido,
+                        [
+                            "quantidade",
+                            "qtd"
+                        ]
+                    )
                 );
 
 
             const valor =
-                Number(
+                converterNumero(
                     pegarValor(
                         pedido,
                         [
-                            "Valor Total",
                             "valorTotal",
-                            "Valor"
+                            "valor total",
+                            "valor",
+                            "total"
                         ]
                     )
-                ) || 0;
+                );
 
 
             const parcelas =
                 pegarValor(
                     pedido,
                     [
-                        "Parcelas"
+                        "parcelas",
+                        "parcelamento"
                     ]
                 );
 
@@ -360,8 +444,10 @@ function mostrarPedidos() {
                 pegarValor(
                     pedido,
                     [
-                        "Pago",
-                        "Pagamento"
+                        "pago",
+                        "pagamento",
+                        "situação",
+                        "situacao"
                     ]
                 );
 
@@ -371,33 +457,39 @@ function mostrarPedidos() {
                 <div class="card">
 
                     <h3>
-                        Pedido ${index + 1}
+                        Pedido ${codigo || index + 1}
                     </h3>
 
-                    <p>
-                        <strong>Responsável:</strong>
-                        ${responsavel || "Não informado"}
-                    </p>
 
                     <p>
                         <strong>Data:</strong>
                         ${data || "Não informado"}
                     </p>
 
+
+                    <p>
+                        <strong>Responsável:</strong>
+                        ${responsavel || "Não informado"}
+                    </p>
+
+
                     <p>
                         <strong>Quantidade:</strong>
-                        ${quantidade || 0}
+                        ${quantidade}
                     </p>
+
 
                     <p>
                         <strong>Valor:</strong>
                         ${formatarMoeda(valor)}
                     </p>
 
+
                     <p>
                         <strong>Parcelas:</strong>
                         ${parcelas || "Não informado"}
                     </p>
+
 
                     <p>
                         <strong>Pagamento:</strong>
@@ -429,7 +521,9 @@ function mostrarUniformes() {
         );
 
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
 
     if (itens.length === 0) {
@@ -437,9 +531,7 @@ function mostrarUniformes() {
         area.innerHTML = `
 
             <div class="empty">
-
                 Nenhum uniforme encontrado.
-
             </div>
 
         `;
@@ -459,8 +551,10 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Nome",
-                        "Nome Personalizado"
+                        "nome",
+                        "nomePersonalizado",
+                        "nome para personalização",
+                        "jogador"
                     ]
                 );
 
@@ -469,8 +563,19 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Número",
-                        "Numero"
+                        "numero",
+                        "número",
+                        "numero da camisa",
+                        "número da camisa"
+                    ]
+                );
+
+
+            const categoria =
+                pegarValor(
+                    item,
+                    [
+                        "categoria"
                     ]
                 );
 
@@ -479,8 +584,18 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Função",
-                        "Funcao"
+                        "funcao",
+                        "função"
+                    ]
+                );
+
+
+            const uniforme =
+                pegarValor(
+                    item,
+                    [
+                        "uniforme",
+                        "tipo de uniforme"
                     ]
                 );
 
@@ -489,19 +604,20 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Modelo",
-                        "Modelo da Camisa"
+                        "modelo",
+                        "modelo da camisa",
+                        "modeloCamisa"
                     ]
                 );
 
 
-            const tamanhoCamisa =
+            const tamanho =
                 pegarValor(
                     item,
                     [
-                        "Tamanho Camisa",
-                        "TamanhoCamisa",
-                        "Tamanho"
+                        "tamanhoCamisa",
+                        "tamanho camisa",
+                        "tamanho da camisa"
                     ]
                 );
 
@@ -510,9 +626,10 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Inferior",
-                        "Peça Inferior",
-                        "Peca Inferior"
+                        "inferior",
+                        "pecaInferior",
+                        "peça inferior",
+                        "tipo inferior"
                     ]
                 );
 
@@ -521,20 +638,23 @@ function mostrarUniformes() {
                 pegarValor(
                     item,
                     [
-                        "Tamanho Inferior"
+                        "tamanhoInferior",
+                        "tamanho inferior"
                     ]
                 );
 
 
             const valor =
-                Number(
+                converterNumero(
                     pegarValor(
                         item,
                         [
-                            "Valor"
+                            "valor",
+                            "preco",
+                            "preço"
                         ]
                     )
-                ) || 0;
+                );
 
 
             html += `
@@ -545,40 +665,60 @@ function mostrarUniformes() {
                         Uniforme ${index + 1}
                     </h3>
 
+
                     <p>
                         <strong>Nome:</strong>
                         ${nome || "Não informado"}
                     </p>
+
 
                     <p>
                         <strong>Número:</strong>
                         ${numero || "Não informado"}
                     </p>
 
+
+                    <p>
+                        <strong>Categoria:</strong>
+                        ${categoria || "Não informado"}
+                    </p>
+
+
                     <p>
                         <strong>Função:</strong>
                         ${funcao || "Não informado"}
                     </p>
+
+
+                    <p>
+                        <strong>Uniforme:</strong>
+                        ${uniforme || "Não informado"}
+                    </p>
+
 
                     <p>
                         <strong>Modelo:</strong>
                         ${modelo || "Não informado"}
                     </p>
 
+
                     <p>
-                        <strong>Tamanho da camisa:</strong>
-                        ${tamanhoCamisa || "Não informado"}
+                        <strong>Tamanho:</strong>
+                        ${tamanho || "Não informado"}
                     </p>
+
 
                     <p>
                         <strong>Peça inferior:</strong>
                         ${inferior || "Nenhum"}
                     </p>
 
+
                     <p>
                         <strong>Tamanho inferior:</strong>
                         ${tamanhoInferior || "N/A"}
                     </p>
+
 
                     <p>
                         <strong>Valor:</strong>
@@ -610,7 +750,9 @@ function mostrarPagamentos() {
         );
 
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
 
     if (pedidos.length === 0) {
@@ -618,9 +760,7 @@ function mostrarPagamentos() {
         area.innerHTML = `
 
             <div class="empty">
-
                 Nenhum pagamento encontrado.
-
             </div>
 
         `;
@@ -634,46 +774,62 @@ function mostrarPagamentos() {
 
 
     pedidos.forEach(
-        function(pedido) {
+        function(pedido, index) {
+
+            const codigo =
+                pegarValor(
+                    pedido,
+                    [
+                        "idPedido",
+                        "id pedido",
+                        "pedido",
+                        "codigo"
+                    ]
+                );
+
 
             const responsavel =
                 pegarValor(
                     pedido,
                     [
-                        "Responsável",
-                        "Responsavel"
+                        "responsavel",
+                        "responsável",
+                        "nome"
                     ]
                 );
 
 
             const valor =
-                Number(
+                converterNumero(
                     pegarValor(
                         pedido,
                         [
-                            "Valor Total",
                             "valorTotal",
-                            "Valor"
+                            "valor total",
+                            "valor",
+                            "total"
                         ]
                     )
-                ) || 0;
+                );
 
 
             const pagamento =
-                pegarValor(
-                    pedido,
-                    [
-                        "Pago",
-                        "Pagamento"
-                    ]
+                normalizarTexto(
+                    pegarValor(
+                        pedido,
+                        [
+                            "pago",
+                            "pagamento",
+                            "situação",
+                            "situacao"
+                        ]
+                    )
                 );
 
 
             const pago =
-                String(pagamento)
-                    .trim()
-                    .toLowerCase()
-                    === "sim";
+                pagamento === "sim" ||
+                pagamento === "pago";
 
 
             html += `
@@ -681,21 +837,39 @@ function mostrarPagamentos() {
                 <div class="card">
 
                     <h3>
-                        ${responsavel || "Pedido"}
+                        ${codigo || "Pedido " + (index + 1)}
                     </h3>
 
+
                     <p>
-                        <strong>Valor:</strong>
+                        <strong>
+                            Responsável:
+                        </strong>
+
+                        ${responsavel || "Não informado"}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Valor:
+                        </strong>
+
                         ${formatarMoeda(valor)}
                     </p>
 
+
                     <p>
-                        <strong>Situação:</strong>
+                        <strong>
+                            Situação:
+                        </strong>
+
                         ${
                             pago
                             ? "Pago"
                             : "Em aberto"
                         }
+
                     </p>
 
                 </div>
@@ -723,7 +897,9 @@ function mostrarConfiguracoes() {
         );
 
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
 
     area.innerHTML = `
@@ -765,15 +941,15 @@ function mostrarMensagem(texto) {
         );
 
 
-    if (!area) return;
+    if (!area) {
+        return;
+    }
 
 
     area.innerHTML = `
 
         <div class="empty">
-
             ${texto}
-
         </div>
 
     `;
