@@ -1,607 +1,922 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-<title>Administração - Vôlei Terapia</title>
-
-<link rel="stylesheet" href="style.css">
-
-<style>
-
-body{
-    background:#f3f3f3;
-}
-
-.admin-header{
-    background:#000;
-    color:white;
-    padding:25px 20px;
-    text-align:center;
-}
-
-.admin-logo{
-    font-size:30px;
-    font-weight:bold;
-}
-
-.admin-logo span{
-    color:#ff007f;
-}
-
-.admin-subtitle{
-    margin-top:6px;
-    color:#ccc;
-}
-
-.admin-container{
-    max-width:1000px;
-    margin:25px auto;
-    padding:15px;
-}
-
-.admin-grid{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
-    margin-bottom:25px;
-}
-
-.admin-card{
-    background:white;
-    border-radius:18px;
-    padding:20px;
-    box-shadow:0 3px 10px #0002;
-}
+// ======================================================
+// ADMIN - VÔLEI TERAPIA
+// ======================================================
 
-.admin-card h3{
-    margin-top:0;
-    color:#ff007f;
-}
+// ======================================================
+// URL DO GOOGLE APPS SCRIPT
+// ======================================================
 
-.admin-number{
-    font-size:30px;
-    font-weight:bold;
-    margin-top:10px;
-}
+const URL_APPS_SCRIPT =
+"https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
-.admin-menu{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:15px;
-}
 
-.admin-button{
-    background:#000;
-    color:white;
-    border:none;
-    border-radius:15px;
-    padding:20px;
-    font-size:17px;
-    font-weight:bold;
-    cursor:pointer;
-}
+// ======================================================
+// DADOS
+// ======================================================
 
-.admin-button:hover{
-    opacity:.9;
-}
+let pedidos = [];
+let itens = [];
 
-.admin-button span{
-    display:block;
-    font-size:28px;
-    margin-bottom:8px;
-}
 
-.section{
-    margin-top:25px;
-}
+// ======================================================
+// CARREGAR DADOS
+// ======================================================
 
-.section-title{
-    color:#000;
-    margin-bottom:12px;
-}
+async function carregarDados() {
 
-.admin-list{
-    background:white;
-    border-radius:15px;
-    padding:15px;
-    box-shadow:0 3px 10px #0002;
-}
+    try {
 
-.empty{
-    text-align:center;
-    color:#777;
-    padding:25px;
-}
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT + "?acao=admin"
+            );
 
-.logout{
-    margin-top:25px;
-    width:100%;
-    background:#ff007f;
-}
 
+        const dados =
+            await resposta.json();
 
-/* =====================================================
-   ÁREA DE LANÇAMENTO DE PAGAMENTO
-   ===================================================== */
 
-.pagamento-lancamento{
+        console.log(
+            "DADOS RECEBIDOS DO APPS SCRIPT:",
+            dados
+        );
 
-    background:white;
 
-    border-radius:18px;
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
 
-    padding:20px;
+            throw new Error(
+                dados?.message ||
+                "Não foi possível carregar os dados."
+            );
 
-    margin-bottom:20px;
+        }
 
-    box-shadow:0 3px 10px #0002;
 
-}
+        pedidos =
+            Array.isArray(dados.pedidos)
+                ? dados.pedidos
+                : [];
 
-.pagamento-lancamento h3{
 
-    margin-top:0;
+        itens =
+            Array.isArray(dados.itens)
+                ? dados.itens
+                : [];
 
-    color:#ff007f;
 
-}
+        atualizarResumo();
 
-.pagamento-lancamento label{
 
-    display:block;
+    } catch (erro) {
 
-    font-weight:bold;
+        console.error(
+            "ERRO AO CARREGAR ADMIN:",
+            erro
+        );
 
-    margin-top:12px;
 
-    margin-bottom:6px;
+        mostrarMensagem(
+            "Não foi possível carregar os dados da administração."
+        );
 
-}
-
-.pagamento-lancamento select,
-.pagamento-lancamento input{
-
-    width:100%;
-
-    box-sizing:border-box;
-
-    padding:12px;
-
-    border:1px solid #ccc;
-
-    border-radius:10px;
-
-    font-size:16px;
-
-}
-
-.pagamento-info{
-
-    background:#f5f5f5;
-
-    border-radius:12px;
-
-    padding:15px;
-
-    margin-top:15px;
-
-}
-
-.pagamento-info p{
-
-    margin:7px 0;
-
-}
-
-.pagamento-registrar{
-
-    width:100%;
-
-    margin-top:15px;
-
-    background:#ff007f;
-
-}
-
-.pagamento-registrar:hover{
-
-    background:#e60073;
-
-}
-
-
-@media(max-width:600px){
-
-    .admin-grid{
-        grid-template-columns:1fr;
-    }
-
-    .admin-menu{
-        grid-template-columns:1fr;
     }
 
 }
 
-</style>
 
-</head>
+// ======================================================
+// ATUALIZAR RESUMO
+// ======================================================
 
+function atualizarResumo() {
 
-<body>
-
-
-<header class="admin-header">
-
-    <div class="admin-logo">
-
-        Vôlei<span>Terapia</span>
-
-    </div>
+    const totalPedidos =
+        document.getElementById(
+            "totalPedidos"
+        );
 
 
-    <div class="admin-subtitle">
-
-        Painel de Administração
-
-    </div>
-
-</header>
+    const totalUniformes =
+        document.getElementById(
+            "totalUniformes"
+        );
 
 
-
-<main class="admin-container">
-
-
-<!-- =====================================================
-     RESUMO
-     ===================================================== -->
-
-<section>
-
-    <div class="admin-grid">
+    const valorTotal =
+        document.getElementById(
+            "valorTotal"
+        );
 
 
-        <div class="admin-card">
+    const valorPendente =
+        document.getElementById(
+            "valorPendente"
+        );
+
+
+    if (totalPedidos) {
+
+        totalPedidos.innerText =
+            pedidos.length;
+
+    }
+
+
+    if (totalUniformes) {
+
+        totalUniformes.innerText =
+            itens.length;
+
+    }
+
+
+    let total = 0;
+
+    let pendente = 0;
+
+
+    pedidos.forEach(
+        function(pedido) {
+
+            const valor =
+                Number(
+                    pedido.valorTotal
+                ) || 0;
+
+
+            const restante =
+                Number(
+                    pedido.Restante
+                ) || 0;
+
+
+            total += valor;
+
+            pendente += restante;
+
+        }
+    );
+
+
+    if (valorTotal) {
+
+        valorTotal.innerText =
+            formatarMoeda(total);
+
+    }
+
+
+    if (valorPendente) {
+
+        valorPendente.innerText =
+            formatarMoeda(pendente);
+
+    }
+
+}
+
+
+// ======================================================
+// PEDIDOS
+// ======================================================
+
+function mostrarPedidos() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    if (pedidos.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                Nenhum pedido encontrado.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    pedidos.forEach(
+        function(pedido) {
+
+            const status =
+                pedido.Status ||
+                "Não pago";
+
+
+            html += `
+
+                <div class="card">
+
+                    <h3>
+                        Pedido ${pedido.idPedido || ""}
+                    </h3>
+
+                    <p>
+                        <strong>Data:</strong>
+                        ${pedido.data || ""}
+                    </p>
+
+                    <p>
+                        <strong>Responsável:</strong>
+                        ${pedido.responsavel || ""}
+                    </p>
+
+                    <p>
+                        <strong>Quantidade:</strong>
+                        ${pedido.quantidade || 0}
+                    </p>
+
+                    <p>
+                        <strong>Valor:</strong>
+                        ${formatarMoeda(
+                            Number(
+                                pedido.valorTotal
+                            ) || 0
+                        )}
+                    </p>
+
+                    <p>
+                        <strong>Parcelas:</strong>
+                        ${pedido.parcelas || ""}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        ${status}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    area.innerHTML = html;
+
+}
+
+
+// ======================================================
+// FUNÇÃO PARA PEGAR O MODELO
+// ======================================================
+
+function obterModelo(item) {
+
+    if (!item) return "";
+
+
+    const possibilidades = [
+
+        item.modelo,
+
+        item.modeloCamisa,
+
+        item["Modelo"],
+
+        item["MODELO"],
+
+        item["Modelo da camisa"],
+
+        item["Modelo da Camisa"],
+
+        item["modelo da camisa"],
+
+        item["modeloCamisa"]
+
+    ];
+
+
+    for (
+        let i = 0;
+        i < possibilidades.length;
+        i++
+    ) {
+
+        const valor =
+            possibilidades[i];
+
+
+        if (
+            valor !== undefined &&
+            valor !== null &&
+            String(valor).trim() !== ""
+        ) {
+
+            return String(valor).trim();
+
+        }
+
+    }
+
+
+    return "Não informado";
+
+}
+
+
+// ======================================================
+// UNIFORMES
+// ======================================================
+
+function mostrarUniformes() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    if (itens.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                Nenhum uniforme encontrado.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    itens.forEach(
+        function(item, index) {
+
+            const modelo =
+                obterModelo(item);
+
+
+            html += `
+
+                <div class="card">
+
+                    <h3>
+                        Uniforme ${index + 1}
+                    </h3>
+
+
+                    <p>
+                        <strong>Nome:</strong>
+                        ${item.nome || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>Número:</strong>
+                        ${item.numero || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>Categoria:</strong>
+                        ${item.categoria || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>Função:</strong>
+                        ${item.funcao || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>Modelo:</strong>
+                        ${modelo}
+                    </p>
+
+
+                    <p>
+                        <strong>Tamanho da camisa:</strong>
+                        ${item.tamanhoCamisa || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>Peça inferior:</strong>
+                        ${item.inferior || "Nenhum"}
+                    </p>
+
+
+                    <p>
+                        <strong>Tamanho inferior:</strong>
+                        ${item.tamanhoInferior || "N/A"}
+                    </p>
+
+
+                    <p>
+                        <strong>Valor:</strong>
+                        ${formatarMoeda(
+                            Number(item.valor) || 0
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    area.innerHTML = html;
+
+}
+
+
+// ======================================================
+// PAGAMENTOS
+// APENAS LEITURA
+// ======================================================
+
+function mostrarPagamentos() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    if (pedidos.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                Nenhum pagamento encontrado.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    pedidos.forEach(
+        function(pedido) {
+
+            const status =
+                pedido.Status !== undefined &&
+                pedido.Status !== null &&
+                String(pedido.Status).trim() !== ""
+                    ? String(pedido.Status).trim()
+                    : "Não pago";
+
+
+            const valorTotal =
+                Number(
+                    pedido.valorTotal
+                ) || 0;
+
+
+            const valorPago =
+                Number(
+                    pedido.Pago
+                ) || 0;
+
+
+            const valorRestante =
+                Number(
+                    pedido.Restante
+                ) || 0;
+
+
+            html += `
+
+                <div class="card">
+
+                    <h3>
+                        ${pedido.idPedido || "Pedido"}
+                    </h3>
+
+
+                    <p>
+                        <strong>
+                            Responsável:
+                        </strong>
+
+                        ${pedido.responsavel || ""}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Valor total:
+                        </strong>
+
+                        ${formatarMoeda(
+                            valorTotal
+                        )}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Status:
+                        </strong>
+
+                        ${status}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Pago:
+                        </strong>
+
+                        ${formatarMoeda(
+                            valorPago
+                        )}
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Restante:
+                        </strong>
+
+                        ${formatarMoeda(
+                            valorRestante
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    area.innerHTML = html;
+
+}
+
+
+// ======================================================
+// PRODUÇÃO
+// APENAS LEITURA DOS ITENS
+// ======================================================
+
+function mostrarProducao() {
+
+    // ==================================================
+    // TESTE DE LIGAÇÃO HTML -> JAVASCRIPT
+    // ==================================================
+
+    alert("PRODUÇÃO FOI CHAMADA!");
+
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    if (itens.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                Nenhum uniforme encontrado para produção.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    let totalUniformes =
+        itens.length;
+
+
+    let totalCamisas = 0;
+
+    let totalBabyLook = 0;
+
+    let totalInferiores = 0;
+
+
+    itens.forEach(
+        function(item) {
+
+            const modelo =
+                String(
+                    item.modelo || ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if (
+                modelo.includes("baby")
+            ) {
+
+                totalBabyLook++;
+
+            } else {
+
+                totalCamisas++;
+
+            }
+
+
+            const inferior =
+                String(
+                    item.inferior || ""
+                )
+                .trim()
+                .toLowerCase();
+
+
+            if (
+                inferior !== "" &&
+                inferior !== "nenhum" &&
+                inferior !== "n/a"
+            ) {
+
+                totalInferiores++;
+
+            }
+
+        }
+    );
+
+
+    let html = `
+
+        <div class="card">
+
+            <h2>
+                🏭 Lista de Produção
+            </h2>
+
+            <p>
+                <strong>
+                    Total de uniformes:
+                </strong>
+
+                ${totalUniformes}
+
+            </p>
+
+            <p>
+                <strong>
+                    Camisas:
+                </strong>
+
+                ${totalCamisas}
+
+            </p>
+
+            <p>
+                <strong>
+                    Baby Look:
+                </strong>
+
+                ${totalBabyLook}
+
+            </p>
+
+            <p>
+                <strong>
+                    Peças inferiores:
+                </strong>
+
+                ${totalInferiores}
+
+            </p>
+
+        </div>
+
+    `;
+
+
+    html += `
+
+        <div class="card">
 
             <h3>
-                Pedidos
+                👕 Uniformes
             </h3>
 
-            <div
-                id="totalPedidos"
-                class="admin-number">
+    `;
 
-                0
 
-            </div>
+    itens.forEach(
+        function(item, index) {
+
+            const modelo =
+                item.modelo || "";
+
+
+            html += `
+
+                <div
+                    style="
+                        border-bottom:1px solid #ddd;
+                        padding:12px 0;
+                    ">
+
+                    <strong>
+                        ${index + 1}.
+                        ${item.nome || ""}
+                    </strong>
+
+                    <p>
+                        <strong>Nº:</strong>
+                        ${item.numero || ""}
+                    </p>
+
+                    <p>
+                        <strong>Função:</strong>
+                        ${item.funcao || ""}
+                    </p>
+
+                    <p>
+                        <strong>Modelo:</strong>
+                        ${modelo}
+                    </p>
+
+                    <p>
+                        <strong>Tamanho:</strong>
+                        ${item.tamanhoCamisa || ""}
+                    </p>
+
+                    <p>
+                        <strong>Peça inferior:</strong>
+                        ${item.inferior || "Nenhum"}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Tamanho inferior:
+                        </strong>
+
+                        ${item.tamanhoInferior || "N/A"}
+
+                    </p>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    html += `
 
         </div>
 
+    `;
 
 
-        <div class="admin-card">
+    area.innerHTML = html;
+
+}
+
+
+// ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+
+function mostrarConfiguracoes() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    area.innerHTML = `
+
+        <div class="card">
 
             <h3>
-                Uniformes
+                Configurações
             </h3>
 
-            <div
-                id="totalUniformes"
-                class="admin-number">
+            <p>
+                Esta área será usada para
+                configurar o sistema.
+            </p>
 
-                0
-
-            </div>
+            <p>
+                Futuramente poderemos colocar
+                aqui os valores dos uniformes,
+                opções de peças e outras
+                configurações.
+            </p>
 
         </div>
 
+    `;
 
+}
 
-        <div class="admin-card">
 
-            <h3>
-                Valor total
-            </h3>
+// ======================================================
+// MENSAGEM
+// ======================================================
 
-            <div
-                id="valorTotal"
-                class="admin-number">
+function mostrarMensagem(texto) {
 
-                R$ 0,00
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
-            </div>
 
-        </div>
+    if (!area) return;
 
 
-
-        <div class="admin-card">
-
-            <h3>
-                Em aberto
-            </h3>
-
-            <div
-                id="valorPendente"
-                class="admin-number">
-
-                R$ 0,00
-
-            </div>
-
-        </div>
-
-
-    </div>
-
-</section>
-
-
-
-<!-- =====================================================
-     MENU
-     ===================================================== -->
-
-<section class="section">
-
-    <h2 class="section-title">
-
-        Administração
-
-    </h2>
-
-
-    <div class="admin-menu">
-
-
-        <button
-            class="admin-button"
-            onclick="mostrarPedidos()">
-
-            <span>📋</span>
-
-            Pedidos
-
-        </button>
-
-
-
-        <button
-            class="admin-button"
-            onclick="mostrarUniformes()">
-
-            <span>👕</span>
-
-            Uniformes
-
-        </button>
-
-
-
-        <button
-            class="admin-button"
-            onclick="mostrarPagamentos()">
-
-            <span>💰</span>
-
-            Pagamentos
-
-        </button>
-
-<button
-    class="admin-button"
-    onclick="mostrarProducao()">
-
-    <span>🏭</span>
-
-    Produção
-
-</button>
-        
-
-        <button
-            class="admin-button"
-            onclick="mostrarConfiguracoes()">
-
-            <span>⚙️</span>
-
-            Configurações
-
-        </button>
-
-
-    </div>
-
-</section>
-
-
-
-<!-- =====================================================
-     ÁREA DE LANÇAMENTO DE PAGAMENTO
-     ===================================================== -->
-
-<section
-    id="areaLancamentoPagamento"
-    class="section"
-    style="display:none;">
-
-    <div class="pagamento-lancamento">
-
-
-        <h3>
-            💰 Lançar pagamento
-        </h3>
-
-
-        <label for="pedidoPagamento">
-
-            Pedido
-
-        </label>
-
-
-        <select
-            id="pedidoPagamento">
-
-            <option value="">
-
-                Selecione o pedido
-
-            </option>
-
-        </select>
-
-
-
-        <div
-            id="informacoesPagamento"
-            class="pagamento-info"
-            style="display:none;">
-
-
-            <p>
-
-                <strong>
-                    Responsável:
-                </strong>
-
-                <span
-                    id="responsavelPagamento">
-                </span>
-
-            </p>
-
-
-            <p>
-
-                <strong>
-                    Valor total:
-                </strong>
-
-                <span
-                    id="totalPagamento">
-                </span>
-
-            </p>
-
-
-            <p>
-
-                <strong>
-                    Já pago:
-                </strong>
-
-                <span
-                    id="pagoPagamento">
-                </span>
-
-            </p>
-
-
-            <p>
-
-                <strong>
-                    Restante:
-                </strong>
-
-                <span
-                    id="restantePagamento">
-                </span>
-
-            </p>
-
-
-            <p>
-
-                <strong>
-                    Status:
-                </strong>
-
-                <span
-                    id="statusPagamento">
-                </span>
-
-            </p>
-
-
-        </div>
-
-
-
-        <label for="valorPagamento">
-
-            Valor recebido agora
-
-        </label>
-
-
-        <input
-            type="number"
-            id="valorPagamento"
-            min="0"
-            step="0.01"
-            placeholder="Ex.: 25,00">
-
-
-        <button
-            id="botaoRegistrarPagamento"
-            class="admin-button pagamento-registrar"
-            type="button">
-
-            💰 REGISTRAR PAGAMENTO
-
-        </button>
-
-
-    </div>
-
-</section>
-
-
-
-<!-- =====================================================
-     ÁREA DE CONTEÚDO
-     ===================================================== -->
-
-<section class="section">
-
-    <div
-        id="conteudoAdmin"
-        class="admin-list">
+    area.innerHTML = `
 
         <div class="empty">
 
-            Selecione uma opção acima.
+            ${texto}
 
         </div>
 
-    </div>
+    `;
 
-</section>
-
-
-
-<button
-    class="admin-button logout"
-    onclick="voltarInicio()">
-
-    VOLTAR AO INÍCIO
-
-</button>
+}
 
 
-</main>
+// ======================================================
+// FORMATAR MOEDA
+// ======================================================
+
+function formatarMoeda(valor) {
+
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "pt-BR",
+        {
+            style: "currency",
+            currency: "BRL"
+        }
+    );
+
+}
 
 
-<script src="admin.js"></script>
+// ======================================================
+// VOLTAR AO INÍCIO
+// ======================================================
+
+function voltarInicio() {
+
+    window.location.href =
+        "index.html";
+
+}
 
 
-</body>
+// ======================================================
+// INICIAR ADMIN
+// ======================================================
 
-</html>
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        carregarDados();
+
+    }
+);
+            
