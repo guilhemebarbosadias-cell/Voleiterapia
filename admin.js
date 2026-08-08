@@ -149,7 +149,7 @@ function atualizarResumo() {
 
             const restante =
                 Number(
-                    pedido.restante
+                    pedido.Restante
                 ) || 0;
 
 
@@ -214,7 +214,7 @@ function mostrarPedidos() {
         function(pedido) {
 
             const status =
-                pedido.status ||
+                pedido.Status ||
                 "Não pago";
 
 
@@ -448,6 +448,7 @@ function mostrarUniformes() {
 
 // ======================================================
 // PAGAMENTOS
+// APENAS LEITURA
 // ======================================================
 
 function mostrarPagamentos() {
@@ -478,7 +479,15 @@ function mostrarPagamentos() {
 
 
     pedidos.forEach(
-        function(pedido, index) {
+        function(pedido) {
+
+            const status =
+                pedido.Status !== undefined &&
+                pedido.Status !== null &&
+                String(pedido.Status).trim() !== ""
+                    ? String(pedido.Status).trim()
+                    : "Não pago";
+
 
             const valorTotal =
                 Number(
@@ -488,19 +497,14 @@ function mostrarPagamentos() {
 
             const valorPago =
                 Number(
-                    pedido.pago
+                    pedido.Pago
                 ) || 0;
 
 
             const valorRestante =
                 Number(
-                    pedido.restante
+                    pedido.Restante
                 ) || 0;
-
-
-            const status =
-                pedido.status ||
-                "Não pago";
 
 
             html += `
@@ -562,84 +566,6 @@ function mostrarPagamentos() {
                         )}
                     </p>
 
-
-                    ${
-                        valorRestante > 0
-
-                        ? `
-
-                        <div style="
-                            margin-top:15px;
-                            padding-top:15px;
-                            border-top:1px solid #ddd;
-                        ">
-
-                            <label
-                                style="
-                                    display:block;
-                                    font-weight:bold;
-                                    margin-bottom:8px;
-                                "
-                            >
-                                Valor recebido agora:
-                            </label>
-
-
-                            <input
-                                type="number"
-                                id="pagamento-${index}"
-                                min="0.01"
-                                max="${valorRestante}"
-                                step="0.01"
-                                placeholder="0,00"
-                                style="
-                                    width:100%;
-                                    box-sizing:border-box;
-                                    padding:12px;
-                                    border:1px solid #ccc;
-                                    border-radius:10px;
-                                    font-size:16px;
-                                    margin-bottom:10px;
-                                "
-                            >
-
-
-                            <button
-                                class="admin-button"
-                                onclick="
-                                    registrarPagamento(
-                                        ${index}
-                                    )
-                                "
-                                style="
-                                    width:100%;
-                                    background:#ff007f;
-                                "
-                            >
-                                💰 Registrar pagamento
-                            </button>
-
-                        </div>
-
-                        `
-
-                        : `
-
-                        <div style="
-                            margin-top:15px;
-                            padding:12px;
-                            background:#eee;
-                            border-radius:10px;
-                            text-align:center;
-                            font-weight:bold;
-                        ">
-                            ✓ Pedido totalmente pago
-                        </div>
-
-                        `
-
-                    }
-
                 </div>
 
             `;
@@ -654,222 +580,221 @@ function mostrarPagamentos() {
 
 
 // ======================================================
-// REGISTRAR PAGAMENTO
+// PRODUÇÃO
+// APENAS LEITURA DOS ITENS
 // ======================================================
 
-async function registrarPagamento(
-    index
-) {
+function mostrarProducao() {
 
-    const pedido =
-        pedidos[index];
-
-
-    if (!pedido) {
-
-        alert(
-            "Pedido não encontrado."
-        );
-
-        return;
-
-    }
-
-
-    const input =
+    const area =
         document.getElementById(
-            "pagamento-" + index
+            "conteudoAdmin"
         );
 
 
-    if (!input) {
+    if (!area) return;
 
-        alert(
-            "Campo de pagamento não encontrado."
-        );
+
+    if (itens.length === 0) {
+
+        area.innerHTML = `
+            <div class="empty">
+                Nenhum uniforme encontrado para produção.
+            </div>
+        `;
 
         return;
 
     }
 
 
-    const valor =
-        Number(
-            input.value
-        ) || 0;
+    let totalUniformes =
+        itens.length;
 
 
-    const restanteAtual =
-        Number(
-            pedido.restante
-        ) || 0;
+    let totalCamisas = 0;
+
+    let totalBabyLook = 0;
+
+    let totalInferiores = 0;
 
 
-    if (valor <= 0) {
+    itens.forEach(
+        function(item) {
 
-        alert(
-            "Digite um valor de pagamento."
-        );
-
-        return;
-
-    }
-
-
-    if (
-        valor > restanteAtual
-    ) {
-
-        alert(
-            "O valor informado é maior que o restante do pedido."
-        );
-
-        return;
-
-    }
+            const modelo =
+                String(
+                    item.modelo || ""
+                )
+                .trim()
+                .toLowerCase();
 
 
-    const confirmar =
-        confirm(
-            "Registrar pagamento de " +
-            formatarMoeda(valor) +
-            " para o pedido " +
-            (pedido.idPedido || "") +
-            "?"
-        );
+            if (
+                modelo.includes("baby")
+            ) {
+
+                totalBabyLook++;
+
+            } else {
+
+                totalCamisas++;
+
+            }
 
 
-    if (!confirmar) {
-
-        return;
-
-    }
-
-
-    try {
-
-        input.disabled =
-            true;
+            const inferior =
+                String(
+                    item.inferior || ""
+                )
+                .trim()
+                .toLowerCase();
 
 
-        const botoes =
-            document.querySelectorAll(
-                ".admin-button"
-            );
+            if (
+                inferior !== "" &&
+                inferior !== "nenhum" &&
+                inferior !== "n/a"
+            ) {
 
+                totalInferiores++;
 
-        const botao =
-            botoes[
-                botoes.length - 1
-            ];
-
-
-        if (botao) {
-
-            botao.disabled =
-                true;
-
-            botao.innerText =
-                "Registrando...";
+            }
 
         }
+    );
 
 
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT,
-                {
+    let html = `
 
-                    method:
-                        "POST",
+        <div class="card">
 
-                    headers: {
+            <h2>
+                🏭 Lista de Produção
+            </h2>
 
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
+            <p>
+                <strong>
+                    Total de uniformes:
+                </strong>
 
-                    },
+                ${totalUniformes}
 
-                    body:
-                        JSON.stringify({
+            </p>
 
-                            acao:
-                                "registrarPagamento",
+            <p>
+                <strong>
+                    Camisas:
+                </strong>
 
-                            idPedido:
-                                pedido.idPedido,
+                ${totalCamisas}
 
-                            responsavel:
-                                pedido.responsavel,
+            </p>
 
-                            valorPago:
-                                valor
+            <p>
+                <strong>
+                    Baby Look:
+                </strong>
 
-                        })
+                ${totalBabyLook}
 
-                }
-            );
+            </p>
+
+            <p>
+                <strong>
+                    Peças inferiores:
+                </strong>
+
+                ${totalInferiores}
+
+            </p>
+
+        </div>
+
+    `;
 
 
-        const dados =
-            await resposta.json();
+    html += `
+
+        <div class="card">
+
+            <h3>
+                👕 Uniformes
+            </h3>
+
+    `;
 
 
-        console.log(
-            "RESPOSTA DO PAGAMENTO:",
-            dados
-        );
+    itens.forEach(
+        function(item, index) {
+
+            const modelo =
+                item.modelo || "";
 
 
-        if (
-            !dados ||
-            dados.result !==
-            "success"
-        ) {
+            html += `
 
-            throw new Error(
-                dados?.message ||
-                "Não foi possível registrar o pagamento."
-            );
+                <div
+                    style="
+                        border-bottom:1px solid #ddd;
+                        padding:12px 0;
+                    ">
+
+                    <strong>
+                        ${index + 1}.
+                        ${item.nome || ""}
+                    </strong>
+
+                    <p>
+                        <strong>Nº:</strong>
+                        ${item.numero || ""}
+                    </p>
+
+                    <p>
+                        <strong>Função:</strong>
+                        ${item.funcao || ""}
+                    </p>
+
+                    <p>
+                        <strong>Modelo:</strong>
+                        ${modelo}
+                    </p>
+
+                    <p>
+                        <strong>Tamanho:</strong>
+                        ${item.tamanhoCamisa || ""}
+                    </p>
+
+                    <p>
+                        <strong>Peça inferior:</strong>
+                        ${item.inferior || "Nenhum"}
+                    </p>
+
+                    <p>
+                        <strong>
+                            Tamanho inferior:
+                        </strong>
+
+                        ${item.tamanhoInferior || "N/A"}
+
+                    </p>
+
+                </div>
+
+            `;
 
         }
+    );
 
 
-        alert(
-            "Pagamento registrado com sucesso!"
-        );
+    html += `
+
+        </div>
+
+    `;
 
 
-        // Recarrega os dados da planilha.
-
-        await carregarDados();
-
-
-        // Mostra novamente a tela de pagamentos.
-
-        mostrarPagamentos();
-
-
-    }
-
-    catch (erro) {
-
-        console.error(
-            "ERRO AO REGISTRAR PAGAMENTO:",
-            erro
-        );
-
-
-        alert(
-            "Não foi possível registrar o pagamento.\n\n" +
-            erro.message
-        );
-
-
-        input.disabled =
-            false;
-
-    }
+    area.innerHTML = html;
 
 }
 
@@ -920,9 +845,7 @@ function mostrarConfiguracoes() {
 // MENSAGEM
 // ======================================================
 
-function mostrarMensagem(
-    texto
-) {
+function mostrarMensagem(texto) {
 
     const area =
         document.getElementById(
@@ -950,22 +873,15 @@ function mostrarMensagem(
 // FORMATAR MOEDA
 // ======================================================
 
-function formatarMoeda(
-    valor
-) {
+function formatarMoeda(valor) {
 
     return Number(
         valor || 0
     ).toLocaleString(
         "pt-BR",
         {
-
-            style:
-                "currency",
-
-            currency:
-                "BRL"
-
+            style: "currency",
+            currency: "BRL"
         }
     );
 
