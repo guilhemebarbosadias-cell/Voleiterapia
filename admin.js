@@ -147,18 +147,15 @@ function atualizarResumo() {
                 ) || 0;
 
 
+            const restante =
+                Number(
+                    pedido.Restante
+                ) || 0;
+
+
             total += valor;
 
-
-            if (
-                String(
-                    pedido.pago || "Não"
-                ).trim().toLowerCase() !== "sim"
-            ) {
-
-                pendente += valor;
-
-            }
+            pendente += restante;
 
         }
     );
@@ -216,6 +213,11 @@ function mostrarPedidos() {
     pedidos.forEach(
         function(pedido) {
 
+            const status =
+                pedido.Status ||
+                "Não pago";
+
+
             html += `
 
                 <div class="card">
@@ -254,8 +256,8 @@ function mostrarPedidos() {
                     </p>
 
                     <p>
-                        <strong>Pagamento:</strong>
-                        ${pedido.pago || "Não"}
+                        <strong>Status:</strong>
+                        ${status}
                     </p>
 
                 </div>
@@ -273,9 +275,6 @@ function mostrarPedidos() {
 
 // ======================================================
 // FUNÇÃO PARA PEGAR O MODELO
-// ======================================================
-// Aceita diferentes nomes possíveis sem alterar
-// nada na planilha ou no Apps Script.
 // ======================================================
 
 function obterModelo(item) {
@@ -449,6 +448,7 @@ function mostrarUniformes() {
 
 // ======================================================
 // PAGAMENTOS
+// APENAS LEITURA NESTA ETAPA
 // ======================================================
 
 function mostrarPagamentos() {
@@ -481,12 +481,27 @@ function mostrarPagamentos() {
     pedidos.forEach(
         function(pedido) {
 
-            const pago =
-                String(
-                    pedido.pago || "Não"
-                )
-                .trim()
-                .toLowerCase() === "sim";
+            const status =
+                pedido.Status ||
+                "Não pago";
+
+
+            const valorTotal =
+                Number(
+                    pedido.valorTotal
+                ) || 0;
+
+
+            const valorPago =
+                Number(
+                    pedido.Pago
+                ) || 0;
+
+
+            const valorRestante =
+                Number(
+                    pedido.Restante
+                ) || 0;
 
 
             html += `
@@ -497,6 +512,7 @@ function mostrarPagamentos() {
                         ${pedido.idPedido || "Pedido"}
                     </h3>
 
+
                     <p>
                         <strong>
                             Responsável:
@@ -505,28 +521,48 @@ function mostrarPagamentos() {
                         ${pedido.responsavel || ""}
                     </p>
 
+
                     <p>
                         <strong>
-                            Valor:
+                            Valor total:
                         </strong>
 
                         ${formatarMoeda(
-                            Number(
-                                pedido.valorTotal
-                            ) || 0
+                            valorTotal
                         )}
                     </p>
 
+
                     <p>
                         <strong>
-                            Situação:
+                            Status:
                         </strong>
 
-                        ${
-                            pago
-                            ? "Pago"
-                            : "Em aberto"
-                        }
+                        ${status}
+
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Pago:
+                        </strong>
+
+                        ${formatarMoeda(
+                            valorPago
+                        )}
+
+                    </p>
+
+
+                    <p>
+                        <strong>
+                            Restante:
+                        </strong>
+
+                        ${formatarMoeda(
+                            valorRestante
+                        )}
 
                     </p>
 
