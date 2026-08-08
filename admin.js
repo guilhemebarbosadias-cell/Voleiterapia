@@ -1,5 +1,10 @@
+// ======================================================
+// URL DO GOOGLE APPS SCRIPT / WEB APP
+// CONSULTA EXCLUSIVA DA ÁREA ADMINISTRATIVA
+// ======================================================
+
 const URL_APPS_SCRIPT =
-"https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
+"https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec?acao=admin";
 
 
 // ======================================================
@@ -20,14 +25,17 @@ async function carregarDados() {
     try {
 
         const resposta =
-            await fetch(
-                URL_APPS_SCRIPT +
-                "?acao=admin"
-            );
+            await fetch(URL_APPS_SCRIPT);
 
 
         const dados =
             await resposta.json();
+
+
+        console.log(
+            "DADOS RECEBIDOS DO ADMIN:",
+            dados
+        );
 
 
         if (dados.result !== "success") {
@@ -75,27 +83,19 @@ async function carregarDados() {
 function atualizarResumo() {
 
     const totalPedidos =
-        document.getElementById(
-            "totalPedidos"
-        );
+        document.getElementById("totalPedidos");
 
 
     const totalUniformes =
-        document.getElementById(
-            "totalUniformes"
-        );
+        document.getElementById("totalUniformes");
 
 
     const valorTotal =
-        document.getElementById(
-            "valorTotal"
-        );
+        document.getElementById("valorTotal");
 
 
     const valorPendente =
-        document.getElementById(
-            "valorPendente"
-        );
+        document.getElementById("valorPendente");
 
 
     if (totalPedidos) {
@@ -123,18 +123,26 @@ function atualizarResumo() {
 
         let valor =
             Number(
-                pedido.valorTotal
-            ) || 0;
+                pedido["Valor Total"] ??
+                pedido.valorTotal ??
+                0
+            );
 
 
         total += valor;
 
 
-        if (
+        const pago =
             String(
-                pedido.pago
-            ).toLowerCase() !== "sim"
-        ) {
+                pedido["Pago"] ??
+                pedido.pago ??
+                "Não"
+            )
+            .trim()
+            .toLowerCase();
+
+
+        if (pago !== "sim") {
 
             pendente += valor;
 
@@ -146,9 +154,7 @@ function atualizarResumo() {
     if (valorTotal) {
 
         valorTotal.innerText =
-            formatarMoeda(
-                total
-            );
+            formatarMoeda(total);
 
     }
 
@@ -156,9 +162,7 @@ function atualizarResumo() {
     if (valorPendente) {
 
         valorPendente.innerText =
-            formatarMoeda(
-                pendente
-            );
+            formatarMoeda(pendente);
 
     }
 
@@ -172,9 +176,7 @@ function atualizarResumo() {
 function mostrarPedidos() {
 
     const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+        document.getElementById("conteudoAdmin");
 
 
     if (!area) return;
@@ -202,53 +204,92 @@ function mostrarPedidos() {
 
     pedidos.forEach(function(pedido) {
 
+        const id =
+            pedido["ID Pedido"] ??
+            pedido.idPedido ??
+            "";
+
+
+        const data =
+            pedido["Data"] ??
+            pedido.data ??
+            "";
+
+
+        const responsavel =
+            pedido["Responsável"] ??
+            pedido.responsavel ??
+            "";
+
+
+        const quantidade =
+            pedido["Quantidade"] ??
+            pedido.quantidade ??
+            0;
+
+
+        const valor =
+            Number(
+                pedido["Valor Total"] ??
+                pedido.valorTotal ??
+                0
+            );
+
+
+        const parcelas =
+            pedido["Parcelas"] ??
+            pedido.parcelas ??
+            "";
+
+
+        const pago =
+            pedido["Pago"] ??
+            pedido.pago ??
+            "Não";
+
+
         html += `
 
             <div class="card">
 
                 <h3>
-                    Pedido
-                    ${pedido.idPedido || ""}
+                    Pedido ${id}
                 </h3>
 
 
                 <p>
                     <strong>Data:</strong>
-                    ${pedido.data || ""}
+                    ${data}
                 </p>
 
 
                 <p>
                     <strong>Responsável:</strong>
-                    ${pedido.responsavel || ""}
+                    ${responsavel}
                 </p>
 
 
                 <p>
                     <strong>Quantidade:</strong>
-                    ${pedido.quantidade || 0}
+                    ${quantidade}
                 </p>
 
 
                 <p>
                     <strong>Valor:</strong>
-                    ${formatarMoeda(
-                        Number(
-                            pedido.valorTotal
-                        ) || 0
-                    )}
+                    ${formatarMoeda(valor)}
                 </p>
 
 
                 <p>
                     <strong>Parcelas:</strong>
-                    ${pedido.parcelas || ""}
+                    ${parcelas}
                 </p>
 
 
                 <p>
                     <strong>Pagamento:</strong>
-                    ${pedido.pago || "Não"}
+                    ${pago}
                 </p>
 
             </div>
@@ -258,8 +299,7 @@ function mostrarPedidos() {
     });
 
 
-    area.innerHTML =
-        html;
+    area.innerHTML = html;
 
 }
 
@@ -271,9 +311,7 @@ function mostrarPedidos() {
 function mostrarUniformes() {
 
     const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+        document.getElementById("conteudoAdmin");
 
 
     if (!area) return;
@@ -301,71 +339,146 @@ function mostrarUniformes() {
 
     itens.forEach(function(item, index) {
 
+        const nome =
+            item["Nome"] ??
+            item.nome ??
+            "";
+
+
+        const numero =
+            item["Número"] ??
+            item.numero ??
+            "";
+
+
+        const categoria =
+            item["Categoria"] ??
+            item.categoria ??
+            "";
+
+
+        const funcao =
+            item["Função"] ??
+            item.funcao ??
+            "";
+
+
+        const uniforme =
+            item["Uniforme"] ??
+            item.uniforme ??
+            "";
+
+
+        const modelo =
+            item["Modelo"] ??
+            item.modelo ??
+            "";
+
+
+        const tamanho =
+            item["Tamanho Camisa"] ??
+            item.tamanhoCamisa ??
+            "";
+
+
+        const inferior =
+            item["Peça Inferior"] ??
+            item.inferior ??
+            "Nenhum";
+
+
+        const tamanhoInferior =
+            item["Tamanho Inferior"] ??
+            item.tamanhoInferior ??
+            "N/A";
+
+
+        const valor =
+            Number(
+                item["Valor"] ??
+                item.valor ??
+                0
+            );
+
+
+        const responsavel =
+            item["Responsável"] ??
+            item.responsavel ??
+            "";
+
+
         html += `
 
             <div class="card">
 
                 <h3>
-                    Uniforme
-                    ${index + 1}
+                    Uniforme ${index + 1}
                 </h3>
 
 
                 <p>
+                    <strong>Responsável:</strong>
+                    ${responsavel}
+                </p>
+
+
+                <p>
                     <strong>Nome:</strong>
-                    ${item.nome || ""}
+                    ${nome}
                 </p>
 
 
                 <p>
                     <strong>Número:</strong>
-                    ${item.numero || ""}
+                    ${numero}
                 </p>
 
 
                 <p>
                     <strong>Categoria:</strong>
-                    ${item.categoria || ""}
+                    ${categoria}
                 </p>
 
 
                 <p>
                     <strong>Função:</strong>
-                    ${item.funcao || ""}
+                    ${funcao}
                 </p>
 
 
                 <p>
                     <strong>Uniforme:</strong>
-                    ${item.uniforme || ""}
+                    ${uniforme}
                 </p>
 
 
                 <p>
                     <strong>Modelo:</strong>
-                    ${item.modelo || ""}
+                    ${modelo}
                 </p>
 
 
                 <p>
                     <strong>Tamanho:</strong>
-                    ${item.tamanhoCamisa || ""}
+                    ${tamanho}
                 </p>
 
 
                 <p>
                     <strong>Peça inferior:</strong>
-                    ${item.inferior || "Nenhum"}
+                    ${inferior}
+                </p>
+
+
+                <p>
+                    <strong>Tamanho inferior:</strong>
+                    ${tamanhoInferior}
                 </p>
 
 
                 <p>
                     <strong>Valor:</strong>
-                    ${formatarMoeda(
-                        Number(
-                            item.valor
-                        ) || 0
-                    )}
+                    ${formatarMoeda(valor)}
                 </p>
 
             </div>
@@ -375,8 +488,7 @@ function mostrarUniformes() {
     });
 
 
-    area.innerHTML =
-        html;
+    area.innerHTML = html;
 
 }
 
@@ -388,9 +500,7 @@ function mostrarUniformes() {
 function mostrarPagamentos() {
 
     const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+        document.getElementById("conteudoAdmin");
 
 
     if (!area) return;
@@ -418,10 +528,34 @@ function mostrarPagamentos() {
 
     pedidos.forEach(function(pedido) {
 
+        const id =
+            pedido["ID Pedido"] ??
+            pedido.idPedido ??
+            "Pedido";
+
+
+        const responsavel =
+            pedido["Responsável"] ??
+            pedido.responsavel ??
+            "";
+
+
+        const valor =
+            Number(
+                pedido["Valor Total"] ??
+                pedido.valorTotal ??
+                0
+            );
+
+
         const pago =
             String(
-                pedido.pago || "Não"
-            ).toLowerCase() === "sim";
+                pedido["Pago"] ??
+                pedido.pago ??
+                "Não"
+            )
+            .trim()
+            .toLowerCase() === "sim";
 
 
         html += `
@@ -429,7 +563,7 @@ function mostrarPagamentos() {
             <div class="card">
 
                 <h3>
-                    ${pedido.idPedido || "Pedido"}
+                    ${id}
                 </h3>
 
 
@@ -439,7 +573,7 @@ function mostrarPagamentos() {
                         Responsável:
                     </strong>
 
-                    ${pedido.responsavel || ""}
+                    ${responsavel}
 
                 </p>
 
@@ -450,11 +584,7 @@ function mostrarPagamentos() {
                         Valor:
                     </strong>
 
-                    ${formatarMoeda(
-                        Number(
-                            pedido.valorTotal
-                        ) || 0
-                    )}
+                    ${formatarMoeda(valor)}
 
                 </p>
 
@@ -480,8 +610,7 @@ function mostrarPagamentos() {
     });
 
 
-    area.innerHTML =
-        html;
+    area.innerHTML = html;
 
 }
 
@@ -493,9 +622,7 @@ function mostrarPagamentos() {
 function mostrarConfiguracoes() {
 
     const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+        document.getElementById("conteudoAdmin");
 
 
     if (!area) return;
@@ -537,9 +664,7 @@ function mostrarConfiguracoes() {
 function mostrarMensagem(texto) {
 
     const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+        document.getElementById("conteudoAdmin");
 
 
     if (!area) return;
@@ -564,15 +689,14 @@ function mostrarMensagem(texto) {
 
 function formatarMoeda(valor) {
 
-    return Number(
-        valor || 0
-    ).toLocaleString(
-        "pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
-        }
-    );
+    return Number(valor || 0)
+        .toLocaleString(
+            "pt-BR",
+            {
+                style: "currency",
+                currency: "BRL"
+            }
+        );
 
 }
 
