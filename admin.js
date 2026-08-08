@@ -448,7 +448,7 @@ function mostrarUniformes() {
 
 // ======================================================
 // PAGAMENTOS
-// APENAS LEITURA NESTA ETAPA
+// APENAS LEITURA
 // ======================================================
 
 function mostrarPagamentos() {
@@ -481,10 +481,21 @@ function mostrarPagamentos() {
     pedidos.forEach(
         function(pedido) {
 
-            const status =
-                pedido.Status ||
-                "Não pago";
+            // ==========================================
+            // LER STATUS
+            // ==========================================
 
+            const status =
+                pedido.Status !== undefined &&
+                pedido.Status !== null &&
+                String(pedido.Status).trim() !== ""
+                    ? String(pedido.Status).trim()
+                    : "Não pago";
+
+
+            // ==========================================
+            // LER VALOR TOTAL
+            // ==========================================
 
             const valorTotal =
                 Number(
@@ -492,11 +503,19 @@ function mostrarPagamentos() {
                 ) || 0;
 
 
+            // ==========================================
+            // LER VALOR PAGO
+            // ==========================================
+
             const valorPago =
                 Number(
                     pedido.Pago
                 ) || 0;
 
+
+            // ==========================================
+            // LER VALOR RESTANTE
+            // ==========================================
 
             const valorRestante =
                 Number(
@@ -539,7 +558,6 @@ function mostrarPagamentos() {
                         </strong>
 
                         ${status}
-
                     </p>
 
 
@@ -551,7 +569,6 @@ function mostrarPagamentos() {
                         ${formatarMoeda(
                             valorPago
                         )}
-
                     </p>
 
 
@@ -563,7 +580,6 @@ function mostrarPagamentos() {
                         ${formatarMoeda(
                             valorRestante
                         )}
-
                     </p>
 
                 </div>
