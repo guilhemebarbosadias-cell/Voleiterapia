@@ -149,7 +149,7 @@ function atualizarResumo() {
 
             const restante =
                 Number(
-                    pedido.Restante
+                    pedido.restante
                 ) || 0;
 
 
@@ -214,7 +214,7 @@ function mostrarPedidos() {
         function(pedido) {
 
             const status =
-                pedido.Status ||
+                pedido.status ||
                 "Não pago";
 
 
@@ -486,10 +486,10 @@ function mostrarPagamentos() {
             // ==========================================
 
             const status =
-                pedido.Status !== undefined &&
-                pedido.Status !== null &&
-                String(pedido.Status).trim() !== ""
-                    ? String(pedido.Status).trim()
+                pedido.status !== undefined &&
+                pedido.status !== null &&
+                String(pedido.status).trim() !== ""
+                    ? String(pedido.status).trim()
                     : "Não pago";
 
 
@@ -509,7 +509,7 @@ function mostrarPagamentos() {
 
             const valorPago =
                 Number(
-                    pedido.Pago
+                    pedido.pago
                 ) || 0;
 
 
@@ -519,7 +519,7 @@ function mostrarPagamentos() {
 
             const valorRestante =
                 Number(
-                    pedido.Restante
+                    pedido.restante
                 ) || 0;
 
 
