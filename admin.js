@@ -31,16 +31,13 @@ async function carregarDados() {
                 URL_APPS_SCRIPT + "?acao=admin"
             );
 
-
         const dados =
             await resposta.json();
-
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
             dados
         );
-
 
         if (
             !dados ||
@@ -54,21 +51,17 @@ async function carregarDados() {
 
         }
 
-
         pedidos =
             Array.isArray(dados.pedidos)
                 ? dados.pedidos
                 : [];
-
 
         itens =
             Array.isArray(dados.itens)
                 ? dados.itens
                 : [];
 
-
         atualizarResumo();
-
 
     } catch (erro) {
 
@@ -76,7 +69,6 @@ async function carregarDados() {
             "ERRO AO CARREGAR ADMIN:",
             erro
         );
-
 
         mostrarMensagem(
             "Não foi possível carregar os dados da administração."
@@ -98,37 +90,28 @@ function atualizarResumo() {
             "totalPedidos"
         );
 
-
     const totalUniformes =
         document.getElementById(
             "totalUniformes"
         );
-
 
     const valorTotal =
         document.getElementById(
             "valorTotal"
         );
 
-
     const valorPendente =
         document.getElementById(
             "valorPendente"
         );
 
-
     let totalVendido = 0;
-
     let totalRecebido = 0;
-
     let totalAberto = 0;
 
     let pedidosPagos = 0;
-
     let pedidosParciais = 0;
-
     let pedidosNaoPagos = 0;
-
 
     pedidos.forEach(
         function(pedido) {
@@ -138,30 +121,24 @@ function atualizarResumo() {
                     pedido.valorTotal
                 ) || 0;
 
-
             const valorPagoPedido =
                 Number(
                     pedido.Pago
                 ) || 0;
-
 
             const valorRestantePedido =
                 Number(
                     pedido.Restante
                 ) || 0;
 
-
             totalVendido +=
                 valorTotalPedido;
-
 
             totalRecebido +=
                 valorPagoPedido;
 
-
             totalAberto +=
                 valorRestantePedido;
-
 
             if (
                 valorRestantePedido <= 0 &&
@@ -232,12 +209,10 @@ function atualizarResumo() {
             "valorRecebido"
         );
 
-
     const parciais =
         document.getElementById(
             "pedidosParciais"
         );
-
 
     const naoPagos =
         document.getElementById(
@@ -275,36 +250,30 @@ function atualizarResumo() {
         "===== RESUMO FINANCEIRO ====="
     );
 
-
     console.log(
         "Total vendido:",
         totalVendido
     );
-
 
     console.log(
         "Total recebido:",
         totalRecebido
     );
 
-
     console.log(
         "Total em aberto:",
         totalAberto
     );
-
 
     console.log(
         "Pedidos pagos:",
         pedidosPagos
     );
 
-
     console.log(
         "Pedidos parciais:",
         pedidosParciais
     );
-
 
     console.log(
         "Pedidos não pagos:",
@@ -320,14 +289,14 @@ function atualizarResumo() {
 
 function mostrarPedidos() {
 
+    esconderAreaLancamentoAntiga();
+
     const area =
         document.getElementById(
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     if (pedidos.length === 0) {
 
@@ -340,7 +309,6 @@ function mostrarPedidos() {
         return;
 
     }
-
 
     let html = "";
 
@@ -403,7 +371,8 @@ function mostrarPedidos() {
     );
 
 
-    area.innerHTML = html;
+    area.innerHTML =
+        html;
 
 }
 
@@ -472,11 +441,12 @@ function obterModelo(item) {
 
 function mostrarUniformes() {
 
+    esconderAreaLancamentoAntiga();
+
     const area =
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -512,54 +482,45 @@ function mostrarUniformes() {
                         Uniforme ${index + 1}
                     </h3>
 
-
                     <p>
                         <strong>Nome:</strong>
                         ${item.nome || ""}
                     </p>
-
 
                     <p>
                         <strong>Número:</strong>
                         ${item.numero || ""}
                     </p>
 
-
                     <p>
                         <strong>Categoria:</strong>
                         ${item.categoria || ""}
                     </p>
-
 
                     <p>
                         <strong>Função:</strong>
                         ${item.funcao || ""}
                     </p>
 
-
                     <p>
                         <strong>Modelo:</strong>
                         ${modelo}
                     </p>
-
 
                     <p>
                         <strong>Tamanho da camisa:</strong>
                         ${item.tamanhoCamisa || ""}
                     </p>
 
-
                     <p>
                         <strong>Peça inferior:</strong>
                         ${item.inferior || "Nenhum"}
                     </p>
 
-
                     <p>
                         <strong>Tamanho inferior:</strong>
                         ${item.tamanhoInferior || "N/A"}
                     </p>
-
 
                     <p>
                         <strong>Valor:</strong>
@@ -576,17 +537,22 @@ function mostrarUniformes() {
     );
 
 
-    area.innerHTML = html;
+    area.innerHTML =
+        html;
 
 }
 
 
 // ======================================================
 // PAGAMENTOS
-// CLICAR NO PEDIDO PARA ABRIR
+// ======================================================
+// O PAGAMENTO É LANÇADO DIRETAMENTE NO PEDIDO.
+// NÃO EXISTE UMA ABA SEPARADA PARA LANÇAMENTO.
 // ======================================================
 
 function mostrarPagamentos() {
+
+    esconderAreaLancamentoAntiga();
 
     const area =
         document.getElementById(
@@ -612,16 +578,29 @@ function mostrarPagamentos() {
 
     let html = `
 
-        <div class="card">
+        <div
+            style="
+                margin-bottom:15px;
+                padding:15px;
+                background:#f5f5f5;
+                border-radius:12px;
+            "
+        >
 
-            <h2>
+            <strong>
                 💰 Pagamentos
-            </h2>
+            </strong>
 
-            <p style="color:#777;">
-                Clique em um pedido para visualizar
-                os valores e lançar um pagamento.
-            </p>
+            <div
+                style="
+                    color:#777;
+                    margin-top:5px;
+                    font-size:14px;
+                "
+            >
+                Selecione o pedido e lance o valor
+                recebido diretamente nele.
+            </div>
 
         </div>
 
@@ -630,6 +609,21 @@ function mostrarPagamentos() {
 
     pedidos.forEach(
         function(pedido, index) {
+
+            const idPedido =
+                pedido.idPedido ||
+                pedido.ID ||
+                pedido.id ||
+                `Pedido ${index + 1}`;
+
+
+            const status =
+                pedido.Status !== undefined &&
+                pedido.Status !== null &&
+                String(pedido.Status).trim() !== ""
+                    ? String(pedido.Status).trim()
+                    : "Não pago";
+
 
             const valorTotal =
                 Number(
@@ -646,37 +640,27 @@ function mostrarPagamentos() {
             const valorRestante =
                 Number(
                     pedido.Restante
-                ) || 0;
+                ) || Math.max(
+                    valorTotal - valorPago,
+                    0
+                );
 
 
-            const status =
-                pedido.Status !== undefined &&
-                pedido.Status !== null &&
-                String(pedido.Status).trim() !== ""
-                    ? String(pedido.Status).trim()
-                    : "Não pago";
-
-
-            const id =
-                pedido.idPedido ||
-                "Pedido";
+            const bloqueado =
+                valorRestante <= 0;
 
 
             html += `
 
                 <div
-                    class="card pagamento-pedido"
+                    class="card"
                     style="
                         margin-bottom:15px;
-                        cursor:pointer;
-                    "
-                    onclick="
-                        abrirPagamentoPedido(${index})
                     "
                 >
 
                     <h3>
-                        ${id}
+                        💰 ${idPedido}
                     </h3>
 
 
@@ -691,19 +675,23 @@ function mostrarPagamentos() {
 
                     <p>
                         <strong>
-                            Valor:
+                            Valor total:
                         </strong>
 
-                        ${formatarMoeda(valorTotal)}
+                        ${formatarMoeda(
+                            valorTotal
+                        )}
                     </p>
 
 
                     <p>
                         <strong>
-                            Pago:
+                            Já pago:
                         </strong>
 
-                        ${formatarMoeda(valorPago)}
+                        ${formatarMoeda(
+                            valorPago
+                        )}
                     </p>
 
 
@@ -712,7 +700,21 @@ function mostrarPagamentos() {
                             Restante:
                         </strong>
 
-                        ${formatarMoeda(valorRestante)}
+                        <span
+                            style="
+                                font-weight:bold;
+                                color:${
+                                    bloqueado
+                                        ? "#168a3a"
+                                        : "#d97706"
+                                };
+                            "
+                        >
+                            ${formatarMoeda(
+                                valorRestante
+                            )}
+                        </span>
+
                     </p>
 
 
@@ -722,67 +724,93 @@ function mostrarPagamentos() {
                         </strong>
 
                         ${status}
+
                     </p>
 
 
-                    <div
-                        id="pagamentoAberto${index}"
-                        style="
-                            display:none;
-                            margin-top:15px;
-                            padding-top:15px;
-                            border-top:1px solid #ddd;
-                        "
-                    >
+                    ${
+                        bloqueado
 
-                        <label
-                            style="
-                                display:block;
-                                font-weight:bold;
-                                margin-bottom:6px;
-                            "
-                        >
-                            Valor recebido agora
-                        </label>
+                        ?
+
+                        `
+                            <div
+                                style="
+                                    margin-top:15px;
+                                    padding:12px;
+                                    background:#e9f8ee;
+                                    color:#168a3a;
+                                    border-radius:10px;
+                                    font-weight:bold;
+                                    text-align:center;
+                                "
+                            >
+                                ✅ Pedido totalmente pago
+                            </div>
+                        `
+
+                        :
+
+                        `
+
+                            <div
+                                style="
+                                    margin-top:15px;
+                                    padding-top:15px;
+                                    border-top:1px solid #ddd;
+                                "
+                            >
+
+                                <label
+                                    style="
+                                        display:block;
+                                        font-weight:bold;
+                                        margin-bottom:6px;
+                                    "
+                                >
+                                    Valor recebido agora
+                                </label>
 
 
-                        <input
-                            type="number"
-                            id="valorPagamento${index}"
-                            min="0"
-                            step="0.01"
-                            placeholder="Ex.: 25,00"
-                            onclick="event.stopPropagation()"
-                            style="
-                                width:100%;
-                                box-sizing:border-box;
-                                padding:12px;
-                                border:1px solid #ccc;
-                                border-radius:10px;
-                                font-size:16px;
-                            "
-                        >
+                                <input
+                                    id="pagamento-${index}"
+                                    type="number"
+                                    min="0"
+                                    max="${valorRestante}"
+                                    step="0.01"
+                                    placeholder="Ex.: 25,00"
+                                    style="
+                                        width:100%;
+                                        box-sizing:border-box;
+                                        padding:12px;
+                                        border:1px solid #ccc;
+                                        border-radius:10px;
+                                        font-size:16px;
+                                    "
+                                >
 
 
-                        <button
-                            type="button"
-                            class="admin-button"
-                            style="
-                                width:100%;
-                                margin-top:12px;
-                                background:#ff007f;
-                            "
-                            onclick="
-                                event.stopPropagation();
-                                registrarPagamentoPedido(${index})
-                            "
-                        >
+                                <button
+                                    type="button"
+                                    class="admin-button"
+                                    style="
+                                        width:100%;
+                                        margin-top:10px;
+                                        background:#ff007f;
+                                    "
+                                    onclick="
+                                        registrarPagamento(
+                                            ${index}
+                                        )
+                                    "
+                                >
+                                    💰 REGISTRAR PAGAMENTO
+                                </button>
 
-                            💰 REGISTRAR PAGAMENTO
+                            </div>
 
-                        </button>
-
-                    </div>
+                        `
+                    }
 
                 </div>
 
@@ -792,48 +820,8 @@ function mostrarPagamentos() {
     );
 
 
-    area.innerHTML = html;
-
-}
-
-
-// ======================================================
-// ABRIR / FECHAR PEDIDO
-// ======================================================
-
-function abrirPagamentoPedido(index) {
-
-    const area =
-        document.getElementById(
-            "pagamentoAberto" + index
-        );
-
-
-    if (!area) return;
-
-
-    const estavaAberto =
-        area.style.display === "block";
-
-
-    document.querySelectorAll(
-        '[id^="pagamentoAberto"]'
-    ).forEach(
-        function(elemento) {
-
-            elemento.style.display =
-                "none";
-
-        }
-    );
-
-
-    if (!estavaAberto) {
-
-        area.style.display =
-            "block";
-
-    }
+    area.innerHTML =
+        html;
 
 }
 
@@ -842,7 +830,7 @@ function abrirPagamentoPedido(index) {
 // REGISTRAR PAGAMENTO
 // ======================================================
 
-async function registrarPagamentoPedido(index) {
+async function registrarPagamento(index) {
 
     const pedido =
         pedidos[index];
@@ -861,23 +849,52 @@ async function registrarPagamentoPedido(index) {
 
     const campo =
         document.getElementById(
-            "valorPagamento" + index
+            `pagamento-${index}`
         );
 
 
-    if (!campo) return;
+    if (!campo) {
+
+        alert(
+            "Campo de pagamento não encontrado."
+        );
+
+        return;
+
+    }
 
 
-    const valor =
+    const valorRecebido =
         Number(
             campo.value
         ) || 0;
 
 
-    if (valor <= 0) {
+    const valorTotal =
+        Number(
+            pedido.valorTotal
+        ) || 0;
+
+
+    const valorPagoAtual =
+        Number(
+            pedido.Pago
+        ) || 0;
+
+
+    const valorRestanteAtual =
+        Number(
+            pedido.Restante
+        ) || Math.max(
+            valorTotal - valorPagoAtual,
+            0
+        );
+
+
+    if (valorRecebido <= 0) {
 
         alert(
-            "Digite um valor de pagamento."
+            "Informe um valor de pagamento."
         );
 
         campo.focus();
@@ -887,13 +904,10 @@ async function registrarPagamentoPedido(index) {
     }
 
 
-    const valorRestante =
-        Number(
-            pedido.Restante
-        ) || 0;
-
-
-    if (valor > valorRestante) {
+    if (
+        valorRecebido >
+        valorRestanteAtual
+    ) {
 
         alert(
             "O valor informado é maior que o valor restante do pedido."
@@ -908,7 +922,8 @@ async function registrarPagamentoPedido(index) {
 
     const idPedido =
         pedido.idPedido ||
-        "";
+        pedido.ID ||
+        pedido.id;
 
 
     if (!idPedido) {
@@ -922,28 +937,62 @@ async function registrarPagamentoPedido(index) {
     }
 
 
+    const botao =
+        document.querySelector(
+            `[onclick="registrarPagamento(${index})"]`
+        );
+
+
+    if (botao) {
+
+        botao.disabled = true;
+
+        botao.innerText =
+            "⏳ REGISTRANDO...";
+
+    }
+
+
     try {
+
+        /*
+         * O Apps Script continua sendo o responsável
+         * por alterar a planilha.
+         *
+         * O JavaScript apenas envia:
+         * - ID do pedido
+         * - valor recebido
+         */
 
         const url =
             URL_APPS_SCRIPT +
-            "?acao=lancarPagamento" +
+            "?acao=registrarPagamento" +
             "&idPedido=" +
-            encodeURIComponent(idPedido) +
+            encodeURIComponent(
+                idPedido
+            ) +
             "&valor=" +
-            encodeURIComponent(valor);
+            encodeURIComponent(
+                valorRecebido
+            );
 
 
         console.log(
-            "LANÇANDO PAGAMENTO:",
+            "ENVIANDO PAGAMENTO:",
             {
-                idPedido,
-                valor
+                idPedido:
+                    idPedido,
+
+                valor:
+                    valorRecebido
             }
         );
 
 
         const resposta =
-            await fetch(url);
+            await fetch(
+                url
+            );
 
 
         const dados =
@@ -963,7 +1012,7 @@ async function registrarPagamentoPedido(index) {
 
             throw new Error(
                 dados?.message ||
-                "Não foi possível registrar o pagamento."
+                "O Apps Script não confirmou o pagamento."
             );
 
         }
@@ -973,6 +1022,12 @@ async function registrarPagamentoPedido(index) {
             "Pagamento registrado com sucesso!"
         );
 
+
+        /*
+         * Recarrega os dados da planilha.
+         * Assim o valor pago, restante e status
+         * aparecem imediatamente atualizados.
+         */
 
         await carregarDados();
 
@@ -989,9 +1044,47 @@ async function registrarPagamentoPedido(index) {
 
 
         alert(
-            erro.message ||
-            "Não foi possível registrar o pagamento."
+            "Não foi possível registrar o pagamento.\n\n" +
+            (
+                erro.message ||
+                "Erro desconhecido."
+            )
         );
+
+
+        if (botao) {
+
+            botao.disabled = false;
+
+            botao.innerText =
+                "💰 REGISTRAR PAGAMENTO";
+
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// ESCONDER ÁREA ANTIGA DE PAGAMENTO
+// ======================================================
+// Mantém compatibilidade caso o HTML antigo ainda
+// possua areaLancamentoPagamento.
+// ======================================================
+
+function esconderAreaLancamentoAntiga() {
+
+    const area =
+        document.getElementById(
+            "areaLancamentoPagamento"
+        );
+
+
+    if (area) {
+
+        area.style.display =
+            "none";
 
     }
 
@@ -1000,10 +1093,11 @@ async function registrarPagamentoPedido(index) {
 
 // ======================================================
 // PRODUÇÃO
-// LISTA DE PRODUÇÃO
 // ======================================================
 
 function mostrarProducao() {
+
+    esconderAreaLancamentoAntiga();
 
     const area =
         document.getElementById(
@@ -1040,9 +1134,7 @@ function mostrarProducao() {
 
 
     let totalCamisas = 0;
-
     let totalBabyLook = 0;
-
     let totalInferiores = 0;
 
 
@@ -1097,7 +1189,6 @@ function mostrarProducao() {
                 🏭 Lista de Produção
             </h2>
 
-
             <p>
                 <strong>
                     Total de uniformes:
@@ -1106,7 +1197,6 @@ function mostrarProducao() {
                 ${totalUniformes}
 
             </p>
-
 
             <p>
                 <strong>
@@ -1117,7 +1207,6 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
                 <strong>
                     Baby Look:
@@ -1126,7 +1215,6 @@ function mostrarProducao() {
                 ${totalBabyLook}
 
             </p>
-
 
             <p>
                 <strong>
@@ -1145,7 +1233,6 @@ function mostrarProducao() {
             <h3>
                 👕 Lista
             </h3>
-
 
             <div
                 style="
@@ -1170,38 +1257,37 @@ function mostrarProducao() {
                             "
                         >
 
-                            <th style="padding:12px;text-align:left;">
+                            <th style="padding:12px;">
                                 Nome
                             </th>
 
-                            <th style="padding:12px;text-align:center;">
+                            <th style="padding:12px;">
                                 Nº
                             </th>
 
-                            <th style="padding:12px;text-align:left;">
+                            <th style="padding:12px;">
                                 Função
                             </th>
 
-                            <th style="padding:12px;text-align:left;">
+                            <th style="padding:12px;">
                                 Modelo
                             </th>
 
-                            <th style="padding:12px;text-align:center;">
+                            <th style="padding:12px;">
                                 Tam. camisa
                             </th>
 
-                            <th style="padding:12px;text-align:left;">
+                            <th style="padding:12px;">
                                 Peça inferior
                             </th>
 
-                            <th style="padding:12px;text-align:center;">
+                            <th style="padding:12px;">
                                 Tam. inferior
                             </th>
 
                         </tr>
 
                     </thead>
-
 
                     <tbody>
     `;
@@ -1213,10 +1299,8 @@ function mostrarProducao() {
             const nome =
                 item.nome || "";
 
-
             const numero =
                 item.numero || "";
-
 
             const funcao =
                 item.funcao || "";
@@ -1248,11 +1332,13 @@ function mostrarProducao() {
 
 
             const inferior =
-                item.inferior || "Nenhum";
+                item.inferior ||
+                "Nenhum";
 
 
             const tamanhoInferior =
-                item.tamanhoInferior || "N/A";
+                item.tamanhoInferior ||
+                "N/A";
 
 
             html += `
@@ -1265,7 +1351,9 @@ function mostrarProducao() {
                 >
 
                     <td style="padding:12px;">
-                        <strong>${nome}</strong>
+                        <strong>
+                            ${nome}
+                        </strong>
                     </td>
 
                     <td
@@ -1362,7 +1450,10 @@ function mostrarProducao() {
 
 function exportarProducaoPlanilha() {
 
-    if (!itens || itens.length === 0) {
+    if (
+        !itens ||
+        itens.length === 0
+    ) {
 
         alert(
             "Não há uniformes para exportar."
@@ -1430,11 +1521,15 @@ function exportarProducaoPlanilha() {
 
 
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
 
     link.href =
@@ -1445,16 +1540,22 @@ function exportarProducaoPlanilha() {
         "lista-producao-volei-terapia.csv";
 
 
-    document.body.appendChild(link);
+    document.body.appendChild(
+        link
+    );
 
 
     link.click();
 
 
-    document.body.removeChild(link);
+    document.body.removeChild(
+        link
+    );
 
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(
+        url
+    );
 
 
     alert(
@@ -1465,7 +1566,7 @@ function exportarProducaoPlanilha() {
 
 
 // ======================================================
-// ESCAPAR DADOS PARA CSV
+// ESCAPAR CSV
 // ======================================================
 
 function escaparCSV(valor) {
@@ -1492,6 +1593,8 @@ function escaparCSV(valor) {
 // ======================================================
 
 function mostrarConfiguracoes() {
+
+    esconderAreaLancamentoAntiga();
 
     const area =
         document.getElementById(
@@ -1524,14 +1627,18 @@ function mostrarConfiguracoes() {
                 💰 Valores das peças
             </h3>
 
-
             <p style="color:#777;">
                 Os valores abaixo poderão ser alterados
                 diretamente por esta área.
             </p>
 
 
-            <div style="display:grid; gap:12px;">
+            <div
+                style="
+                    display:grid;
+                    gap:12px;
+                "
+            >
 
                 <div>
 
@@ -1693,7 +1800,6 @@ function mostrarConfiguracoes() {
                 🏐 Configurações do sistema
             </h3>
 
-
             <label>
                 Nome do time
             </label>
@@ -1810,6 +1916,143 @@ function mostrarConfiguracoes() {
 
 
 // ======================================================
+// SALVAR CONFIGURAÇÕES
+// ======================================================
+
+function salvarConfiguracoes() {
+
+    const configuracoes = {
+
+        camisa:
+            Number(
+                document.getElementById(
+                    "configCamisa"
+                )?.value
+            ) || 0,
+
+        babyLook:
+            Number(
+                document.getElementById(
+                    "configBabyLook"
+                )?.value
+            ) || 0,
+
+        calcaoMasc:
+            Number(
+                document.getElementById(
+                    "configCalcaoMasc"
+                )?.value
+            ) || 0,
+
+        calcaoFem:
+            Number(
+                document.getElementById(
+                    "configCalcaoFem"
+                )?.value
+            ) || 0,
+
+        shortDoll:
+            Number(
+                document.getElementById(
+                    "configShortDoll"
+                )?.value
+            ) || 0,
+
+        shortSuplex:
+            Number(
+                document.getElementById(
+                    "configShortSuplex"
+                )?.value
+            ) || 0,
+
+        nomeTime:
+            document.getElementById(
+                "configNomeTime"
+            )?.value || "Vôlei Terapia",
+
+        numeroInicial:
+            Number(
+                document.getElementById(
+                    "configNumeroInicial"
+                )?.value
+            ) || 1,
+
+        numeroFinal:
+            Number(
+                document.getElementById(
+                    "configNumeroFinal"
+                )?.value
+            ) || 99
+
+    };
+
+
+    localStorage.setItem(
+        "configVoleiTerapia",
+        JSON.stringify(
+            configuracoes
+        )
+    );
+
+
+    alert(
+        "Configurações salvas neste dispositivo."
+    );
+
+}
+
+
+// ======================================================
+// RESTAURAR CONFIGURAÇÕES
+// ======================================================
+
+function restaurarConfiguracoes() {
+
+    if (
+        !confirm(
+            "Restaurar as configurações padrão?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    const padrao = {
+
+        camisa: 75,
+        babyLook: 75,
+        calcaoMasc: 35,
+        calcaoFem: 35,
+        shortDoll: 30,
+        shortSuplex: 35,
+        nomeTime: "Vôlei Terapia",
+        numeroInicial: 1,
+        numeroFinal: 99
+
+    };
+
+
+    localStorage.setItem(
+        "configVoleiTerapia",
+        JSON.stringify(
+            padrao
+        )
+    );
+
+
+    mostrarConfiguracoes();
+
+
+    alert(
+        "Configurações restauradas."
+    );
+
+}
+
+
+// ======================================================
 // MENSAGEM
 // ======================================================
 
@@ -1875,6 +2118,8 @@ function voltarInicio() {
 document.addEventListener(
     "DOMContentLoaded",
     function() {
+
+        esconderAreaLancamentoAntiga();
 
         carregarDados();
 
