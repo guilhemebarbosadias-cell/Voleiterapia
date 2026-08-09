@@ -1409,21 +1409,315 @@ function mostrarConfiguracoes() {
 
         <div class="card">
 
+            <h2>
+                ⚙️ Configurações
+            </h2>
+
+            <p style="color:#777;">
+                Gerencie os valores e as principais
+                configurações do sistema.
+            </p>
+
+        </div>
+
+
+        <!-- ==================================================
+             VALORES DAS PEÇAS
+             ================================================== -->
+
+        <div class="card">
+
             <h3>
-                Configurações
+                💰 Valores das peças
             </h3>
 
-            <p>
-                Esta área será usada para
-                configurar o sistema.
+
+            <p style="color:#777;">
+                Os valores abaixo poderão ser alterados
+                diretamente por esta área.
             </p>
 
-            <p>
-                Futuramente poderemos colocar
-                aqui os valores dos uniformes,
-                opções de peças e outras
-                configurações.
-            </p>
+
+            <div style="display:grid; gap:12px;">
+
+
+                <div>
+
+                    <label>
+                        Camisa
+                    </label>
+
+                    <input
+                        id="configCamisa"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Baby Look
+                    </label>
+
+                    <input
+                        id="configBabyLook"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Calção masculino
+                    </label>
+
+                    <input
+                        id="configCalcaoMasc"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Calção feminino
+                    </label>
+
+                    <input
+                        id="configCalcaoFem"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Short Doll
+                    </label>
+
+                    <input
+                        id="configShortDoll"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="30"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Short Suplex
+                    </label>
+
+                    <input
+                        id="configShortSuplex"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- ==================================================
+             CONFIGURAÇÕES DO SISTEMA
+             ================================================== -->
+
+        <div class="card">
+
+            <h3>
+                🏐 Configurações do sistema
+            </h3>
+
+
+            <label>
+                Nome do time
+            </label>
+
+            <input
+                id="configNomeTime"
+                type="text"
+                value="Vôlei Terapia"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                    margin-top:6px;
+                "
+            >
+
+
+            <label
+                style="
+                    display:block;
+                    margin-top:15px;
+                "
+            >
+                Número inicial
+            </label>
+
+            <input
+                id="configNumeroInicial"
+                type="number"
+                min="1"
+                max="99"
+                value="1"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                    margin-top:6px;
+                "
+            >
+
+
+            <label
+                style="
+                    display:block;
+                    margin-top:15px;
+                "
+            >
+                Número final
+            </label>
+
+            <input
+                id="configNumeroFinal"
+                type="number"
+                min="1"
+                max="99"
+                value="99"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                    margin-top:6px;
+                "
+            >
+
+        </div>
+
+
+        <!-- ==================================================
+             BOTÕES
+             ================================================== -->
+
+        <div class="card">
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="salvarConfiguracoes()"
+            >
+
+                💾 SALVAR ALTERAÇÕES
+
+            </button>
+
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    margin-top:10px;
+                    background:#555;
+                "
+                onclick="restaurarConfiguracoes()"
+            >
+
+                🔄 RESTAURAR PADRÃO
+
+            </button>
 
         </div>
 
@@ -1503,3 +1797,4 @@ document.addEventListener(
 
     }
 );
+
