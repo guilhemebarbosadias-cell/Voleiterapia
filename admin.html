@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
 
 <title>Administração - Vôlei Terapia</title>
+
 <link rel="stylesheet" href="style.css">
+
 <style>
 
 body{
@@ -125,90 +131,73 @@ body{
    ===================================================== */
 
 .pagamento-lancamento{
-
     background:white;
-
     border-radius:18px;
-
     padding:20px;
-
     margin-bottom:20px;
-
     box-shadow:0 3px 10px #0002;
-
 }
 
 .pagamento-lancamento h3{
-
     margin-top:0;
-
     color:#ff007f;
-
 }
 
 .pagamento-lancamento label{
-
     display:block;
-
     font-weight:bold;
-
     margin-top:12px;
-
     margin-bottom:6px;
-
 }
 
 .pagamento-lancamento select,
 .pagamento-lancamento input{
-
     width:100%;
-
     box-sizing:border-box;
-
     padding:12px;
-
     border:1px solid #ccc;
-
     border-radius:10px;
-
     font-size:16px;
-
 }
 
 .pagamento-info{
-
     background:#f5f5f5;
-
     border-radius:12px;
-
     padding:15px;
-
     margin-top:15px;
-
 }
 
 .pagamento-info p{
-
     margin:7px 0;
-
 }
 
 .pagamento-registrar{
-
     width:100%;
-
     margin-top:15px;
-
     background:#ff007f;
-
 }
 
 .pagamento-registrar:hover{
-
     background:#e60073;
-
 }
 
+
+/* =====================================================
+   BOTÃO LANÇAR PAGAMENTO
+   ===================================================== */
+
+.botao-lancar-pagamento{
+    background:#ff007f;
+}
+
+.botao-lancar-pagamento:hover{
+    background:#e60073;
+}
+
+
+/* =====================================================
+   RESPONSIVO
+   ===================================================== */
 
 @media(max-width:600px){
 
@@ -223,401 +212,470 @@ body{
 }
 
 </style>
+
 </head>
+
+
 <body>
+
+
 <header class="admin-header">
-<div class="admin-logo">
 
-    Vôlei<span>Terapia</span>
+    <div class="admin-logo">
 
-</div>
+        Vôlei<span>Terapia</span>
 
+    </div>
 
-<div class="admin-subtitle">
+    <div class="admin-subtitle">
 
-    Painel de Administração
+        Painel de Administração
 
-</div>
+    </div>
 
 </header>
+
+
+
 <main class="admin-container">
+
+
 <!-- =====================================================
-     RESUMO
+     RESUMO FINANCEIRO
      ===================================================== -->
+
 <section>
-<div class="admin-grid">
+
+    <div class="admin-grid">
 
 
-    <div class="admin-card">
+        <div class="admin-card">
 
-        <h3>
-            Pedidos
-        </h3>
+            <h3>
+                Pedidos
+            </h3>
 
-        <div
-            id="totalPedidos"
-            class="admin-number">
+            <div
+                id="totalPedidos"
+                class="admin-number">
 
-            0
+                0
 
-        </div>
-
-    </div>
-
-
-
-    <div class="admin-card">
-
-        <h3>
-            Uniformes
-        </h3>
-
-        <div
-            id="totalUniformes"
-            class="admin-number">
-
-            0
+            </div>
 
         </div>
 
-    </div>
 
 
+        <div class="admin-card">
 
-    <div class="admin-card">
+            <h3>
+                Uniformes
+            </h3>
 
-        <h3>
-            Valor total
-        </h3>
+            <div
+                id="totalUniformes"
+                class="admin-number">
 
-        <div
-            id="valorTotal"
-            class="admin-number">
+                0
 
-            R$ 0,00
-
-        </div>
-
-    </div>
-
-
-
-    <div class="admin-card">
-
-        <h3>
-            Em aberto
-        </h3>
-
-        <div
-            id="valorPendente"
-            class="admin-number">
-
-            R$ 0,00
+            </div>
 
         </div>
 
-    </div>
 
 
+        <div class="admin-card">
 
-    <div class="admin-card">
+            <h3>
+                Valor total
+            </h3>
 
-        <h3>
-            💵 Recebido
-        </h3>
+            <div
+                id="valorTotal"
+                class="admin-number">
 
-        <div
-            id="valorRecebido"
-            class="admin-number">
+                R$ 0,00
 
-            R$ 0,00
-
-        </div>
-
-    </div>
-
-
-
-    <div class="admin-card">
-
-        <h3>
-            🟡 Pagamentos parciais
-        </h3>
-
-        <div
-            id="pedidosParciais"
-            class="admin-number">
-
-            0
+            </div>
 
         </div>
 
-    </div>
 
 
+        <div class="admin-card">
 
-    <div class="admin-card">
+            <h3>
+                Em aberto
+            </h3>
 
-        <h3>
-            ❌ Não pagos
-        </h3>
+            <div
+                id="valorPendente"
+                class="admin-number">
 
-        <div
-            id="pedidosNaoPagos"
-            class="admin-number">
+                R$ 0,00
 
-            0
+            </div>
 
         </div>
 
+
+
+        <div class="admin-card">
+
+            <h3>
+                💵 Recebido
+            </h3>
+
+            <div
+                id="valorRecebido"
+                class="admin-number">
+
+                R$ 0,00
+
+            </div>
+
+        </div>
+
+
+
+        <div class="admin-card">
+
+            <h3>
+                🟡 Pagamentos parciais
+            </h3>
+
+            <div
+                id="pedidosParciais"
+                class="admin-number">
+
+                0
+
+            </div>
+
+        </div>
+
+
+
+        <div class="admin-card">
+
+            <h3>
+                ❌ Não pagos
+            </h3>
+
+            <div
+                id="pedidosNaoPagos"
+                class="admin-number">
+
+                0
+
+            </div>
+
+        </div>
+
+
     </div>
-
-
-</div>
 
 </section>
+
+
+
 <!-- =====================================================
      MENU
      ===================================================== -->
+
 <section class="section">
-<h2 class="section-title">
 
-    Administração
+    <h2 class="section-title">
 
-</h2>
+        Administração
 
-
-<div class="admin-menu">
+    </h2>
 
 
-    <button
-        class="admin-button"
-        onclick="mostrarPedidos()">
-
-        <span>📋</span>
-
-        Pedidos
-
-    </button>
+    <div class="admin-menu">
 
 
+        <button
+            type="button"
+            class="admin-button"
+            onclick="mostrarPedidos()">
 
-    <button
-        class="admin-button"
-        onclick="mostrarUniformes()">
+            <span>📋</span>
 
-        <span>👕</span>
+            Pedidos
 
-        Uniformes
-
-    </button>
+        </button>
 
 
 
-    <button
-        class="admin-button"
-        onclick="mostrarPagamentos()">
+        <button
+            type="button"
+            class="admin-button"
+            onclick="mostrarUniformes()">
 
-        <span>💰</span>
+            <span>👕</span>
 
-        Pagamentos
+            Uniformes
 
-    </button>
-
-
-
-    <button
-        class="admin-button"
-        onclick="mostrarProducao()">
-
-        <span>🏭</span>
-
-        Produção
-
-    </button>
+        </button>
 
 
 
-    <button
-        class="admin-button"
-        onclick="mostrarConfiguracoes()">
+        <button
+            type="button"
+            class="admin-button"
+            onclick="mostrarPagamentos()">
 
-        <span>⚙️</span>
+            <span>💰</span>
 
-        Configurações
+            Pagamentos
 
-    </button>
+        </button>
 
 
-</div>
+
+        <!-- =================================================
+             BOTÃO LANÇAR PAGAMENTO
+             ================================================= -->
+
+        <button
+            type="button"
+            class="admin-button botao-lancar-pagamento"
+            onclick="
+                document.getElementById('areaLancamentoPagamento').style.display='block';
+                document.getElementById('areaLancamentoPagamento').scrollIntoView({behavior:'smooth'});
+            ">
+
+            <span>💳</span>
+
+            Lançar pagamento
+
+        </button>
+
+
+
+        <button
+            type="button"
+            class="admin-button"
+            onclick="mostrarProducao()">
+
+            <span>🏭</span>
+
+            Produção
+
+        </button>
+
+
+
+        <button
+            type="button"
+            class="admin-button"
+            onclick="mostrarConfiguracoes()">
+
+            <span>⚙️</span>
+
+            Configurações
+
+        </button>
+
+
+    </div>
 
 </section>
+
+
+
 <!-- =====================================================
      ÁREA DE LANÇAMENTO DE PAGAMENTO
      ===================================================== -->
+
 <section
     id="areaLancamentoPagamento"
     class="section"
     style="display:none;">
-<div class="pagamento-lancamento">
+
+    <div class="pagamento-lancamento">
 
 
-    <h3>
-        💰 Lançar pagamento
-    </h3>
+        <h3>
+            💰 Lançar pagamento
+        </h3>
 
 
-    <label for="pedidoPagamento">
+        <label for="pedidoPagamento">
 
-        Pedido
+            Pedido
 
-    </label>
-
-
-    <select
-        id="pedidoPagamento">
-
-        <option value="">
-
-            Selecione o pedido
-
-        </option>
-
-    </select>
+        </label>
 
 
+        <select
+            id="pedidoPagamento">
 
-    <div
-        id="informacoesPagamento"
-        class="pagamento-info"
-        style="display:none;">
+            <option value="">
 
+                Selecione o pedido
 
-        <p>
+            </option>
 
-            <strong>
-                Responsável:
-            </strong>
-
-            <span
-                id="responsavelPagamento">
-            </span>
-
-        </p>
+        </select>
 
 
-        <p>
 
-            <strong>
-                Valor total:
-            </strong>
-
-            <span
-                id="totalPagamento">
-            </span>
-
-        </p>
+        <div
+            id="informacoesPagamento"
+            class="pagamento-info"
+            style="display:none;">
 
 
-        <p>
+            <p>
 
-            <strong>
-                Já pago:
-            </strong>
+                <strong>
+                    Responsável:
+                </strong>
 
-            <span
-                id="pagoPagamento">
-            </span>
+                <span
+                    id="responsavelPagamento">
+                </span>
 
-        </p>
-
-
-        <p>
-
-            <strong>
-                Restante:
-            </strong>
-
-            <span
-                id="restantePagamento">
-            </span>
-
-        </p>
+            </p>
 
 
-        <p>
+            <p>
 
-            <strong>
-                Status:
-            </strong>
+                <strong>
+                    Valor total:
+                </strong>
 
-            <span
-                id="statusPagamento">
-            </span>
+                <span
+                    id="totalPagamento">
+                </span>
 
-        </p>
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Já pago:
+                </strong>
+
+                <span
+                    id="pagoPagamento">
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Restante:
+                </strong>
+
+                <span
+                    id="restantePagamento">
+                </span>
+
+            </p>
+
+
+            <p>
+
+                <strong>
+                    Status:
+                </strong>
+
+                <span
+                    id="statusPagamento">
+                </span>
+
+            </p>
+
+
+        </div>
+
+
+
+        <label for="valorPagamento">
+
+            Valor recebido agora
+
+        </label>
+
+
+        <input
+            type="number"
+            id="valorPagamento"
+            min="0"
+            step="0.01"
+            placeholder="Ex.: 25,00">
+
+
+        <button
+            id="botaoRegistrarPagamento"
+            class="admin-button pagamento-registrar"
+            type="button">
+
+            💰 REGISTRAR PAGAMENTO
+
+        </button>
 
 
     </div>
 
-
-
-    <label for="valorPagamento">
-
-        Valor recebido agora
-
-    </label>
-
-
-    <input
-        type="number"
-        id="valorPagamento"
-        min="0"
-        step="0.01"
-        placeholder="Ex.: 25,00">
-
-
-    <button
-        id="botaoRegistrarPagamento"
-        class="admin-button pagamento-registrar"
-        type="button">
-
-        💰 REGISTRAR PAGAMENTO
-
-    </button>
-
-
-</div>
-
 </section>
+
+
+
 <!-- =====================================================
      ÁREA DE CONTEÚDO
      ===================================================== -->
+
 <section class="section">
-<div
-    id="conteudoAdmin"
-    class="admin-list">
 
-    <div class="empty">
+    <div
+        id="conteudoAdmin"
+        class="admin-list">
 
-        Selecione uma opção acima.
+        <div class="empty">
+
+            Selecione uma opção acima.
+
+        </div>
 
     </div>
 
-</div>
-
 </section>
-<button
-class="admin-button logout"
-onclick="voltarInicio()">
 
-VOLTAR AO INÍCIO
+
+
+<!-- =====================================================
+     VOLTAR AO INÍCIO
+     ===================================================== -->
+
+<button
+    type="button"
+    class="admin-button logout"
+    onclick="voltarInicio()">
+
+    VOLTAR AO INÍCIO
 
 </button>
+
+
 </main>
+
+
+
 <!-- =====================================================
      CHAMADA DO JAVASCRIPT
      ===================================================== -->
+
 <script src="admin.js"></script>
+
+
 </body>
+
 </html>
