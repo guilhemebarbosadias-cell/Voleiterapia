@@ -263,6 +263,50 @@ function atualizarResumo() {
     }
 
 
+    const valorRecebido =
+        document.getElementById(
+            "valorRecebido"
+        );
+
+
+    const parciais =
+        document.getElementById(
+            "pedidosParciais"
+        );
+
+
+    const naoPagos =
+        document.getElementById(
+            "pedidosNaoPagos"
+        );
+
+
+    if (valorRecebido) {
+
+        valorRecebido.innerText =
+            formatarMoeda(
+                totalRecebido
+            );
+
+    }
+
+
+    if (parciais) {
+
+        parciais.innerText =
+            pedidosParciais;
+
+    }
+
+
+    if (naoPagos) {
+
+        naoPagos.innerText =
+            pedidosNaoPagos;
+
+    }
+
+
     // ==================================================
     // LOG PARA CONFERÊNCIA
     // ==================================================
