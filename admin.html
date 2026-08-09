@@ -1,225 +1,30 @@
-// ======================================================
-// PRODUÇÃO
-// APENAS LEITURA DOS ITENS
-// ======================================================
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste Admin</title>
 
-function mostrarProducao() {
-
-    // ==================================================
-    // TESTE DE LIGAÇÃO HTML -> JAVASCRIPT
-    // ==================================================
-
-    alert("PRODUÇÃO FOI CHAMADA!");
-
-
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
-
-
-    if (!area) return;
-
-
-    if (itens.length === 0) {
-
-        area.innerHTML = `
-            <div class="empty">
-                Nenhum uniforme encontrado para produção.
-            </div>
-        `;
-
-        return;
-
-    }
-
-
-    let totalUniformes =
-        itens.length;
-
-
-    let totalCamisas = 0;
-
-    let totalBabyLook = 0;
-
-    let totalInferiores = 0;
-
-
-    itens.forEach(
-        function(item) {
-
-            const modelo =
-                String(
-                    item.modelo || ""
-                )
-                .trim()
-                .toLowerCase();
-
-
-            if (
-                modelo.includes("baby")
-            ) {
-
-                totalBabyLook++;
-
-            } else {
-
-                totalCamisas++;
-
-            }
-
-
-            const inferior =
-                String(
-                    item.inferior || ""
-                )
-                .trim()
-                .toLowerCase();
-
-
-            if (
-                inferior !== "" &&
-                inferior !== "nenhum" &&
-                inferior !== "n/a"
-            ) {
-
-                totalInferiores++;
-
-            }
-
+    <style>
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
         }
-    );
 
-
-    let html = `
-
-        <div class="card">
-
-            <h2>
-                🏭 Lista de Produção
-            </h2>
-
-            <p>
-                <strong>
-                    Total de uniformes:
-                </strong>
-
-                ${totalUniformes}
-
-            </p>
-
-            <p>
-                <strong>
-                    Camisas:
-                </strong>
-
-                ${totalCamisas}
-
-            </p>
-
-            <p>
-                <strong>
-                    Baby Look:
-                </strong>
-
-                ${totalBabyLook}
-
-            </p>
-
-            <p>
-                <strong>
-                    Peças inferiores:
-                </strong>
-
-                ${totalInferiores}
-
-            </p>
-
-        </div>
-
-    `;
-
-
-    html += `
-
-        <div class="card">
-
-            <h3>
-                👕 Uniformes
-            </h3>
-
-    `;
-
-
-    itens.forEach(
-        function(item, index) {
-
-            const modelo =
-                item.modelo || "";
-
-
-            html += `
-
-                <div
-                    style="
-                        border-bottom:1px solid #ddd;
-                        padding:12px 0;
-                    ">
-
-                    <strong>
-                        ${index + 1}.
-                        ${item.nome || ""}
-                    </strong>
-
-                    <p>
-                        <strong>Nº:</strong>
-                        ${item.numero || ""}
-                    </p>
-
-                    <p>
-                        <strong>Função:</strong>
-                        ${item.funcao || ""}
-                    </p>
-
-                    <p>
-                        <strong>Modelo:</strong>
-                        ${modelo}
-                    </p>
-
-                    <p>
-                        <strong>Tamanho:</strong>
-                        ${item.tamanhoCamisa || ""}
-                    </p>
-
-                    <p>
-                        <strong>Peça inferior:</strong>
-                        ${item.inferior || "Nenhum"}
-                    </p>
-
-                    <p>
-                        <strong>
-                            Tamanho inferior:
-                        </strong>
-
-                        ${item.tamanhoInferior || "N/A"}
-
-                    </p>
-
-                </div>
-
-            `;
-
+        h1 {
+            color: #ff007f;
         }
-    );
+    </style>
+</head>
 
+<body>
 
-    html += `
+    <h1>Vôlei Terapia</h1>
 
-        </div>
+    <p>TESTE DO ADMIN</p>
 
-    `;
-
-
-    area.innerHTML = html;
-
-}
+</body>
+</html>
