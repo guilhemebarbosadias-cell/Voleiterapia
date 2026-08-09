@@ -93,10 +93,6 @@ async function carregarDados() {
 
 function atualizarResumo() {
 
-    // ==================================================
-    // ELEMENTOS EXISTENTES
-    // ==================================================
-
     const totalPedidos =
         document.getElementById(
             "totalPedidos"
@@ -121,26 +117,14 @@ function atualizarResumo() {
         );
 
 
-    // ==================================================
-    // CONTADORES
-    // ==================================================
-
     let totalVendido = 0;
-
     let totalRecebido = 0;
-
     let totalAberto = 0;
 
     let pedidosPagos = 0;
-
     let pedidosParciais = 0;
-
     let pedidosNaoPagos = 0;
 
-
-    // ==================================================
-    // ANALISAR PEDIDOS
-    // ==================================================
 
     pedidos.forEach(
         function(pedido) {
@@ -163,10 +147,6 @@ function atualizarResumo() {
                 ) || 0;
 
 
-            // ------------------------------------------
-            // VALORES
-            // ------------------------------------------
-
             totalVendido +=
                 valorTotalPedido;
 
@@ -178,10 +158,6 @@ function atualizarResumo() {
             totalAberto +=
                 valorRestantePedido;
 
-
-            // ------------------------------------------
-            // SITUAÇÃO DO PEDIDO
-            // ------------------------------------------
 
             if (
                 valorRestantePedido <= 0 &&
@@ -211,10 +187,6 @@ function atualizarResumo() {
     );
 
 
-    // ==================================================
-    // PEDIDOS
-    // ==================================================
-
     if (totalPedidos) {
 
         totalPedidos.innerText =
@@ -223,10 +195,6 @@ function atualizarResumo() {
     }
 
 
-    // ==================================================
-    // UNIFORMES
-    // ==================================================
-
     if (totalUniformes) {
 
         totalUniformes.innerText =
@@ -234,10 +202,6 @@ function atualizarResumo() {
 
     }
 
-
-    // ==================================================
-    // TOTAL VENDIDO
-    // ==================================================
 
     if (valorTotal) {
 
@@ -248,10 +212,6 @@ function atualizarResumo() {
 
     }
 
-
-    // ==================================================
-    // TOTAL EM ABERTO
-    // ==================================================
 
     if (valorPendente) {
 
@@ -306,10 +266,6 @@ function atualizarResumo() {
 
     }
 
-
-    // ==================================================
-    // LOG PARA CONFERÊNCIA
-    // ==================================================
 
     console.log(
         "===== RESUMO FINANCEIRO ====="
@@ -460,19 +416,12 @@ function obterModelo(item) {
     const possibilidades = [
 
         item.modelo,
-
         item.modeloCamisa,
-
         item["Modelo"],
-
         item["MODELO"],
-
         item["Modelo da camisa"],
-
         item["Modelo da Camisa"],
-
         item["modelo da camisa"],
-
         item["modeloCamisa"]
 
     ];
@@ -552,54 +501,45 @@ function mostrarUniformes() {
                         Uniforme ${index + 1}
                     </h3>
 
-
                     <p>
                         <strong>Nome:</strong>
                         ${item.nome || ""}
                     </p>
-
 
                     <p>
                         <strong>Número:</strong>
                         ${item.numero || ""}
                     </p>
 
-
                     <p>
                         <strong>Categoria:</strong>
                         ${item.categoria || ""}
                     </p>
-
 
                     <p>
                         <strong>Função:</strong>
                         ${item.funcao || ""}
                     </p>
 
-
                     <p>
                         <strong>Modelo:</strong>
                         ${modelo}
                     </p>
-
 
                     <p>
                         <strong>Tamanho da camisa:</strong>
                         ${item.tamanhoCamisa || ""}
                     </p>
 
-
                     <p>
                         <strong>Peça inferior:</strong>
                         ${item.inferior || "Nenhum"}
                     </p>
 
-
                     <p>
                         <strong>Tamanho inferior:</strong>
                         ${item.tamanhoInferior || "N/A"}
                     </p>
-
 
                     <p>
                         <strong>Valor:</strong>
@@ -623,7 +563,7 @@ function mostrarUniformes() {
 
 // ======================================================
 // PAGAMENTOS
-// APENAS LEITURA
+// LANÇAMENTO DENTRO DA PRÓPRIA ABA
 // ======================================================
 
 function mostrarPagamentos() {
@@ -650,18 +590,195 @@ function mostrarPagamentos() {
     }
 
 
-    let html = "";
+    let html = `
+
+        <div class="card">
+
+            <h2>
+                💰 Pagamentos
+            </h2>
+
+            <p style="color:#777;">
+                Selecione um pedido para consultar
+                e lançar um novo pagamento.
+            </p>
+
+            <label
+                for="pedidoPagamento"
+                style="
+                    display:block;
+                    font-weight:bold;
+                    margin-top:15px;
+                    margin-bottom:6px;
+                "
+            >
+                Pedido
+            </label>
+
+            <select
+                id="pedidoPagamento"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                "
+                onchange="selecionarPedidoPagamento()"
+            >
+
+                <option value="">
+                    Selecione o pedido
+                </option>
+
+    `;
+
+
+    pedidos.forEach(
+        function(pedido) {
+
+            const id =
+                pedido.idPedido || "";
+
+
+            const responsavel =
+                pedido.responsavel || "";
+
+
+            const valor =
+                Number(
+                    pedido.valorTotal
+                ) || 0;
+
+
+            html += `
+
+                <option value="${id}">
+
+                    ${id} - ${responsavel}
+                    - ${formatarMoeda(valor)}
+
+                </option>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+            </select>
+
+        </div>
+
+
+        <div
+            id="informacoesPagamento"
+            class="card"
+            style="display:none;"
+        >
+
+            <h3>
+                💳 Lançar pagamento
+            </h3>
+
+
+            <p>
+                <strong>Responsável:</strong>
+                <span id="responsavelPagamento"></span>
+            </p>
+
+
+            <p>
+                <strong>Valor total:</strong>
+                <span id="totalPagamento"></span>
+            </p>
+
+
+            <p>
+                <strong>Já pago:</strong>
+                <span id="pagoPagamento"></span>
+            </p>
+
+
+            <p>
+                <strong>Restante:</strong>
+                <span id="restantePagamento"></span>
+            </p>
+
+
+            <p>
+                <strong>Status:</strong>
+                <span id="statusPagamento"></span>
+            </p>
+
+
+            <label
+                for="valorPagamento"
+                style="
+                    display:block;
+                    font-weight:bold;
+                    margin-top:15px;
+                    margin-bottom:6px;
+                "
+            >
+                Valor recebido agora
+            </label>
+
+
+            <input
+                type="number"
+                id="valorPagamento"
+                min="0"
+                step="0.01"
+                placeholder="Ex.: 25,00"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                "
+            >
+
+
+            <button
+                id="botaoRegistrarPagamento"
+                class="admin-button"
+                type="button"
+                style="
+                    width:100%;
+                    margin-top:15px;
+                    background:#ff007f;
+                "
+                onclick="registrarPagamento()"
+            >
+
+                💰 REGISTRAR PAGAMENTO
+
+            </button>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                📋 Situação dos pedidos
+            </h3>
+
+    `;
 
 
     pedidos.forEach(
         function(pedido) {
 
             const status =
-                pedido.Status !== undefined &&
-                pedido.Status !== null &&
-                String(pedido.Status).trim() !== ""
-                    ? String(pedido.Status).trim()
-                    : "Não pago";
+                pedido.Status ||
+                "Não pago";
 
 
             const valorTotal =
@@ -684,7 +801,12 @@ function mostrarPagamentos() {
 
             html += `
 
-                <div class="card">
+                <div
+                    style="
+                        border-bottom:1px solid #ddd;
+                        padding:15px 0;
+                    "
+                >
 
                     <h3>
                         ${pedido.idPedido || "Pedido"}
@@ -705,9 +827,8 @@ function mostrarPagamentos() {
                             Valor total:
                         </strong>
 
-                        ${formatarMoeda(
-                            valorTotal
-                        )}
+                        ${formatarMoeda(valorTotal)}
+
                     </p>
 
 
@@ -717,6 +838,7 @@ function mostrarPagamentos() {
                         </strong>
 
                         ${status}
+
                     </p>
 
 
@@ -725,9 +847,8 @@ function mostrarPagamentos() {
                             Pago:
                         </strong>
 
-                        ${formatarMoeda(
-                            valorPago
-                        )}
+                        ${formatarMoeda(valorPago)}
+
                     </p>
 
 
@@ -736,9 +857,8 @@ function mostrarPagamentos() {
                             Restante:
                         </strong>
 
-                        ${formatarMoeda(
-                            valorRestante
-                        )}
+                        ${formatarMoeda(valorRestante)}
+
                     </p>
 
                 </div>
@@ -749,14 +869,368 @@ function mostrarPagamentos() {
     );
 
 
-    area.innerHTML = html;
+    html += `
+
+        </div>
+
+    `;
+
+
+    area.innerHTML =
+        html;
+
+}
+
+
+// ======================================================
+// SELECIONAR PEDIDO PARA PAGAMENTO
+// ======================================================
+
+function selecionarPedidoPagamento() {
+
+    const select =
+        document.getElementById(
+            "pedidoPagamento"
+        );
+
+
+    const area =
+        document.getElementById(
+            "informacoesPagamento"
+        );
+
+
+    if (!select || !area) return;
+
+
+    const idSelecionado =
+        select.value;
+
+
+    if (!idSelecionado) {
+
+        area.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    const pedido =
+        pedidos.find(
+            function(item) {
+
+                return String(
+                    item.idPedido
+                ) === String(
+                    idSelecionado
+                );
+
+            }
+        );
+
+
+    if (!pedido) {
+
+        area.style.display =
+            "none";
+
+        return;
+
+    }
+
+
+    const valorTotal =
+        Number(
+            pedido.valorTotal
+        ) || 0;
+
+
+    const valorPago =
+        Number(
+            pedido.Pago
+        ) || 0;
+
+
+    const valorRestante =
+        Number(
+            pedido.Restante
+        ) || 0;
+
+
+    const status =
+        pedido.Status ||
+        "Não pago";
+
+
+    document.getElementById(
+        "responsavelPagamento"
+    ).innerText =
+        pedido.responsavel || "";
+
+
+    document.getElementById(
+        "totalPagamento"
+    ).innerText =
+        formatarMoeda(
+            valorTotal
+        );
+
+
+    document.getElementById(
+        "pagoPagamento"
+    ).innerText =
+        formatarMoeda(
+            valorPago
+        );
+
+
+    document.getElementById(
+        "restantePagamento"
+    ).innerText =
+        formatarMoeda(
+            valorRestante
+        );
+
+
+    document.getElementById(
+        "statusPagamento"
+    ).innerText =
+        status;
+
+
+    document.getElementById(
+        "valorPagamento"
+    ).value =
+        "";
+
+
+    area.style.display =
+        "block";
+
+}
+
+
+// ======================================================
+// REGISTRAR PAGAMENTO
+// ======================================================
+
+async function registrarPagamento() {
+
+    const select =
+        document.getElementById(
+            "pedidoPagamento"
+        );
+
+
+    const input =
+        document.getElementById(
+            "valorPagamento"
+        );
+
+
+    const botao =
+        document.getElementById(
+            "botaoRegistrarPagamento"
+        );
+
+
+    if (!select || !input) {
+
+        return;
+
+    }
+
+
+    const idPedido =
+        select.value;
+
+
+    const valor =
+        Number(
+            input.value
+        );
+
+
+    if (!idPedido) {
+
+        alert(
+            "Selecione um pedido."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !valor ||
+        valor <= 0
+    ) {
+
+        alert(
+            "Informe um valor de pagamento válido."
+        );
+
+        return;
+
+    }
+
+
+    const pedido =
+        pedidos.find(
+            function(item) {
+
+                return String(
+                    item.idPedido
+                ) === String(
+                    idPedido
+                );
+
+            }
+        );
+
+
+    if (!pedido) {
+
+        alert(
+            "Pedido não encontrado."
+        );
+
+        return;
+
+    }
+
+
+    const restante =
+        Number(
+            pedido.Restante
+        ) || 0;
+
+
+    if (
+        restante > 0 &&
+        valor > restante
+    ) {
+
+        alert(
+            "O valor informado é maior que o valor restante do pedido."
+        );
+
+        return;
+
+    }
+
+
+    if (botao) {
+
+        botao.disabled =
+            true;
+
+        botao.innerText =
+            "⏳ REGISTRANDO...";
+
+    }
+
+
+    try {
+
+        const url =
+            URL_APPS_SCRIPT +
+            "?acao=registrarPagamento" +
+            "&idPedido=" +
+            encodeURIComponent(
+                idPedido
+            ) +
+            "&valor=" +
+            encodeURIComponent(
+                valor
+            );
+
+
+        console.log(
+            "ENVIANDO PAGAMENTO:",
+            {
+                idPedido,
+                valor,
+                url
+            }
+        );
+
+
+        const resposta =
+            await fetch(
+                url
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        console.log(
+            "RESPOSTA DO PAGAMENTO:",
+            dados
+        );
+
+
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
+
+            throw new Error(
+                dados?.message ||
+                "O pagamento não pôde ser registrado."
+            );
+
+        }
+
+
+        alert(
+            "Pagamento registrado com sucesso!"
+        );
+
+
+        await carregarDados();
+
+
+        mostrarPagamentos();
+
+
+    } catch (erro) {
+
+        console.error(
+            "ERRO AO REGISTRAR PAGAMENTO:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível registrar o pagamento.\n\n" +
+            erro.message
+        );
+
+    } finally {
+
+        if (botao) {
+
+            botao.disabled =
+                false;
+
+            botao.innerText =
+                "💰 REGISTRAR PAGAMENTO";
+
+        }
+
+    }
 
 }
 
 
 // ======================================================
 // PRODUÇÃO
-// LISTA DE PRODUÇÃO
 // ======================================================
 
 function mostrarProducao() {
@@ -769,10 +1243,6 @@ function mostrarProducao() {
 
     if (!area) return;
 
-
-    // ==================================================
-    // VERIFICAR SE EXISTEM ITENS
-    // ==================================================
 
     if (
         !itens ||
@@ -795,18 +1265,12 @@ function mostrarProducao() {
     }
 
 
-    // ==================================================
-    // CONTADORES
-    // ==================================================
-
     const totalUniformes =
         itens.length;
 
 
     let totalCamisas = 0;
-
     let totalBabyLook = 0;
-
     let totalInferiores = 0;
 
 
@@ -852,10 +1316,6 @@ function mostrarProducao() {
         }
     );
 
-
-    // ==================================================
-    // CABEÇALHO / RESUMO
-    // ==================================================
 
     let html = `
 
@@ -938,72 +1398,31 @@ function mostrarProducao() {
                             "
                         >
 
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:left;
-                                "
-                            >
+                            <th style="padding:12px;text-align:left;">
                                 Nome
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:center;
-                                "
-                            >
+                            <th style="padding:12px;text-align:center;">
                                 Nº
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:left;
-                                "
-                            >
+                            <th style="padding:12px;text-align:left;">
                                 Função
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:left;
-                                "
-                            >
+                            <th style="padding:12px;text-align:left;">
                                 Modelo
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:center;
-                                "
-                            >
+                            <th style="padding:12px;text-align:center;">
                                 Tam. camisa
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:left;
-                                "
-                            >
+                            <th style="padding:12px;text-align:left;">
                                 Peça inferior
                             </th>
 
-
-                            <th
-                                style="
-                                    padding:12px;
-                                    text-align:center;
-                                "
-                            >
+                            <th style="padding:12px;text-align:center;">
                                 Tam. inferior
                             </th>
 
@@ -1015,10 +1434,6 @@ function mostrarProducao() {
                     <tbody>
     `;
 
-
-    // ==================================================
-    // LINHAS DA PRODUÇÃO
-    // ==================================================
 
     itens.forEach(
         function(item) {
@@ -1034,10 +1449,6 @@ function mostrarProducao() {
             const funcao =
                 item.funcao || "";
 
-
-            // ------------------------------------------
-            // MODELO
-            // ------------------------------------------
 
             let modelo =
                 obterModelo(item);
@@ -1060,25 +1471,13 @@ function mostrarProducao() {
             }
 
 
-            // ------------------------------------------
-            // TAMANHO DA CAMISA
-            // ------------------------------------------
-
             const tamanhoCamisa =
                 item.tamanhoCamisa || "";
 
 
-            // ------------------------------------------
-            // PEÇA INFERIOR
-            // ------------------------------------------
-
             const inferior =
                 item.inferior || "Nenhum";
 
-
-            // ------------------------------------------
-            // TAMANHO INFERIOR
-            // ------------------------------------------
 
             const tamanhoInferior =
                 item.tamanhoInferior || "N/A";
@@ -1088,23 +1487,13 @@ function mostrarProducao() {
 
                 <tr
                     style="
-                        border-bottom:
-                            1px solid #ddd;
+                        border-bottom:1px solid #ddd;
                     "
                 >
 
-                    <td
-                        style="
-                            padding:12px;
-                        "
-                    >
-
-                        <strong>
-                            ${nome}
-                        </strong>
-
+                    <td style="padding:12px;">
+                        <strong>${nome}</strong>
                     </td>
-
 
                     <td
                         style="
@@ -1113,33 +1502,16 @@ function mostrarProducao() {
                             font-weight:bold;
                         "
                     >
-
                         ${numero}
-
                     </td>
 
-
-                    <td
-                        style="
-                            padding:12px;
-                        "
-                    >
-
+                    <td style="padding:12px;">
                         ${funcao}
-
                     </td>
 
-
-                    <td
-                        style="
-                            padding:12px;
-                        "
-                    >
-
+                    <td style="padding:12px;">
                         ${modelo}
-
                     </td>
-
 
                     <td
                         style="
@@ -1147,22 +1519,12 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
-
                         ${tamanhoCamisa}
-
                     </td>
 
-
-                    <td
-                        style="
-                            padding:12px;
-                        "
-                    >
-
+                    <td style="padding:12px;">
                         ${inferior}
-
                     </td>
-
 
                     <td
                         style="
@@ -1170,9 +1532,7 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
-
                         ${tamanhoInferior}
-
                     </td>
 
                 </tr>
@@ -1182,10 +1542,6 @@ function mostrarProducao() {
         }
     );
 
-
-    // ==================================================
-    // FECHAR TABELA
-    // ==================================================
 
     html += `
 
@@ -1197,14 +1553,6 @@ function mostrarProducao() {
 
         </div>
 
-    `;
-
-
-    // ==================================================
-    // BOTÃO DE EXPORTAÇÃO
-    // ==================================================
-
-    html += `
 
         <div class="card">
 
@@ -1215,9 +1563,7 @@ function mostrarProducao() {
                     width:100%;
                     background:#ff007f;
                 "
-                onclick="
-                    exportarProducaoPlanilha()
-                "
+                onclick="exportarProducaoPlanilha()"
             >
 
                 📊 EXPORTAR PARA PLANILHA
@@ -1228,10 +1574,6 @@ function mostrarProducao() {
 
     `;
 
-
-    // ==================================================
-    // MOSTRAR NA TELA
-    // ==================================================
 
     area.innerHTML =
         html;
@@ -1245,7 +1587,10 @@ function mostrarProducao() {
 
 function exportarProducaoPlanilha() {
 
-    if (!itens || itens.length === 0) {
+    if (
+        !itens ||
+        itens.length === 0
+    ) {
 
         alert(
             "Não há uniformes para exportar."
@@ -1256,19 +1601,11 @@ function exportarProducaoPlanilha() {
     }
 
 
-    // ==================================================
-    // CABEÇALHO DA PLANILHA
-    // ==================================================
-
     let csv = "";
 
     csv +=
         "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
 
-
-    // ==================================================
-    // ADICIONAR CADA UNIFORME
-    // ==================================================
 
     itens.forEach(
         function(item) {
@@ -1276,28 +1613,30 @@ function exportarProducaoPlanilha() {
             const nome =
                 item.nome || "";
 
+
             const numero =
                 item.numero || "";
+
 
             const funcao =
                 item.funcao || "";
 
+
             const modelo =
                 obterModelo(item);
+
 
             const tamanho =
                 item.tamanhoCamisa || "";
 
+
             const inferior =
                 item.inferior || "";
+
 
             const tamanhoInferior =
                 item.tamanhoInferior || "";
 
-
-            // ==================================================
-            // LINHA DA CAMISA
-            // ==================================================
 
             csv +=
                 "CAMISA;" +
@@ -1314,10 +1653,6 @@ function exportarProducaoPlanilha() {
     );
 
 
-    // ==================================================
-    // CRIAR ARQUIVO CSV
-    // ==================================================
-
     const blob =
         new Blob(
             ["\uFEFF" + csv],
@@ -1328,16 +1663,16 @@ function exportarProducaoPlanilha() {
         );
 
 
-    // ==================================================
-    // CRIAR DOWNLOAD
-    // ==================================================
-
     const url =
-        URL.createObjectURL(blob);
+        URL.createObjectURL(
+            blob
+        );
 
 
     const link =
-        document.createElement("a");
+        document.createElement(
+            "a"
+        );
 
 
     link.href =
@@ -1348,16 +1683,22 @@ function exportarProducaoPlanilha() {
         "lista-producao-volei-terapia.csv";
 
 
-    document.body.appendChild(link);
+    document.body.appendChild(
+        link
+    );
 
 
     link.click();
 
 
-    document.body.removeChild(link);
+    document.body.removeChild(
+        link
+    );
 
 
-    URL.revokeObjectURL(url);
+    URL.revokeObjectURL(
+        url
+    );
 
 
     alert(
@@ -1368,7 +1709,7 @@ function exportarProducaoPlanilha() {
 
 
 // ======================================================
-// ESCAPAR DADOS PARA CSV
+// ESCAPAR CSV
 // ======================================================
 
 function escaparCSV(valor) {
@@ -1421,16 +1762,11 @@ function mostrarConfiguracoes() {
         </div>
 
 
-        <!-- ==================================================
-             VALORES DAS PEÇAS
-             ================================================== -->
-
         <div class="card">
 
             <h3>
                 💰 Valores das peças
             </h3>
-
 
             <p style="color:#777;">
                 Os valores abaixo poderão ser alterados
@@ -1438,8 +1774,7 @@ function mostrarConfiguracoes() {
             </p>
 
 
-            <div style="display:grid; gap:12px;">
-
+            <div style="display:grid;gap:12px;">
 
                 <div>
 
@@ -1590,15 +1925,10 @@ function mostrarConfiguracoes() {
 
                 </div>
 
-
             </div>
 
         </div>
 
-
-        <!-- ==================================================
-             CONFIGURAÇÕES DO SISTEMA
-             ================================================== -->
 
         <div class="card">
 
@@ -1683,10 +2013,6 @@ function mostrarConfiguracoes() {
         </div>
 
 
-        <!-- ==================================================
-             BOTÕES
-             ================================================== -->
-
         <div class="card">
 
             <button
@@ -1765,8 +2091,8 @@ function formatarMoeda(valor) {
     ).toLocaleString(
         "pt-BR",
         {
-            style: "currency",
-            currency: "BRL"
+            style:"currency",
+            currency:"BRL"
         }
     );
 
@@ -1797,4 +2123,3 @@ document.addEventListener(
 
     }
 );
-
