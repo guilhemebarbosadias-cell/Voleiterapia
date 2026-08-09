@@ -581,7 +581,7 @@ function mostrarPagamentos() {
 
 // ======================================================
 // PRODUÇÃO
-// APENAS LEITURA DOS ITENS
+// LISTA DE PRODUÇÃO
 // ======================================================
 
 function mostrarProducao() {
@@ -608,62 +608,77 @@ function mostrarProducao() {
     }
 
 
-    let totalUniformes =
-        itens.length;
+    // ==================================================
+    // SEPARAR CAMISAS E PEÇAS INFERIORES
+    // ==================================================
 
+    const camisas = [];
 
-    let totalCamisas = 0;
-
-    let totalBabyLook = 0;
-
-    let totalInferiores = 0;
+    const inferiores = [];
 
 
     itens.forEach(
         function(item) {
 
-            const modelo =
-                String(
-                    item.modelo || ""
-                )
-                .trim()
-                .toLowerCase();
+            // ------------------------------------------
+            // CAMISA
+            // ------------------------------------------
+
+            camisas.push({
+
+                nome:
+                    item.nome || "",
+
+                numero:
+                    item.numero || "",
+
+                modelo:
+                    obterModelo(item),
+
+                tamanho:
+                    item.tamanhoCamisa || ""
+
+            });
 
 
-            if (
-                modelo.includes("baby")
-            ) {
-
-                totalBabyLook++;
-
-            } else {
-
-                totalCamisas++;
-
-            }
-
+            // ------------------------------------------
+            // PEÇA INFERIOR
+            // ------------------------------------------
 
             const inferior =
                 String(
                     item.inferior || ""
-                )
-                .trim()
-                .toLowerCase();
+                ).trim();
 
 
             if (
                 inferior !== "" &&
-                inferior !== "nenhum" &&
-                inferior !== "n/a"
+                inferior.toLowerCase() !== "nenhum" &&
+                inferior.toLowerCase() !== "n/a"
             ) {
 
-                totalInferiores++;
+                inferiores.push({
+
+                    nome:
+                        item.nome || "",
+
+                    peca:
+                        inferior,
+
+                    tamanho:
+                        item.tamanhoInferior || ""
+
+                });
 
             }
 
         }
     );
 
+
+    // ==================================================
+    // RESUMO
+    // ==================================================
 
     let html = `
 
@@ -675,38 +690,18 @@ function mostrarProducao() {
 
             <p>
                 <strong>
-                    Total de uniformes:
+                    Total de camisas:
                 </strong>
 
-                ${totalUniformes}
-
+                ${camisas.length}
             </p>
 
             <p>
                 <strong>
-                    Camisas:
+                    Total de peças inferiores:
                 </strong>
 
-                ${totalCamisas}
-
-            </p>
-
-            <p>
-                <strong>
-                    Baby Look:
-                </strong>
-
-                ${totalBabyLook}
-
-            </p>
-
-            <p>
-                <strong>
-                    Peças inferiores:
-                </strong>
-
-                ${totalInferiores}
-
+                ${inferiores.length}
             </p>
 
         </div>
@@ -714,72 +709,149 @@ function mostrarProducao() {
     `;
 
 
+    // ==================================================
+    // LISTA DE CAMISAS
+    // ==================================================
+
     html += `
 
         <div class="card">
 
             <h3>
-                👕 Uniformes
+                👕 CAMISAS
             </h3>
+
+            <div
+                style="
+                    overflow-x:auto;
+                "
+            >
+
+                <table
+                    style="
+                        width:100%;
+                        border-collapse:collapse;
+                        margin-top:15px;
+                    "
+                >
+
+                    <thead>
+
+                        <tr>
+
+                            <th
+                                style="
+                                    text-align:left;
+                                    padding:10px;
+                                    border-bottom:2px solid #ff007f;
+                                "
+                            >
+                                Qtd.
+                            </th>
+
+                            <th
+                                style="
+                                    text-align:left;
+                                    padding:10px;
+                                    border-bottom:2px solid #ff007f;
+                                "
+                            >
+                                Nome
+                            </th>
+
+                            <th
+                                style="
+                                    text-align:left;
+                                    padding:10px;
+                                    border-bottom:2px solid #ff007f;
+                                "
+                            >
+                                Nº
+                            </th>
+
+                            <th
+                                style="
+                                    text-align:left;
+                                    padding:10px;
+                                    border-bottom:2px solid #ff007f;
+                                "
+                            >
+                                Modelo
+                            </th>
+
+                            <th
+                                style="
+                                    text-align:left;
+                                    padding:10px;
+                                    border-bottom:2px solid #ff007f;
+                                "
+                            >
+                                Tamanho
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
 
     `;
 
 
-    itens.forEach(
-        function(item, index) {
-
-            const modelo =
-                item.modelo || "";
-
+    camisas.forEach(
+        function(camisa) {
 
             html += `
 
-                <div
-                    style="
-                        border-bottom:1px solid #ddd;
-                        padding:12px 0;
-                    ">
+                <tr>
 
-                    <strong>
-                        ${index + 1}.
-                        ${item.nome || ""}
-                    </strong>
+                    <td
+                        style="
+                            padding:10px;
+                            border-bottom:1px solid #ddd;
+                        "
+                    >
+                        1
+                    </td>
 
-                    <p>
-                        <strong>Nº:</strong>
-                        ${item.numero || ""}
-                    </p>
+                    <td
+                        style="
+                            padding:10px;
+                            border-bottom:1px solid #ddd;
+                            font-weight:bold;
+                        "
+                    >
+                        ${camisa.nome}
+                    </td>
 
-                    <p>
-                        <strong>Função:</strong>
-                        ${item.funcao || ""}
-                    </p>
+                    <td
+                        style="
+                            padding:10px;
+                            border-bottom:1px solid #ddd;
+                        "
+                    >
+                        ${camisa.numero}
+                    </td>
 
-                    <p>
-                        <strong>Modelo:</strong>
-                        ${modelo}
-                    </p>
+                    <td
+                        style="
+                            padding:10px;
+                            border-bottom:1px solid #ddd;
+                        "
+                    >
+                        ${camisa.modelo}
+                    </td>
 
-                    <p>
-                        <strong>Tamanho:</strong>
-                        ${item.tamanhoCamisa || ""}
-                    </p>
+                    <td
+                        style="
+                            padding:10px;
+                            border-bottom:1px solid #ddd;
+                        "
+                    >
+                        ${camisa.tamanho}
+                    </td>
 
-                    <p>
-                        <strong>Peça inferior:</strong>
-                        ${item.inferior || "Nenhum"}
-                    </p>
-
-                    <p>
-                        <strong>
-                            Tamanho inferior:
-                        </strong>
-
-                        ${item.tamanhoInferior || "N/A"}
-
-                    </p>
-
-                </div>
+                </tr>
 
             `;
 
@@ -789,12 +861,215 @@ function mostrarProducao() {
 
     html += `
 
+                    </tbody>
+
+                </table>
+
+            </div>
+
         </div>
 
     `;
 
 
-    area.innerHTML = html;
+    // ==================================================
+    // LISTA DE INFERIORES
+    // ==================================================
+
+    if (inferiores.length > 0) {
+
+        html += `
+
+            <div class="card">
+
+                <h3>
+                    🩳 PEÇAS INFERIORES
+                </h3>
+
+                <div
+                    style="
+                        overflow-x:auto;
+                    "
+                >
+
+                    <table
+                        style="
+                            width:100%;
+                            border-collapse:collapse;
+                            margin-top:15px;
+                        "
+                    >
+
+                        <thead>
+
+                            <tr>
+
+                                <th
+                                    style="
+                                        text-align:left;
+                                        padding:10px;
+                                        border-bottom:2px solid #ff007f;
+                                    "
+                                >
+                                    Qtd.
+                                </th>
+
+                                <th
+                                    style="
+                                        text-align:left;
+                                        padding:10px;
+                                        border-bottom:2px solid #ff007f;
+                                    "
+                                >
+                                    Nome
+                                </th>
+
+                                <th
+                                    style="
+                                        text-align:left;
+                                        padding:10px;
+                                        border-bottom:2px solid #ff007f;
+                                    "
+                                >
+                                    Peça
+                                </th>
+
+                                <th
+                                    style="
+                                        text-align:left;
+                                        padding:10px;
+                                        border-bottom:2px solid #ff007f;
+                                    "
+                                >
+                                    Tamanho
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+        `;
+
+
+        inferiores.forEach(
+            function(inferior) {
+
+                html += `
+
+                    <tr>
+
+                        <td
+                            style="
+                                padding:10px;
+                                border-bottom:1px solid #ddd;
+                            "
+                        >
+                            1
+                        </td>
+
+                        <td
+                            style="
+                                padding:10px;
+                                border-bottom:1px solid #ddd;
+                                font-weight:bold;
+                            "
+                        >
+                            ${inferior.nome}
+                        </td>
+
+                        <td
+                            style="
+                                padding:10px;
+                                border-bottom:1px solid #ddd;
+                            "
+                        >
+                            ${inferior.peca}
+                        </td>
+
+                        <td
+                            style="
+                                padding:10px;
+                                border-bottom:1px solid #ddd;
+                            "
+                        >
+                            ${inferior.tamanho}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            }
+        );
+
+
+        html += `
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        `;
+
+    }
+
+
+    // ==================================================
+    // BOTÕES
+    // PREPARADOS PARA A PRÓXIMA ETAPA
+    // ==================================================
+
+    html += `
+
+        <div class="card">
+
+            <button
+                type="button"
+                class="admin-button"
+                onclick="window.print()"
+                style="
+                    width:100%;
+                    margin-bottom:10px;
+                    background:#000;
+                "
+            >
+
+                🖨️ IMPRIMIR / SALVAR PDF
+
+            </button>
+
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="alert('Exportação para planilha será adicionada na próxima etapa.')"
+            >
+
+                📊 EXPORTAR PARA PLANILHA
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    // ==================================================
+    // MOSTRAR NA TELA
+    // ==================================================
+
+    area.innerHTML =
+        html;
 
 }
 
