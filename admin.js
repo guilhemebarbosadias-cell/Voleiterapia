@@ -88,10 +88,14 @@ async function carregarDados() {
 
 
 // ======================================================
-// ATUALIZAR RESUMO
+// ATUALIZAR RESUMO FINANCEIRO
 // ======================================================
 
 function atualizarResumo() {
+
+    // ==================================================
+    // ELEMENTOS EXISTENTES
+    // ==================================================
 
     const totalPedidos =
         document.getElementById(
@@ -117,6 +121,100 @@ function atualizarResumo() {
         );
 
 
+    // ==================================================
+    // CONTADORES
+    // ==================================================
+
+    let totalVendido = 0;
+
+    let totalRecebido = 0;
+
+    let totalAberto = 0;
+
+    let pedidosPagos = 0;
+
+    let pedidosParciais = 0;
+
+    let pedidosNaoPagos = 0;
+
+
+    // ==================================================
+    // ANALISAR PEDIDOS
+    // ==================================================
+
+    pedidos.forEach(
+        function(pedido) {
+
+            const valorTotalPedido =
+                Number(
+                    pedido.valorTotal
+                ) || 0;
+
+
+            const valorPagoPedido =
+                Number(
+                    pedido.Pago
+                ) || 0;
+
+
+            const valorRestantePedido =
+                Number(
+                    pedido.Restante
+                ) || 0;
+
+
+            // ------------------------------------------
+            // VALORES
+            // ------------------------------------------
+
+            totalVendido +=
+                valorTotalPedido;
+
+
+            totalRecebido +=
+                valorPagoPedido;
+
+
+            totalAberto +=
+                valorRestantePedido;
+
+
+            // ------------------------------------------
+            // SITUAÇÃO DO PEDIDO
+            // ------------------------------------------
+
+            if (
+                valorRestantePedido <= 0 &&
+                valorTotalPedido > 0
+            ) {
+
+                pedidosPagos++;
+
+            }
+
+            else if (
+                valorPagoPedido > 0 &&
+                valorRestantePedido > 0
+            ) {
+
+                pedidosParciais++;
+
+            }
+
+            else {
+
+                pedidosNaoPagos++;
+
+            }
+
+        }
+    );
+
+
+    // ==================================================
+    // PEDIDOS
+    // ==================================================
+
     if (totalPedidos) {
 
         totalPedidos.innerText =
@@ -124,6 +222,10 @@ function atualizarResumo() {
 
     }
 
+
+    // ==================================================
+    // UNIFORMES
+    // ==================================================
 
     if (totalUniformes) {
 
@@ -133,48 +235,77 @@ function atualizarResumo() {
     }
 
 
-    let total = 0;
-
-    let pendente = 0;
-
-
-    pedidos.forEach(
-        function(pedido) {
-
-            const valor =
-                Number(
-                    pedido.valorTotal
-                ) || 0;
-
-
-            const restante =
-                Number(
-                    pedido.Restante
-                ) || 0;
-
-
-            total += valor;
-
-            pendente += restante;
-
-        }
-    );
-
+    // ==================================================
+    // TOTAL VENDIDO
+    // ==================================================
 
     if (valorTotal) {
 
         valorTotal.innerText =
-            formatarMoeda(total);
+            formatarMoeda(
+                totalVendido
+            );
 
     }
 
+
+    // ==================================================
+    // TOTAL EM ABERTO
+    // ==================================================
 
     if (valorPendente) {
 
         valorPendente.innerText =
-            formatarMoeda(pendente);
+            formatarMoeda(
+                totalAberto
+            );
 
     }
+
+
+    // ==================================================
+    // LOG PARA CONFERÊNCIA
+    // ==================================================
+
+    console.log(
+        "===== RESUMO FINANCEIRO ====="
+    );
+
+
+    console.log(
+        "Total vendido:",
+        totalVendido
+    );
+
+
+    console.log(
+        "Total recebido:",
+        totalRecebido
+    );
+
+
+    console.log(
+        "Total em aberto:",
+        totalAberto
+    );
+
+
+    console.log(
+        "Pedidos pagos:",
+        pedidosPagos
+    );
+
+
+    console.log(
+        "Pedidos parciais:",
+        pedidosParciais
+    );
+
+
+    console.log(
+        "Pedidos não pagos:",
+        pedidosNaoPagos
+    );
 
 }
 
@@ -1328,4 +1459,3 @@ document.addEventListener(
 
     }
 );
-
