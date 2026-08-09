@@ -1052,7 +1052,7 @@ function mostrarProducao() {
                     width:100%;
                     background:#ff007f;
                 "
-                onclick="alert('Exportação para planilha será adicionada na próxima etapa.')"
+                onclick="exportarProducaoPlanilha()"
             >
 
                 📊 EXPORTAR PARA PLANILHA
@@ -1070,6 +1070,220 @@ function mostrarProducao() {
 
     area.innerHTML =
         html;
+
+}
+
+
+// ======================================================
+// EXPORTAR PRODUÇÃO PARA PLANILHA
+// ======================================================
+
+function exportarProducaoPlanilha() {
+
+    if (!itens || itens.length === 0) {
+
+        alert(
+            "Não há uniformes para exportar."
+        );
+
+        return;
+
+    }
+
+
+    // ==================================================
+    // CABEÇALHO
+    // ==================================================
+
+    let linhas = [];
+
+
+    linhas.push([
+        "TIPO",
+        "QTD.",
+        "NOME",
+        "Nº",
+        "MODELO",
+        "TAMANHO",
+        "PEÇA INFERIOR",
+        "TAMANHO INFERIOR"
+    ]);
+
+
+    // ==================================================
+    // ADICIONAR ITENS
+    // ==================================================
+
+    itens.forEach(
+        function(item) {
+
+            const nome =
+                item.nome || "";
+
+            const numero =
+                item.numero || "";
+
+            const modelo =
+                obterModelo(item);
+
+            const tamanho =
+                item.tamanhoCamisa || "";
+
+            const inferior =
+                String(
+                    item.inferior || ""
+                ).trim();
+
+            const tamanhoInferior =
+                item.tamanhoInferior || "";
+
+
+            // ------------------------------------------
+            // CAMISA
+            // ------------------------------------------
+
+            linhas.push([
+
+                "CAMISA",
+
+                "1",
+
+                nome,
+
+                numero,
+
+                modelo,
+
+                tamanho,
+
+                "",
+
+                ""
+
+            ]);
+
+
+            // ------------------------------------------
+            // INFERIOR
+            // ------------------------------------------
+
+            if (
+                inferior !== "" &&
+                inferior.toLowerCase() !== "nenhum" &&
+                inferior.toLowerCase() !== "n/a"
+            ) {
+
+                linhas.push([
+
+                    "INFERIOR",
+
+                    "1",
+
+                    nome,
+
+                    "",
+
+                    "",
+
+                    "",
+
+                    inferior,
+
+                    tamanhoInferior
+
+                ]);
+
+            }
+
+        }
+    );
+
+
+    // ==================================================
+    // TRANSFORMAR EM CSV
+    // ==================================================
+
+    const csv =
+        linhas
+            .map(
+                function(linha) {
+
+                    return linha
+                        .map(
+                            function(valor) {
+
+                                const texto =
+                                    String(
+                                        valor ?? ""
+                                    )
+                                    .replace(
+                                        /"/g,
+                                        '""'
+                                    );
+
+                                return `"${texto}"`;
+
+                            }
+                        )
+                        .join(";");
+
+                }
+            )
+            .join("\n");
+
+
+    // ==================================================
+    // CRIAR ARQUIVO
+    // ==================================================
+
+    const blob =
+        new Blob(
+            [
+                "\uFEFF" + csv
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        "lista-producao-volei-terapia.csv";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    URL.revokeObjectURL(
+        url
+    );
 
 }
 
