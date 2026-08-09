@@ -1,30 +1,909 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste Admin</title>
+// ======================================================
+// ADMIN - VÔLEI TERAPIA
+// ======================================================
 
-    <style>
-        body {
-            background: #000;
-            color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-        }
+// ======================================================
+// URL DO GOOGLE APPS SCRIPT
+// ======================================================
 
-        h1 {
-            color: #ff007f;
-        }
-    </style>
-</head>
+const URL_APPS_SCRIPT =
+"https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
-<body>
+// ======================================================
+// DADOS
+// ======================================================
 
-    <h1>Vôlei Terapia</h1>
+let pedidos = [];
+let itens = [];
 
-    <p>TESTE DO ADMIN</p>
+// ======================================================
+// CARREGAR DADOS
+// ======================================================
 
-</body>
-</html>
+async function carregarDados() {
+
+try {  
+
+    const resposta =  
+        await fetch(  
+            URL_APPS_SCRIPT + "?acao=admin"  
+        );  
+
+
+    const dados =  
+        await resposta.json();  
+
+
+    console.log(  
+        "DADOS RECEBIDOS DO APPS SCRIPT:",  
+        dados  
+    );  
+
+
+    if (  
+        !dados ||  
+        dados.result !== "success"  
+    ) {  
+
+        throw new Error(  
+            dados?.message ||  
+            "Não foi possível carregar os dados."  
+        );  
+
+    }  
+
+
+    pedidos =  
+        Array.isArray(dados.pedidos)  
+            ? dados.pedidos  
+            : [];  
+
+
+    itens =  
+        Array.isArray(dados.itens)  
+            ? dados.itens  
+            : [];  
+
+
+    atualizarResumo();  
+
+
+} catch (erro) {  
+
+    console.error(  
+        "ERRO AO CARREGAR ADMIN:",  
+        erro  
+    );  
+
+
+    mostrarMensagem(  
+        "Não foi possível carregar os dados da administração."  
+    );  
+
+}
+
+}
+
+// ======================================================
+// ATUALIZAR RESUMO
+// ======================================================
+
+function atualizarResumo() {
+
+const totalPedidos =  
+    document.getElementById(  
+        "totalPedidos"  
+    );  
+
+
+const totalUniformes =  
+    document.getElementById(  
+        "totalUniformes"  
+    );  
+
+
+const valorTotal =  
+    document.getElementById(  
+        "valorTotal"  
+    );  
+
+
+const valorPendente =  
+    document.getElementById(  
+        "valorPendente"  
+    );  
+
+
+if (totalPedidos) {  
+
+    totalPedidos.innerText =  
+        pedidos.length;  
+
+}  
+
+
+if (totalUniformes) {  
+
+    totalUniformes.innerText =  
+        itens.length;  
+
+}  
+
+
+let total = 0;  
+
+let pendente = 0;  
+
+
+pedidos.forEach(  
+    function(pedido) {  
+
+        const valor =  
+            Number(  
+                pedido.valorTotal  
+            ) || 0;  
+
+
+        const restante =  
+            Number(  
+                pedido.Restante  
+            ) || 0;  
+
+
+        total += valor;  
+
+        pendente += restante;  
+
+    }  
+);  
+
+
+if (valorTotal) {  
+
+    valorTotal.innerText =  
+        formatarMoeda(total);  
+
+}  
+
+
+if (valorPendente) {  
+
+    valorPendente.innerText =  
+        formatarMoeda(pendente);  
+
+}
+
+}
+
+// ======================================================
+// PEDIDOS
+// ======================================================
+
+function mostrarPedidos() {
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+if (pedidos.length === 0) {  
+
+    area.innerHTML = `  
+        <div class="empty">  
+            Nenhum pedido encontrado.  
+        </div>  
+    `;  
+
+    return;  
+
+}  
+
+
+let html = "";  
+
+
+pedidos.forEach(  
+    function(pedido) {  
+
+        const status =  
+            pedido.Status ||  
+            "Não pago";  
+
+
+        html += `  
+
+            <div class="card">  
+
+                <h3>  
+                    Pedido ${pedido.idPedido || ""}  
+                </h3>  
+
+                <p>  
+                    <strong>Data:</strong>  
+                    ${pedido.data || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Responsável:</strong>  
+                    ${pedido.responsavel || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Quantidade:</strong>  
+                    ${pedido.quantidade || 0}  
+                </p>  
+
+                <p>  
+                    <strong>Valor:</strong>  
+                    ${formatarMoeda(  
+                        Number(  
+                            pedido.valorTotal  
+                        ) || 0  
+                    )}  
+                </p>  
+
+                <p>  
+                    <strong>Parcelas:</strong>  
+                    ${pedido.parcelas || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Status:</strong>  
+                    ${status}  
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML = html;
+
+}
+
+// ======================================================
+// FUNÇÃO PARA PEGAR O MODELO
+// ======================================================
+
+function obterModelo(item) {
+
+if (!item) return "";  
+
+
+const possibilidades = [  
+
+    item.modelo,  
+
+    item.modeloCamisa,  
+
+    item["Modelo"],  
+
+    item["MODELO"],  
+
+    item["Modelo da camisa"],  
+
+    item["Modelo da Camisa"],  
+
+    item["modelo da camisa"],  
+
+    item["modeloCamisa"]  
+
+];  
+
+
+for (  
+    let i = 0;  
+    i < possibilidades.length;  
+    i++  
+) {  
+
+    const valor =  
+        possibilidades[i];  
+
+
+    if (  
+        valor !== undefined &&  
+        valor !== null &&  
+        String(valor).trim() !== ""  
+    ) {  
+
+        return String(valor).trim();  
+
+    }  
+
+}  
+
+
+return "Não informado";
+
+}
+
+// ======================================================
+// UNIFORMES
+// ======================================================
+
+function mostrarUniformes() {
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+if (itens.length === 0) {  
+
+    area.innerHTML = `  
+        <div class="empty">  
+            Nenhum uniforme encontrado.  
+        </div>  
+    `;  
+
+    return;  
+
+}  
+
+
+let html = "";  
+
+
+itens.forEach(  
+    function(item, index) {  
+
+        const modelo =  
+            obterModelo(item);  
+
+
+        html += `  
+
+            <div class="card">  
+
+                <h3>  
+                    Uniforme ${index + 1}  
+                </h3>  
+
+
+                <p>  
+                    <strong>Nome:</strong>  
+                    ${item.nome || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>Número:</strong>  
+                    ${item.numero || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>Categoria:</strong>  
+                    ${item.categoria || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>Função:</strong>  
+                    ${item.funcao || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>Modelo:</strong>  
+                    ${modelo}  
+                </p>  
+
+
+                <p>  
+                    <strong>Tamanho da camisa:</strong>  
+                    ${item.tamanhoCamisa || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>Peça inferior:</strong>  
+                    ${item.inferior || "Nenhum"}  
+                </p>  
+
+
+                <p>  
+                    <strong>Tamanho inferior:</strong>  
+                    ${item.tamanhoInferior || "N/A"}  
+                </p>  
+
+
+                <p>  
+                    <strong>Valor:</strong>  
+                    ${formatarMoeda(  
+                        Number(item.valor) || 0  
+                    )}  
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML = html;
+
+}
+
+// ======================================================
+// PAGAMENTOS
+// APENAS LEITURA
+// ======================================================
+
+function mostrarPagamentos() {
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+if (pedidos.length === 0) {  
+
+    area.innerHTML = `  
+        <div class="empty">  
+            Nenhum pagamento encontrado.  
+        </div>  
+    `;  
+
+    return;  
+
+}  
+
+
+let html = "";  
+
+
+pedidos.forEach(  
+    function(pedido) {  
+
+        const status =  
+            pedido.Status !== undefined &&  
+            pedido.Status !== null &&  
+            String(pedido.Status).trim() !== ""  
+                ? String(pedido.Status).trim()  
+                : "Não pago";  
+
+
+        const valorTotal =  
+            Number(  
+                pedido.valorTotal  
+            ) || 0;  
+
+
+        const valorPago =  
+            Number(  
+                pedido.Pago  
+            ) || 0;  
+
+
+        const valorRestante =  
+            Number(  
+                pedido.Restante  
+            ) || 0;  
+
+
+        html += `  
+
+            <div class="card">  
+
+                <h3>  
+                    ${pedido.idPedido || "Pedido"}  
+                </h3>  
+
+
+                <p>  
+                    <strong>  
+                        Responsável:  
+                    </strong>  
+
+                    ${pedido.responsavel || ""}  
+                </p>  
+
+
+                <p>  
+                    <strong>  
+                        Valor total:  
+                    </strong>  
+
+                    ${formatarMoeda(  
+                        valorTotal  
+                    )}  
+                </p>  
+
+
+                <p>  
+                    <strong>  
+                        Status:  
+                    </strong>  
+
+                    ${status}  
+                </p>  
+
+
+                <p>  
+                    <strong>  
+                        Pago:  
+                    </strong>  
+
+                    ${formatarMoeda(  
+                        valorPago  
+                    )}  
+                </p>  
+
+
+                <p>  
+                    <strong>  
+                        Restante:  
+                    </strong>  
+
+                    ${formatarMoeda(  
+                        valorRestante  
+                    )}  
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML = html;
+
+}
+
+// ======================================================
+// PRODUÇÃO
+// APENAS LEITURA DOS ITENS
+// ======================================================
+
+function mostrarProducao() {
+
+// ==================================================  
+// TESTE DE LIGAÇÃO HTML -> JAVASCRIPT  
+// ==================================================  
+
+alert("PRODUÇÃO FOI CHAMADA!");  
+
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+if (itens.length === 0) {  
+
+    area.innerHTML = `  
+        <div class="empty">  
+            Nenhum uniforme encontrado para produção.  
+        </div>  
+    `;  
+
+    return;  
+
+}  
+
+
+let totalUniformes =  
+    itens.length;  
+
+
+let totalCamisas = 0;  
+
+let totalBabyLook = 0;  
+
+let totalInferiores = 0;  
+
+
+itens.forEach(  
+    function(item) {  
+
+        const modelo =  
+            String(  
+                item.modelo || ""  
+            )  
+            .trim()  
+            .toLowerCase();  
+
+
+        if (  
+            modelo.includes("baby")  
+        ) {  
+
+            totalBabyLook++;  
+
+        } else {  
+
+            totalCamisas++;  
+
+        }  
+
+
+        const inferior =  
+            String(  
+                item.inferior || ""  
+            )  
+            .trim()  
+            .toLowerCase();  
+
+
+        if (  
+            inferior !== "" &&  
+            inferior !== "nenhum" &&  
+            inferior !== "n/a"  
+        ) {  
+
+            totalInferiores++;  
+
+        }  
+
+    }  
+);  
+
+
+let html = `  
+
+    <div class="card">  
+
+        <h2>  
+            🏭 Lista de Produção  
+        </h2>  
+
+        <p>  
+            <strong>  
+                Total de uniformes:  
+            </strong>  
+
+            ${totalUniformes}  
+
+        </p>  
+
+        <p>  
+            <strong>  
+                Camisas:  
+            </strong>  
+
+            ${totalCamisas}  
+
+        </p>  
+
+        <p>  
+            <strong>  
+                Baby Look:  
+            </strong>  
+
+            ${totalBabyLook}  
+
+        </p>  
+
+        <p>  
+            <strong>  
+                Peças inferiores:  
+            </strong>  
+
+            ${totalInferiores}  
+
+        </p>  
+
+    </div>  
+
+`;  
+
+
+html += `  
+
+    <div class="card">  
+
+        <h3>  
+            👕 Uniformes  
+        </h3>  
+
+`;  
+
+
+itens.forEach(  
+    function(item, index) {  
+
+        const modelo =  
+            item.modelo || "";  
+
+
+        html += `  
+
+            <div  
+                style="  
+                    border-bottom:1px solid #ddd;  
+                    padding:12px 0;  
+                ">  
+
+                <strong>  
+                    ${index + 1}.  
+                    ${item.nome || ""}  
+                </strong>  
+
+                <p>  
+                    <strong>Nº:</strong>  
+                    ${item.numero || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Função:</strong>  
+                    ${item.funcao || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Modelo:</strong>  
+                    ${modelo}  
+                </p>  
+
+                <p>  
+                    <strong>Tamanho:</strong>  
+                    ${item.tamanhoCamisa || ""}  
+                </p>  
+
+                <p>  
+                    <strong>Peça inferior:</strong>  
+                    ${item.inferior || "Nenhum"}  
+                </p>  
+
+                <p>  
+                    <strong>  
+                        Tamanho inferior:  
+                    </strong>  
+
+                    ${item.tamanhoInferior || "N/A"}  
+
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+html += `  
+
+    </div>  
+
+`;  
+
+
+area.innerHTML = html;
+
+}
+
+// ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+
+function mostrarConfiguracoes() {
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+area.innerHTML = `  
+
+    <div class="card">  
+
+        <h3>  
+            Configurações  
+        </h3>  
+
+        <p>  
+            Esta área será usada para  
+            configurar o sistema.  
+        </p>  
+
+        <p>  
+            Futuramente poderemos colocar  
+            aqui os valores dos uniformes,  
+            opções de peças e outras  
+            configurações.  
+        </p>  
+
+    </div>  
+
+`;
+
+}
+
+// ======================================================
+// MENSAGEM
+// ======================================================
+
+function mostrarMensagem(texto) {
+
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
+
+
+if (!area) return;  
+
+
+area.innerHTML = `  
+
+    <div class="empty">  
+
+        ${texto}  
+
+    </div>  
+
+`;
+
+}
+
+// ======================================================
+// FORMATAR MOEDA
+// ======================================================
+
+function formatarMoeda(valor) {
+
+return Number(  
+    valor || 0  
+).toLocaleString(  
+    "pt-BR",  
+    {  
+        style: "currency",  
+        currency: "BRL"  
+    }  
+);
+
+}
+
+// ======================================================
+// VOLTAR AO INÍCIO
+// ======================================================
+
+function voltarInicio() {
+
+window.location.href =  
+    "index.html";
+
+}
+
+// ======================================================
+// INICIAR ADMIN
+// ======================================================
+
+document.addEventListener(
+"DOMContentLoaded",
+function() {
+
+carregarDados();  
+
+}
+
+);
