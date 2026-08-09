@@ -11,19 +11,6 @@ const URL_APPS_SCRIPT =
 
 
 // ======================================================
-// AÇÃO DE LANÇAMENTO DE PAGAMENTO
-// ======================================================
-//
-// O Apps Script já está preparado para receber o lançamento.
-// Caso a função do Apps Script tenha outro nome de ação,
-// basta alterar SOMENTE esta linha.
-//
-
-const ACAO_LANCAR_PAGAMENTO =
-"lancarPagamento";
-
-
-// ======================================================
 // DADOS
 // ======================================================
 
@@ -44,16 +31,13 @@ async function carregarDados() {
                 URL_APPS_SCRIPT + "?acao=admin"
             );
 
-
         const dados =
             await resposta.json();
-
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
             dados
         );
-
 
         if (
             !dados ||
@@ -67,21 +51,17 @@ async function carregarDados() {
 
         }
 
-
         pedidos =
             Array.isArray(dados.pedidos)
                 ? dados.pedidos
                 : [];
-
 
         itens =
             Array.isArray(dados.itens)
                 ? dados.itens
                 : [];
 
-
         atualizarResumo();
-
 
     } catch (erro) {
 
@@ -89,7 +69,6 @@ async function carregarDados() {
             "ERRO AO CARREGAR ADMIN:",
             erro
         );
-
 
         mostrarMensagem(
             "Não foi possível carregar os dados da administração."
@@ -101,140 +80,88 @@ async function carregarDados() {
 
 
 // ======================================================
-// CONVERTER VALOR
+// PEGAR VALOR TOTAL
 // ======================================================
-//
-// Aceita:
-// 75
-// "75"
-// "75,00"
-// "R$ 75,00"
-//
 
-function converterNumero(valor) {
+function obterValorTotalPedido(pedido) {
 
-    if (
-        valor === undefined ||
-        valor === null ||
-        valor === ""
-    ) {
-
-        return 0;
-
-    }
-
-
-    if (typeof valor === "number") {
-
-        return isNaN(valor)
-            ? 0
-            : valor;
-
-    }
-
-
-    let texto =
-        String(valor)
-            .trim();
-
-
-    texto =
-        texto.replace(
-            /R\$/gi,
-            ""
-        );
-
-
-    texto =
-        texto.replace(
-            /\s/g,
-            ""
-        );
-
-
-    // Caso venha no formato brasileiro:
-    // 1.234,56
-    if (
-        texto.includes(",")
-    ) {
-
-        texto =
-            texto
-                .replace(/\./g, "")
-                .replace(",", ".");
-
-    }
-
-
-    const numero =
-        Number(texto);
-
-
-    return isNaN(numero)
-        ? 0
-        : numero;
+    return Number(
+        pedido?.valorTotal
+    ) || 0;
 
 }
 
 
 // ======================================================
-// CALCULAR PAGAMENTO DO PEDIDO
+// PEGAR VALOR PAGO
 // ======================================================
-//
-// IMPORTANTE:
-//
-// Não confiamos mais em pedido.Restante.
-//
-// O restante é sempre:
-// valorTotal - valorPago
-//
-// Isso corrige o problema:
-// Valor total = 75
-// Pago = 0
-// Restante = 0
-//
-// O sistema passa a considerar:
-// Restante = 75
-//
 
-function obterDadosPagamento(pedido) {
+function obterValorPagoPedido(pedido) {
 
-    const valorTotal =
-        converterNumero(
-            pedido?.valorTotal
-        );
+    return Number(
+        pedido?.Pago
+    ) || 0;
+
+}
 
 
-    const valorPago =
-        converterNumero(
-            pedido?.Pago
-        );
+// ======================================================
+// CALCULAR RESTANTE
+// ======================================================
+
+function obterRestantePedido(pedido) {
+
+    const total =
+        obterValorTotalPedido(pedido);
+
+    const pago =
+        obterValorPagoPedido(pedido);
+
+    const restante =
+        total - pago;
+
+    return Math.max(
+        0,
+        restante
+    );
+
+}
 
 
-    let restante =
-        valorTotal - valorPago;
+// ======================================================
+// OBTER STATUS CORRETO
+// ======================================================
 
+function obterStatusPedido(pedido) {
 
-    // Evita valores negativos
-    if (restante < 0) {
+    const total =
+        obterValorTotalPedido(pedido);
 
-        restante = 0;
+    const pago =
+        obterValorPagoPedido(pedido);
+
+    const restante =
+        obterRestantePedido(pedido);
+
+    if (total <= 0) {
+
+        return "Sem valor";
 
     }
 
+    if (restante <= 0) {
 
-    return {
+        return "Pago";
 
-        valorTotal:
-            valorTotal,
+    }
 
-        valorPago:
-            valorPago,
+    if (pago > 0) {
 
-        restante:
-            restante
+        return "Pagamento parcial";
 
-    };
+    }
+
+    return "Não pago";
 
 }
 
@@ -250,22 +177,34 @@ function atualizarResumo() {
             "totalPedidos"
         );
 
-
     const totalUniformes =
         document.getElementById(
             "totalUniformes"
         );
-
 
     const valorTotal =
         document.getElementById(
             "valorTotal"
         );
 
-
     const valorPendente =
         document.getElementById(
             "valorPendente"
+        );
+
+    const valorRecebido =
+        document.getElementById(
+            "valorRecebido"
+        );
+
+    const parciais =
+        document.getElementById(
+            "pedidosParciais"
+        );
+
+    const naoPagos =
+        document.getElementById(
+            "pedidosNaoPagos"
         );
 
 
@@ -275,8 +214,6 @@ function atualizarResumo() {
 
     let totalAberto = 0;
 
-    let pedidosPagos = 0;
-
     let pedidosParciais = 0;
 
     let pedidosNaoPagos = 0;
@@ -285,47 +222,43 @@ function atualizarResumo() {
     pedidos.forEach(
         function(pedido) {
 
-            const pagamento =
-                obterDadosPagamento(
+            const total =
+                obterValorTotalPedido(
+                    pedido
+                );
+
+            const pago =
+                obterValorPagoPedido(
+                    pedido
+                );
+
+            const restante =
+                obterRestantePedido(
                     pedido
                 );
 
 
-            totalVendido +=
-                pagamento.valorTotal;
+            totalVendido += total;
 
+            totalRecebido += pago;
 
-            totalRecebido +=
-                pagamento.valorPago;
+            totalAberto += restante;
 
-
-            totalAberto +=
-                pagamento.restante;
-
-
-            // ------------------------------------------
-            // SITUAÇÃO
-            // ------------------------------------------
 
             if (
-                pagamento.valorTotal > 0 &&
-                pagamento.restante <= 0
-            ) {
-
-                pedidosPagos++;
-
-            }
-
-            else if (
-                pagamento.valorPago > 0 &&
-                pagamento.restante > 0
+                total > 0 &&
+                pago > 0 &&
+                restante > 0
             ) {
 
                 pedidosParciais++;
 
             }
 
-            else {
+            else if (
+                total > 0 &&
+                pago <= 0
+            ) {
 
                 pedidosNaoPagos++;
 
@@ -361,39 +294,21 @@ function atualizarResumo() {
     }
 
 
-    if (valorPendente) {
-
-        valorPendente.innerText =
-            formatarMoeda(
-                totalAberto
-            );
-
-    }
-
-
-    const valorRecebido =
-        document.getElementById(
-            "valorRecebido"
-        );
-
-
-    const parciais =
-        document.getElementById(
-            "pedidosParciais"
-        );
-
-
-    const naoPagos =
-        document.getElementById(
-            "pedidosNaoPagos"
-        );
-
-
     if (valorRecebido) {
 
         valorRecebido.innerText =
             formatarMoeda(
                 totalRecebido
+            );
+
+    }
+
+
+    if (valorPendente) {
+
+        valorPendente.innerText =
+            formatarMoeda(
+                totalAberto
             );
 
     }
@@ -419,40 +334,19 @@ function atualizarResumo() {
         "===== RESUMO FINANCEIRO ====="
     );
 
-
     console.log(
         "Total vendido:",
         totalVendido
     );
-
 
     console.log(
         "Total recebido:",
         totalRecebido
     );
 
-
     console.log(
         "Total em aberto:",
         totalAberto
-    );
-
-
-    console.log(
-        "Pedidos pagos:",
-        pedidosPagos
-    );
-
-
-    console.log(
-        "Pedidos parciais:",
-        pedidosParciais
-    );
-
-
-    console.log(
-        "Pedidos não pagos:",
-        pedidosNaoPagos
     );
 
 }
@@ -468,7 +362,6 @@ function mostrarPedidos() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -492,15 +385,24 @@ function mostrarPedidos() {
     pedidos.forEach(
         function(pedido) {
 
-            const pagamento =
-                obterDadosPagamento(
+            const status =
+                obterStatusPedido(
                     pedido
                 );
 
+            const total =
+                obterValorTotalPedido(
+                    pedido
+                );
 
-            const status =
-                obterStatusPagamento(
-                    pagamento
+            const pago =
+                obterValorPagoPedido(
+                    pedido
+                );
+
+            const restante =
+                obterRestantePedido(
+                    pedido
                 );
 
 
@@ -509,7 +411,8 @@ function mostrarPedidos() {
                 <div class="card">
 
                     <h3>
-                        Pedido ${pedido.idPedido || ""}
+                        Pedido
+                        ${pedido.idPedido || ""}
                     </h3>
 
                     <p>
@@ -529,9 +432,17 @@ function mostrarPedidos() {
 
                     <p>
                         <strong>Valor:</strong>
-                        ${formatarMoeda(
-                            pagamento.valorTotal
-                        )}
+                        ${formatarMoeda(total)}
+                    </p>
+
+                    <p>
+                        <strong>Pago:</strong>
+                        ${formatarMoeda(pago)}
+                    </p>
+
+                    <p>
+                        <strong>Restante:</strong>
+                        ${formatarMoeda(restante)}
                     </p>
 
                     <p>
@@ -554,39 +465,6 @@ function mostrarPedidos() {
 
     area.innerHTML =
         html;
-
-}
-
-
-// ======================================================
-// STATUS DO PAGAMENTO
-// ======================================================
-
-function obterStatusPagamento(
-    pagamento
-) {
-
-    if (
-        pagamento.valorTotal > 0 &&
-        pagamento.restante <= 0
-    ) {
-
-        return "Pago";
-
-    }
-
-
-    if (
-        pagamento.valorPago > 0 &&
-        pagamento.restante > 0
-    ) {
-
-        return "Parcial";
-
-    }
-
-
-    return "Não pago";
 
 }
 
@@ -637,9 +515,7 @@ function obterModelo(item) {
             String(valor).trim() !== ""
         ) {
 
-            return String(
-                valor
-            ).trim();
+            return String(valor).trim();
 
         }
 
@@ -661,7 +537,6 @@ function mostrarUniformes() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -697,67 +572,50 @@ function mostrarUniformes() {
                         Uniforme ${index + 1}
                     </h3>
 
-
                     <p>
                         <strong>Nome:</strong>
                         ${item.nome || ""}
                     </p>
-
 
                     <p>
                         <strong>Número:</strong>
                         ${item.numero || ""}
                     </p>
 
-
                     <p>
                         <strong>Categoria:</strong>
                         ${item.categoria || ""}
                     </p>
-
 
                     <p>
                         <strong>Função:</strong>
                         ${item.funcao || ""}
                     </p>
 
-
                     <p>
                         <strong>Modelo:</strong>
                         ${modelo}
                     </p>
 
-
                     <p>
-                        <strong>
-                            Tamanho da camisa:
-                        </strong>
+                        <strong>Tamanho da camisa:</strong>
                         ${item.tamanhoCamisa || ""}
                     </p>
 
-
                     <p>
-                        <strong>
-                            Peça inferior:
-                        </strong>
+                        <strong>Peça inferior:</strong>
                         ${item.inferior || "Nenhum"}
                     </p>
 
-
                     <p>
-                        <strong>
-                            Tamanho inferior:
-                        </strong>
+                        <strong>Tamanho inferior:</strong>
                         ${item.tamanhoInferior || "N/A"}
                     </p>
-
 
                     <p>
                         <strong>Valor:</strong>
                         ${formatarMoeda(
-                            converterNumero(
-                                item.valor
-                            )
+                            Number(item.valor) || 0
                         )}
                     </p>
 
@@ -778,22 +636,8 @@ function mostrarUniformes() {
 // ======================================================
 // PAGAMENTOS
 // ======================================================
-//
-// O pagamento é lançado DIRETAMENTE NO PEDIDO.
-//
-// Não existe uma tela separada.
-// Não existe seleção de pedido em outro lugar.
-//
-// É exatamente:
-//
-// Pedido
-// Responsável
-// Valor total
-// Pago
-// Restante
-// [campo para valor]
-// [REGISTRAR PAGAMENTO]
-//
+// O PAGAMENTO É LANÇADO DIRETAMENTE NO PEDIDO.
+// NÃO EXISTE UMA NOVA ABA DE LANÇAMENTO.
 // ======================================================
 
 function mostrarPagamentos() {
@@ -802,7 +646,6 @@ function mostrarPagamentos() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -826,52 +669,25 @@ function mostrarPagamentos() {
     pedidos.forEach(
         function(pedido, index) {
 
-            const pagamento =
-                obterDadosPagamento(
+            const total =
+                obterValorTotalPedido(
                     pedido
                 );
 
-
-            const status =
-                obterStatusPagamento(
-                    pagamento
-                );
-
-
-            const id =
-                pedido.idPedido ||
-                `pedido-${index}`;
-
-
             const pago =
-                pagamento.valorPago;
-
+                obterValorPagoPedido(
+                    pedido
+                );
 
             const restante =
-                pagamento.restante;
-
-
-            const pagoTexto =
-                formatarMoeda(
-                    pago
+                obterRestantePedido(
+                    pedido
                 );
 
-
-            const restanteTexto =
-                formatarMoeda(
-                    restante
+            const status =
+                obterStatusPedido(
+                    pedido
                 );
-
-
-            const totalTexto =
-                formatarMoeda(
-                    pagamento.valorTotal
-                );
-
-
-            const estaPago =
-                restante <= 0 &&
-                pagamento.valorTotal > 0;
 
 
             html += `
@@ -883,44 +699,9 @@ function mostrarPagamentos() {
                     "
                 >
 
-                    <h3
-                        style="
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:center;
-                            gap:10px;
-                            flex-wrap:wrap;
-                        "
-                    >
-
-                        <span>
-                            💰 Pedido ${id}
-                        </span>
-
-                        <span
-                            style="
-                                font-size:14px;
-                                padding:6px 10px;
-                                border-radius:20px;
-                                background:${
-                                    estaPago
-                                    ? "#d4edda"
-                                    : pagamento.valorPago > 0
-                                        ? "#fff3cd"
-                                        : "#f8d7da"
-                                };
-                                color:${
-                                    estaPago
-                                    ? "#155724"
-                                    : pagamento.valorPago > 0
-                                        ? "#856404"
-                                        : "#721c24"
-                                };
-                            "
-                        >
-                            ${status}
-                        </span>
-
+                    <h3>
+                        💰 Pedido
+                        ${pedido.idPedido || ""}
                     </h3>
 
 
@@ -941,7 +722,7 @@ function mostrarPagamentos() {
                             Valor total:
                         </strong>
 
-                        ${totalTexto}
+                        ${formatarMoeda(total)}
 
                     </p>
 
@@ -952,7 +733,7 @@ function mostrarPagamentos() {
                             Já pago:
                         </strong>
 
-                        ${pagoTexto}
+                        ${formatarMoeda(pago)}
 
                     </p>
 
@@ -966,15 +747,29 @@ function mostrarPagamentos() {
                         <span
                             id="restante-${index}"
                         >
-                            ${restanteTexto}
+                            ${formatarMoeda(restante)}
+                        </span>
+
+                    </p>
+
+
+                    <p>
+
+                        <strong>
+                            Status:
+                        </strong>
+
+                        <span
+                            id="status-${index}"
+                        >
+                            ${status}
                         </span>
 
                     </p>
 
 
                     ${
-                        estaPago
-
+                        restante > 0
                         ?
 
                         `
@@ -982,39 +777,16 @@ function mostrarPagamentos() {
                         <div
                             style="
                                 margin-top:15px;
-                                padding:12px;
-                                background:#d4edda;
-                                border-radius:10px;
-                                color:#155724;
-                                font-weight:bold;
-                                text-align:center;
-                            "
-                        >
-
-                            ✅ Pedido totalmente pago
-
-                        </div>
-
-                        `
-
-                        :
-
-                        `
-
-                        <div
-                            style="
-                                margin-top:15px;
                                 padding-top:15px;
-                                border-top:1px solid #eee;
+                                border-top:1px solid #ddd;
                             "
                         >
 
                             <label
-                                for="pagamento-${index}"
                                 style="
                                     display:block;
                                     font-weight:bold;
-                                    margin-bottom:7px;
+                                    margin-bottom:6px;
                                 "
                             >
 
@@ -1024,10 +796,10 @@ function mostrarPagamentos() {
 
 
                             <input
-                                id="pagamento-${index}"
                                 type="number"
-                                min="0.01"
-                                max="${restante.toFixed(2)}"
+                                id="pagamento-${index}"
+                                min="0"
+                                max="${restante}"
                                 step="0.01"
                                 placeholder="Ex.: 25,00"
                                 style="
@@ -1056,7 +828,7 @@ function mostrarPagamentos() {
                                 "
                             >
 
-                                💰 REGISTRAR PAGAMENTO
+                                💰 LANÇAR PAGAMENTO
 
                             </button>
 
@@ -1064,6 +836,26 @@ function mostrarPagamentos() {
 
                         `
 
+                        :
+
+                        `
+
+                        <div
+                            style="
+                                margin-top:15px;
+                                padding:12px;
+                                background:#e8f5e9;
+                                border-radius:10px;
+                                text-align:center;
+                                font-weight:bold;
+                            "
+                        >
+
+                            ✅ Pedido totalmente pago
+
+                        </div>
+
+                        `
                     }
 
                 </div>
@@ -1084,12 +876,10 @@ function mostrarPagamentos() {
 // REGISTRAR PAGAMENTO
 // ======================================================
 
-async function registrarPagamento(
-    indice
-) {
+async function registrarPagamento(index) {
 
     const pedido =
-        pedidos[indice];
+        pedidos[index];
 
 
     if (!pedido) {
@@ -1103,28 +893,9 @@ async function registrarPagamento(
     }
 
 
-    const pagamento =
-        obterDadosPagamento(
-            pedido
-        );
-
-
-    if (
-        pagamento.restante <= 0
-    ) {
-
-        alert(
-            "Este pedido já está totalmente pago."
-        );
-
-        return;
-
-    }
-
-
     const campo =
         document.getElementById(
-            `pagamento-${indice}`
+            `pagamento-${index}`
         );
 
 
@@ -1140,12 +911,15 @@ async function registrarPagamento(
 
 
     const valor =
-        converterNumero(
-            campo.value
+        Number(
+            String(
+                campo.value
+            ).replace(",", ".")
         );
 
 
     if (
+        !valor ||
         valor <= 0
     ) {
 
@@ -1153,46 +927,72 @@ async function registrarPagamento(
             "Digite um valor de pagamento."
         );
 
-        campo.focus();
-
         return;
 
     }
 
 
-    if (
-        valor > pagamento.restante
-    ) {
+    const total =
+        obterValorTotalPedido(
+            pedido
+        );
+
+
+    const pagoAtual =
+        obterValorPagoPedido(
+            pedido
+        );
+
+
+    const restanteAtual =
+        obterRestantePedido(
+            pedido
+        );
+
+
+    if (valor > restanteAtual) {
 
         alert(
             "O valor informado é maior que o restante do pedido."
         );
 
-        campo.focus();
-
         return;
 
     }
 
 
-    const idPedido =
-        pedido.idPedido;
+    const novoPago =
+        pagoAtual + valor;
 
 
-    if (!idPedido) {
-
-        alert(
-            "Este pedido não possui ID."
+    const novoRestante =
+        Math.max(
+            0,
+            total - novoPago
         );
 
-        return;
+
+    let novoStatus =
+        "Não pago";
+
+
+    if (novoRestante <= 0) {
+
+        novoStatus =
+            "Pago";
+
+    }
+
+    else if (novoPago > 0) {
+
+        novoStatus =
+            "Pagamento parcial";
 
     }
 
 
     const botao =
-        campo
-            .parentElement
+        campo.parentElement
             ?.querySelector(
                 "button"
             );
@@ -1206,53 +1006,32 @@ async function registrarPagamento(
         botao.innerText =
             "⏳ REGISTRANDO...";
 
-        botao.style.opacity =
-            "0.6";
-
     }
 
 
     try {
 
-        console.log(
-            "ENVIANDO PAGAMENTO:",
-            {
-                acao:
-                    ACAO_LANCAR_PAGAMENTO,
-
-                idPedido:
-                    idPedido,
-
-                valor:
-                    valor
-            }
-        );
-
-
-        // ==================================================
-        // ENVIO PARA O APPS SCRIPT
-        // ==================================================
+        /*
+         * O Apps Script recebe:
+         *
+         * acao=lancarPagamento
+         * idPedido
+         * valor
+         */
 
         const parametros =
-            new URLSearchParams();
+            new URLSearchParams({
 
+                acao:
+                    "lancarPagamento",
 
-        parametros.append(
-            "acao",
-            ACAO_LANCAR_PAGAMENTO
-        );
+                idPedido:
+                    pedido.idPedido || "",
 
+                valor:
+                    valor.toFixed(2)
 
-        parametros.append(
-            "idPedido",
-            idPedido
-        );
-
-
-        parametros.append(
-            "valorPagamento",
-            valor.toFixed(2)
-        );
+            });
 
 
         const resposta =
@@ -1280,29 +1059,43 @@ async function registrarPagamento(
 
             throw new Error(
                 dados?.message ||
-                "O Apps Script não confirmou o pagamento."
+                "O pagamento não foi registrado."
             );
 
         }
 
 
-        alert(
-            "Pagamento registrado com sucesso!"
-        );
+        // ==================================================
+        // ATUALIZAR PEDIDO LOCALMENTE
+        // ==================================================
+
+        pedido.Pago =
+            novoPago;
+
+        pedido.Restante =
+            novoRestante;
+
+        pedido.Status =
+            novoStatus;
 
 
         // ==================================================
-        // RECARREGAR DADOS
+        // ATUALIZAR RESUMO
         // ==================================================
 
-        await carregarDados();
+        atualizarResumo();
 
 
         // ==================================================
-        // CONTINUAR NA ABA PAGAMENTOS
+        // RECARREGAR ABA DE PAGAMENTOS
         // ==================================================
 
         mostrarPagamentos();
+
+
+        alert(
+            "Pagamento registrado com sucesso!"
+        );
 
 
     } catch (erro) {
@@ -1325,10 +1118,7 @@ async function registrarPagamento(
                 false;
 
             botao.innerText =
-                "💰 REGISTRAR PAGAMENTO";
-
-            botao.style.opacity =
-                "1";
+                "💰 LANÇAR PAGAMENTO";
 
         }
 
@@ -1347,7 +1137,6 @@ function mostrarProducao() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -1437,9 +1226,7 @@ function mostrarProducao() {
                 🏭 Lista de Produção
             </h2>
 
-
             <p>
-
                 <strong>
                     Total de uniformes:
                 </strong>
@@ -1448,9 +1235,7 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
-
                 <strong>
                     Camisas:
                 </strong>
@@ -1459,9 +1244,7 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
-
                 <strong>
                     Baby Look:
                 </strong>
@@ -1470,9 +1253,7 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
-
                 <strong>
                     Peças inferiores:
                 </strong>
@@ -1489,7 +1270,6 @@ function mostrarProducao() {
             <h3>
                 👕 Lista
             </h3>
-
 
             <div
                 style="
@@ -1556,10 +1336,8 @@ function mostrarProducao() {
             const nome =
                 item.nome || "";
 
-
             const numero =
                 item.numero || "";
-
 
             const funcao =
                 item.funcao || "";
@@ -1731,37 +1509,29 @@ function exportarProducaoPlanilha() {
     itens.forEach(
         function(item) {
 
-            const nome =
-                item.nome || "";
-
-            const numero =
-                item.numero || "";
-
-            const funcao =
-                item.funcao || "";
-
-            const modelo =
-                obterModelo(item);
-
-            const tamanho =
-                item.tamanhoCamisa || "";
-
-            const inferior =
-                item.inferior || "";
-
-            const tamanhoInferior =
-                item.tamanhoInferior || "";
-
-
             csv +=
                 "CAMISA;" +
-                escaparCSV(nome) + ";" +
-                escaparCSV(numero) + ";" +
-                escaparCSV(funcao) + ";" +
-                escaparCSV(modelo) + ";" +
-                escaparCSV(tamanho) + ";" +
-                escaparCSV(inferior) + ";" +
-                escaparCSV(tamanhoInferior) +
+                escaparCSV(
+                    item.nome || ""
+                ) + ";" +
+                escaparCSV(
+                    item.numero || ""
+                ) + ";" +
+                escaparCSV(
+                    item.funcao || ""
+                ) + ";" +
+                escaparCSV(
+                    obterModelo(item)
+                ) + ";" +
+                escaparCSV(
+                    item.tamanhoCamisa || ""
+                ) + ";" +
+                escaparCSV(
+                    item.inferior || ""
+                ) + ";" +
+                escaparCSV(
+                    item.tamanhoInferior || ""
+                ) +
                 "\n";
 
         }
@@ -1840,14 +1610,8 @@ function escaparCSV(valor) {
 
 
     return String(valor)
-        .replace(
-            /"/g,
-            '""'
-        )
-        .replace(
-            /;/g,
-            ","
-        );
+        .replace(/"/g, '""')
+        .replace(/;/g, ",");
 
 }
 
@@ -1863,7 +1627,6 @@ function mostrarConfiguracoes() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
 
 
@@ -1875,11 +1638,7 @@ function mostrarConfiguracoes() {
                 ⚙️ Configurações
             </h2>
 
-            <p
-                style="
-                    color:#777;
-                "
-            >
+            <p style="color:#777;">
 
                 Gerencie os valores e as principais
                 configurações do sistema.
@@ -1895,66 +1654,156 @@ function mostrarConfiguracoes() {
                 💰 Valores das peças
             </h3>
 
+            <div style="display:grid;gap:12px;">
 
-            <p
-                style="
-                    color:#777;
-                "
-            >
+                <div>
 
-                Os valores abaixo poderão ser
-                configurados nesta área.
+                    <label>
+                        Camisa
+                    </label>
 
-            </p>
+                    <input
+                        id="configCamisa"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
 
-
-            <div
-                style="
-                    display:grid;
-                    gap:12px;
-                "
-            >
-
-                ${criarCampoConfiguracao(
-                    "configCamisa",
-                    "Camisa",
-                    "75"
-                )}
-
-
-                ${criarCampoConfiguracao(
-                    "configBabyLook",
-                    "Baby Look",
-                    "75"
-                )}
+                </div>
 
 
-                ${criarCampoConfiguracao(
-                    "configCalcaoMasc",
-                    "Calção masculino",
-                    "35"
-                )}
+                <div>
+
+                    <label>
+                        Baby Look
+                    </label>
+
+                    <input
+                        id="configBabyLook"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
 
 
-                ${criarCampoConfiguracao(
-                    "configCalcaoFem",
-                    "Calção feminino",
-                    "35"
-                )}
+                <div>
+
+                    <label>
+                        Calção masculino
+                    </label>
+
+                    <input
+                        id="configCalcaoMasc"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
 
 
-                ${criarCampoConfiguracao(
-                    "configShortDoll",
-                    "Short Doll",
-                    "30"
-                )}
+                <div>
+
+                    <label>
+                        Calção feminino
+                    </label>
+
+                    <input
+                        id="configCalcaoFem"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
 
 
-                ${criarCampoConfiguracao(
-                    "configShortSuplex",
-                    "Short Suplex",
-                    "35"
-                )}
+                <div>
+
+                    <label>
+                        Short Doll
+                    </label>
+
+                    <input
+                        id="configShortDoll"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="30"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Short Suplex
+                    </label>
+
+                    <input
+                        id="configShortSuplex"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
 
             </div>
 
@@ -1967,11 +1816,9 @@ function mostrarConfiguracoes() {
                 🏐 Configurações do sistema
             </h3>
 
-
             <label>
                 Nome do time
             </label>
-
 
             <input
                 id="configNomeTime"
@@ -1984,63 +1831,6 @@ function mostrarConfiguracoes() {
                     border:1px solid #ccc;
                     border-radius:10px;
                     font-size:16px;
-                    margin-top:6px;
-                "
-            >
-
-
-            <label
-                style="
-                    display:block;
-                    margin-top:15px;
-                "
-            >
-                Número inicial
-            </label>
-
-
-            <input
-                id="configNumeroInicial"
-                type="number"
-                min="1"
-                max="99"
-                value="1"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                    margin-top:6px;
-                "
-            >
-
-
-            <label
-                style="
-                    display:block;
-                    margin-top:15px;
-                "
-            >
-                Número final
-            </label>
-
-
-            <input
-                id="configNumeroFinal"
-                type="number"
-                min="1"
-                max="99"
-                value="99"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                    margin-top:6px;
                 "
             >
 
@@ -2056,9 +1846,7 @@ function mostrarConfiguracoes() {
                     width:100%;
                     background:#ff007f;
                 "
-                onclick="
-                    salvarConfiguracoes()
-                "
+                onclick="salvarConfiguracoes()"
             >
 
                 💾 SALVAR ALTERAÇÕES
@@ -2074,9 +1862,7 @@ function mostrarConfiguracoes() {
                     margin-top:10px;
                     background:#555;
                 "
-                onclick="
-                    restaurarConfiguracoes()
-                "
+                onclick="restaurarConfiguracoes()"
             >
 
                 🔄 RESTAURAR PADRÃO
@@ -2091,270 +1877,6 @@ function mostrarConfiguracoes() {
 
 
 // ======================================================
-// CAMPO DE CONFIGURAÇÃO
-// ======================================================
-
-function criarCampoConfiguracao(
-    id,
-    label,
-    valor
-) {
-
-    return `
-
-        <div>
-
-            <label
-                for="${id}"
-                style="
-                    display:block;
-                    font-weight:bold;
-                    margin-bottom:6px;
-                "
-            >
-
-                ${label}
-
-            </label>
-
-
-            <input
-                id="${id}"
-                type="number"
-                min="0"
-                step="0.01"
-                value="${valor}"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                "
-            >
-
-        </div>
-
-    `;
-
-}
-
-
-// ======================================================
-// SALVAR CONFIGURAÇÕES
-// ======================================================
-//
-// Por enquanto ficam salvas no navegador.
-// Não altera os valores históricos dos pedidos.
-//
-
-function salvarConfiguracoes() {
-
-    const configuracoes = {
-
-        camisa:
-            obterValorInput(
-                "configCamisa"
-            ),
-
-        babyLook:
-            obterValorInput(
-                "configBabyLook"
-            ),
-
-        calcaoMasc:
-            obterValorInput(
-                "configCalcaoMasc"
-            ),
-
-        calcaoFem:
-            obterValorInput(
-                "configCalcaoFem"
-            ),
-
-        shortDoll:
-            obterValorInput(
-                "configShortDoll"
-            ),
-
-        shortSuplex:
-            obterValorInput(
-                "configShortSuplex"
-            ),
-
-        nomeTime:
-            obterValorInputTexto(
-                "configNomeTime"
-            ),
-
-        numeroInicial:
-            obterValorInput(
-                "configNumeroInicial"
-            ),
-
-        numeroFinal:
-            obterValorInput(
-                "configNumeroFinal"
-            )
-
-    };
-
-
-    localStorage.setItem(
-        "configVoleiTerapia",
-        JSON.stringify(
-            configuracoes
-        )
-    );
-
-
-    alert(
-        "Configurações salvas."
-    );
-
-}
-
-
-// ======================================================
-// RESTAURAR CONFIGURAÇÕES
-// ======================================================
-
-function restaurarConfiguracoes() {
-
-    const padrao = {
-
-        camisa: 75,
-
-        babyLook: 75,
-
-        calcaoMasc: 35,
-
-        calcaoFem: 35,
-
-        shortDoll: 30,
-
-        shortSuplex: 35,
-
-        nomeTime:
-            "Vôlei Terapia",
-
-        numeroInicial: 1,
-
-        numeroFinal: 99
-
-    };
-
-
-    localStorage.setItem(
-        "configVoleiTerapia",
-        JSON.stringify(
-            padrao
-        )
-    );
-
-
-    mostrarConfiguracoes();
-
-
-    alert(
-        "Configurações restauradas."
-    );
-
-}
-
-
-// ======================================================
-// OBTER CONFIGURAÇÕES
-// ======================================================
-
-function obterConfiguracoes() {
-
-    try {
-
-        const dados =
-            localStorage.getItem(
-                "configVoleiTerapia"
-            );
-
-
-        if (!dados) {
-
-            return null;
-
-        }
-
-
-        return JSON.parse(
-            dados
-        );
-
-    } catch (erro) {
-
-        console.error(
-            "Erro nas configurações:",
-            erro
-        );
-
-
-        return null;
-
-    }
-
-}
-
-
-// ======================================================
-// INPUT NUMÉRICO
-// ======================================================
-
-function obterValorInput(id) {
-
-    const elemento =
-        document.getElementById(
-            id
-        );
-
-
-    if (!elemento) {
-
-        return 0;
-
-    }
-
-
-    return converterNumero(
-        elemento.value
-    );
-
-}
-
-
-// ======================================================
-// INPUT TEXTO
-// ======================================================
-
-function obterValorInputTexto(id) {
-
-    const elemento =
-        document.getElementById(
-            id
-        );
-
-
-    if (!elemento) {
-
-        return "";
-
-    }
-
-
-    return elemento.value;
-
-}
-
-
-// ======================================================
 // MENSAGEM
 // ======================================================
 
@@ -2364,7 +1886,6 @@ function mostrarMensagem(texto) {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -2393,11 +1914,8 @@ function formatarMoeda(valor) {
     ).toLocaleString(
         "pt-BR",
         {
-            style:
-                "currency",
-
-            currency:
-                "BRL"
+            style:"currency",
+            currency:"BRL"
         }
     );
 
