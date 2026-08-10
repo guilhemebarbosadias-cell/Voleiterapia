@@ -9,7 +9,6 @@
 const URL_APPS_SCRIPT =
 "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
-
 // ======================================================
 // DADOS
 // ======================================================
@@ -17,295 +16,253 @@ const URL_APPS_SCRIPT =
 let pedidos = [];
 let itens = [];
 
-
 // ======================================================
 // CARREGAR DADOS
 // ======================================================
 
 async function carregarDados() {
 
-    try {
+try {  
 
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT +
-                "?acao=admin"
-            );
-
-        const dados =
-            await resposta.json();
-
-        console.log(
-            "DADOS RECEBIDOS DO APPS SCRIPT:",
-            dados
-        );
-
-        if (
-            !dados ||
-            dados.result !== "success"
-        ) {
-
-            throw new Error(
-                dados?.message ||
-                "Não foi possível carregar os dados."
-            );
-
-        }
-
-        pedidos =
-            Array.isArray(
-                dados.pedidos
-            )
-                ? dados.pedidos
-                : [];
-
-        itens =
-            Array.isArray(
-                dados.itens
-            )
-                ? dados.itens
-                : [];
+    const resposta =  
+        await fetch(  
+            URL_APPS_SCRIPT +  
+            "?acao=admin"  
+        );  
 
 
-        // ==================================================
-        // NORMALIZAR PEDIDOS
-        // ==================================================
-
-        pedidos =
-            pedidos.map(
-                function(pedido) {
-
-                    return {
-
-                        ...pedido,
-
-                        idPedido:
-                            pedido.idPedido || "",
-
-                        data:
-                            pedido.data || "",
-
-                        responsavel:
-                            pedido.responsavel || "",
-
-                        quantidade:
-                            Number(
-                                pedido.quantidade
-                            ) || 0,
-
-                        valorTotal:
-                            Number(
-                                pedido.valorTotal
-                            ) || 0,
-
-                        parcelas:
-                            pedido.parcelas || "",
-
-                        status:
-                            pedido.status || "Não pago",
-
-                        pago:
-                            Number(
-                                pedido.pago
-                            ) || 0,
-
-                        restante:
-                            Number(
-                                pedido.restante
-                            ) || 0
-
-                    };
-
-                }
-            );
+    const dados =  
+        await resposta.json();  
 
 
-        atualizarResumo();
+    console.log(  
+        "DADOS RECEBIDOS DO APPS SCRIPT:",  
+        dados  
+    );  
 
 
-        console.log(
-            "PEDIDOS NORMALIZADOS:",
-            pedidos
-        );
+    if (  
+        !dados ||  
+        dados.result !== "success"  
+    ) {  
+
+        throw new Error(  
+            dados?.message ||  
+            "Não foi possível carregar os dados."  
+        );  
+
+    }  
 
 
-    } catch (erro) {
+    pedidos =  
+        Array.isArray(  
+            dados.pedidos  
+        )  
+            ? dados.pedidos  
+            : [];  
 
-        console.error(
-            "ERRO AO CARREGAR ADMIN:",
-            erro
-        );
 
-        mostrarMensagem(
-            "Não foi possível carregar os dados da administração."
-        );
+    itens =  
+        Array.isArray(  
+            dados.itens  
+        )  
+            ? dados.itens  
+            : [];  
 
-    }
+
+    // ==================================================  
+    // NORMALIZAR OS PEDIDOS  
+    // ==================================================  
+
+    pedidos =  
+        pedidos.map(  
+            function(pedido) {  
+
+                return {  
+
+                    ...pedido,  
+
+                    idPedido:  
+                        pedido.idPedido || "",  
+
+                    data:  
+                        pedido.data || "",  
+
+                    responsavel:  
+                        pedido.responsavel || "",  
+
+                    quantidade:  
+                        Number(  
+                            pedido.quantidade  
+                        ) || 0,  
+
+                    valorTotal:  
+                        Number(  
+                            pedido.valorTotal  
+                        ) || 0,  
+
+                    parcelas:  
+                        pedido.parcelas || "",  
+
+                    status:  
+                        pedido.status || "Não pago",  
+
+                    pago:  
+                        Number(  
+                            pedido.pago  
+                        ) || 0,  
+
+                    restante:  
+                        Number(  
+                            pedido.restante  
+                        ) || 0  
+
+                };  
+
+            }  
+        );  
+
+
+    atualizarResumo();  
+
+
+    console.log(  
+        "PEDIDOS NORMALIZADOS:",  
+        pedidos  
+    );  
+
+
+} catch (erro) {  
+
+    console.error(  
+        "ERRO AO CARREGAR ADMIN:",  
+        erro  
+    );  
+
+
+    mostrarMensagem(  
+        "Não foi possível carregar os dados da administração."  
+    );  
 
 }
 
+}
 
 // ======================================================
 // PEGAR VALOR TOTAL
 // ======================================================
 
 function obterValorTotalPedido(
-    pedido
+pedido
 ) {
 
-    return Number(
-        pedido?.valorTotal
-    ) || 0;
+return Number(  
+    pedido?.valorTotal  
+) || 0;
 
 }
-
 
 // ======================================================
 // PEGAR VALOR PAGO
 // ======================================================
 
 function obterValorPagoPedido(
-    pedido
+pedido
 ) {
 
-    return Number(
-        pedido?.pago
-    ) || 0;
+return Number(  
+    pedido?.pago  
+) || 0;
 
 }
-
 
 // ======================================================
 // CALCULAR RESTANTE
 // ======================================================
 
 function obterRestantePedido(
-    pedido
+pedido
 ) {
 
-    const total =
-        obterValorTotalPedido(
-            pedido
-        );
+const total =  
+    obterValorTotalPedido(  
+        pedido  
+    );  
 
-    const pago =
-        obterValorPagoPedido(
-            pedido
-        );
 
-    return Math.max(
-        total - pago,
-        0
-    );
+const pago =  
+    obterValorPagoPedido(  
+        pedido  
+    );  
+
+
+const restanteCalculado =  
+    Math.max(  
+        total - pago,  
+        0  
+    );  
+
+
+return restanteCalculado;
 
 }
-
 
 // ======================================================
 // OBTER STATUS CORRETO
 // ======================================================
 
 function obterStatusPedido(
-    pedido
+pedido
 ) {
 
-    const total =
-        obterValorTotalPedido(
-            pedido
-        );
-
-    const pago =
-        obterValorPagoPedido(
-            pedido
-        );
-
-    const restante =
-        obterRestantePedido(
-            pedido
-        );
+const total =  
+    obterValorTotalPedido(  
+        pedido  
+    );  
 
 
-    if (
-        total <= 0
-    ) {
-
-        return "Sem valor";
-
-    }
+const pago =  
+    obterValorPagoPedido(  
+        pedido  
+    );  
 
 
-    if (
-        restante <= 0
-    ) {
-
-        return "Pago";
-
-    }
+const restante =  
+    obterRestantePedido(  
+        pedido  
+    );  
 
 
-    if (
-        pago > 0
-    ) {
+if (  
+    total <= 0  
+) {  
 
-        return "Pagamento parcial";
+    return "Sem valor";  
 
-    }
-
-
-    return "Não pago";
-
-}
+}  
 
 
-// ======================================================
-// ETIQUETA COLORIDA DO STATUS
-// ======================================================
+if (  
+    restante <= 0  
+) {  
 
-function mostrarStatusTag(
-    status
-) {
+    return "Pago";  
 
-    const texto =
-        String(
-            status || "Não pago"
-        ).trim();
+}  
 
 
-    let classe =
-        "nao-pago";
+if (  
+    pago > 0  
+) {  
+
+    return "Pagamento parcial";  
+
+}  
 
 
-    if (
-        texto === "Pago"
-    ) {
-
-        classe =
-            "pago";
-
-    }
-
-    else if (
-        texto === "Pagamento parcial"
-    ) {
-
-        classe =
-            "parcial";
-
-    }
-
-
-    return `
-
-        <span
-            class="pagamento-status ${classe}"
-        >
-            ${texto}
-        </span>
-
-    `;
+return "Não pago";
 
 }
-
 
 // ======================================================
 // ATUALIZAR RESUMO FINANCEIRO
@@ -313,164 +270,178 @@ function mostrarStatusTag(
 
 function atualizarResumo() {
 
-    const totalPedidos =
-        document.getElementById(
-            "totalPedidos"
-        );
-
-    const totalUniformes =
-        document.getElementById(
-            "totalUniformes"
-        );
-
-    const valorTotal =
-        document.getElementById(
-            "valorTotal"
-        );
-
-    const valorPendente =
-        document.getElementById(
-            "valorPendente"
-        );
-
-    const valorRecebido =
-        document.getElementById(
-            "valorRecebido"
-        );
-
-    const parciais =
-        document.getElementById(
-            "pedidosParciais"
-        );
-
-    const naoPagos =
-        document.getElementById(
-            "pedidosNaoPagos"
-        );
+const totalPedidos =  
+    document.getElementById(  
+        "totalPedidos"  
+    );  
 
 
-    let totalVendido = 0;
-    let totalRecebido = 0;
-    let totalAberto = 0;
-    let pedidosParciais = 0;
-    let pedidosNaoPagos = 0;
+const totalUniformes =  
+    document.getElementById(  
+        "totalUniformes"  
+    );  
 
 
-    pedidos.forEach(
-        function(pedido) {
-
-            const total =
-                obterValorTotalPedido(
-                    pedido
-                );
-
-            const pago =
-                obterValorPagoPedido(
-                    pedido
-                );
-
-            const restante =
-                obterRestantePedido(
-                    pedido
-                );
+const valorTotal =  
+    document.getElementById(  
+        "valorTotal"  
+    );  
 
 
-            totalVendido +=
-                total;
-
-            totalRecebido +=
-                pago;
-
-            totalAberto +=
-                restante;
+const valorPendente =  
+    document.getElementById(  
+        "valorPendente"  
+    );  
 
 
-            if (
-                total > 0 &&
-                pago > 0 &&
-                restante > 0
-            ) {
-
-                pedidosParciais++;
-
-            }
-
-            else if (
-                total > 0 &&
-                pago <= 0
-            ) {
-
-                pedidosNaoPagos++;
-
-            }
-
-        }
-    );
+const valorRecebido =  
+    document.getElementById(  
+        "valorRecebido"  
+    );  
 
 
-    if (totalPedidos) {
-
-        totalPedidos.innerText =
-            pedidos.length;
-
-    }
+const parciais =  
+    document.getElementById(  
+        "pedidosParciais"  
+    );  
 
 
-    if (totalUniformes) {
-
-        totalUniformes.innerText =
-            itens.length;
-
-    }
+const naoPagos =  
+    document.getElementById(  
+        "pedidosNaoPagos"  
+    );  
 
 
-    if (valorTotal) {
+let totalVendido = 0;  
 
-        valorTotal.innerText =
-            formatarMoeda(
-                totalVendido
-            );
+let totalRecebido = 0;  
 
-    }
+let totalAberto = 0;  
 
+let pedidosParciais = 0;  
 
-    if (valorRecebido) {
-
-        valorRecebido.innerText =
-            formatarMoeda(
-                totalRecebido
-            );
-
-    }
+let pedidosNaoPagos = 0;  
 
 
-    if (valorPendente) {
+pedidos.forEach(  
+    function(pedido) {  
 
-        valorPendente.innerText =
-            formatarMoeda(
-                totalAberto
-            );
-
-    }
-
-
-    if (parciais) {
-
-        parciais.innerText =
-            pedidosParciais;
-
-    }
+        const total =  
+            obterValorTotalPedido(  
+                pedido  
+            );  
 
 
-    if (naoPagos) {
+        const pago =  
+            obterValorPagoPedido(  
+                pedido  
+            );  
 
-        naoPagos.innerText =
-            pedidosNaoPagos;
 
-    }
+        const restante =  
+            obterRestantePedido(  
+                pedido  
+            );  
+
+
+        totalVendido +=  
+            total;  
+
+
+        totalRecebido +=  
+            pago;  
+
+
+        totalAberto +=  
+            restante;  
+
+
+        if (  
+            total > 0 &&  
+            pago > 0 &&  
+            restante > 0  
+        ) {  
+
+            pedidosParciais++;  
+
+        }  
+
+
+        else if (  
+            total > 0 &&  
+            pago <= 0  
+        ) {  
+
+            pedidosNaoPagos++;  
+
+        }  
+
+    }  
+);  
+
+
+if (totalPedidos) {  
+
+    totalPedidos.innerText =  
+        pedidos.length;  
+
+}  
+
+
+if (totalUniformes) {  
+
+    totalUniformes.innerText =  
+        itens.length;  
+
+}  
+
+
+if (valorTotal) {  
+
+    valorTotal.innerText =  
+        formatarMoeda(  
+            totalVendido  
+        );  
+
+}  
+
+
+if (valorRecebido) {  
+
+    valorRecebido.innerText =  
+        formatarMoeda(  
+            totalRecebido  
+        );  
+
+}  
+
+
+if (valorPendente) {  
+
+    valorPendente.innerText =  
+        formatarMoeda(  
+            totalAberto  
+        );  
+
+}  
+
+
+if (parciais) {  
+
+    parciais.innerText =  
+        pedidosParciais;  
+
+}  
+
+
+if (naoPagos) {  
+
+    naoPagos.innerText =  
+        pedidosNaoPagos;  
+
+}  
 
 }
-
 
 // ======================================================
 // PEDIDOS
@@ -478,141 +449,175 @@ function atualizarResumo() {
 
 function mostrarPedidos() {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    if (
-        pedidos.length === 0
-    ) {
+if (  
+    pedidos.length === 0  
+) {  
 
-        area.innerHTML = `
+    area.innerHTML = `  
 
-            <div class="empty">
+        <div class="empty">  
 
-                Nenhum pedido encontrado.
+            Nenhum pedido encontrado.  
 
-            </div>
+        </div>  
 
-        `;
+    `;  
 
-        return;
+    return;  
 
-    }
-
-
-    let html = "";
+}  
 
 
-    pedidos.forEach(
-        function(pedido) {
-
-            const status =
-                obterStatusPedido(
-                    pedido
-                );
-
-            const total =
-                obterValorTotalPedido(
-                    pedido
-                );
-
-            const pago =
-                obterValorPagoPedido(
-                    pedido
-                );
-
-            const restante =
-                obterRestantePedido(
-                    pedido
-                );
+let html = "";  
 
 
-            html += `
+pedidos.forEach(  
+    function(pedido) {  
 
-                <div class="card">
-
-                    <h3>
-                        Pedido
-                        ${pedido.idPedido || ""}
-                    </h3>
-
-
-                    <p>
-                        <strong>Data:</strong>
-                        ${pedido.data || ""}
-                    </p>
+        const status =  
+            obterStatusPedido(  
+                pedido  
+            );  
 
 
-                    <p>
-                        <strong>Responsável:</strong>
-                        ${pedido.responsavel || ""}
-                    </p>
+        const total =  
+            obterValorTotalPedido(  
+                pedido  
+            );  
 
 
-                    <p>
-                        <strong>Quantidade:</strong>
-                        ${pedido.quantidade || 0}
-                    </p>
+        const pago =  
+            obterValorPagoPedido(  
+                pedido  
+            );  
 
 
-                    <p>
-                        <strong>Valor:</strong>
-                        ${formatarMoeda(total)}
-                    </p>
+        const restante =  
+            obterRestantePedido(  
+                pedido  
+            );  
 
 
-                    <p>
-                        <strong>Pago:</strong>
-                        ${formatarMoeda(pago)}
-                    </p>
+        html += `  
+
+            <div class="card">  
+
+                <h3>  
+
+                    Pedido  
+                    ${pedido.idPedido || ""}  
+
+                </h3>  
 
 
-                    <p>
-                        <strong>Restante:</strong>
-                        ${formatarMoeda(restante)}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Data:  
+                    </strong>  
+
+                    ${pedido.data || ""}  
+
+                </p>  
 
 
-                    <p>
+                <p>  
 
-                        <strong>
-                            Parcelas:
-                        </strong>
+                    <strong>  
+                        Responsável:  
+                    </strong>  
 
-                        ${pedido.parcelas || ""}
+                    ${pedido.responsavel || ""}  
 
-                    </p>
-
-
-                    <p>
-
-                        <strong>
-                            Status:
-                        </strong>
-
-                        ${mostrarStatusTag(status)}
-
-                    </p>
-
-                </div>
-
-            `;
-
-        }
-    );
+                </p>  
 
 
-    area.innerHTML =
-        html;
+                <p>  
+
+                    <strong>  
+                        Quantidade:  
+                    </strong>  
+
+                    ${pedido.quantidade || 0}  
+
+                </p>  
+
+
+                <p>  
+
+                    <strong>  
+                        Valor:  
+                    </strong>  
+
+                    ${formatarMoeda(total)}  
+
+                </p>  
+
+
+                <p>  
+
+                    <strong>  
+                        Pago:  
+                    </strong>  
+
+                    ${formatarMoeda(pago)}  
+
+                </p>  
+
+
+                <p>  
+
+                    <strong>  
+                        Restante:  
+                    </strong>  
+
+                    ${formatarMoeda(restante)}  
+
+                </p>  
+
+
+                <p>  
+
+                    <strong>  
+                        Parcelas:  
+                    </strong>  
+
+                    ${pedido.parcelas || ""}  
+
+                </p>  
+
+
+                <p>  
+
+                    <strong>  
+                        Status:  
+                    </strong>  
+
+                    ${status}  
+
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML =  
+    html;
 
 }
-
 
 // ======================================================
 // MODELO
@@ -620,52 +625,58 @@ function mostrarPedidos() {
 
 function obterModelo(item) {
 
-    if (!item) return "";
+if (!item) return "";  
 
 
-    const possibilidades = [
+const possibilidades = [  
 
-        item.modelo,
-        item.modeloCamisa,
-        item["Modelo"],
-        item["MODELO"],
-        item["Modelo da camisa"],
-        item["Modelo da Camisa"],
-        item["modelo da camisa"],
-        item["modeloCamisa"]
+    item.modelo,  
 
-    ];
+    item.modeloCamisa,  
 
+    item["Modelo"],  
 
-    for (
-        let i = 0;
-        i < possibilidades.length;
-        i++
-    ) {
+    item["MODELO"],  
 
-        const valor =
-            possibilidades[i];
+    item["Modelo da camisa"],  
+
+    item["Modelo da Camisa"],  
+
+    item["modelo da camisa"],  
+
+    item["modeloCamisa"]  
+
+];  
 
 
-        if (
-            valor !== undefined &&
-            valor !== null &&
-            String(valor).trim() !== ""
-        ) {
+for (  
+    let i = 0;  
+    i < possibilidades.length;  
+    i++  
+) {  
 
-            return String(
-                valor
-            ).trim();
-
-        }
-
-    }
+    const valor =  
+        possibilidades[i];  
 
 
-    return "Não informado";
+    if (  
+        valor !== undefined &&  
+        valor !== null &&  
+        String(valor).trim() !== ""  
+    ) {  
+
+        return String(  
+            valor  
+        ).trim();  
+
+    }  
+
+}  
+
+
+return "Não informado";
 
 }
-
 
 // ======================================================
 // UNIFORMES
@@ -673,128 +684,170 @@ function obterModelo(item) {
 
 function mostrarUniformes() {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    if (
-        itens.length === 0
-    ) {
+if (  
+    itens.length === 0  
+) {  
 
-        area.innerHTML = `
+    area.innerHTML = `  
 
-            <div class="empty">
+        <div class="empty">  
 
-                Nenhum uniforme encontrado.
+            Nenhum uniforme encontrado.  
 
-            </div>
+        </div>  
 
-        `;
+    `;  
 
-        return;
+    return;  
 
-    }
-
-
-    let html = "";
+}  
 
 
-    itens.forEach(
-        function(item, index) {
-
-            const modelo =
-                obterModelo(item);
+let html = "";  
 
 
-            html += `
+itens.forEach(  
+    function(item, index) {  
 
-                <div class="card">
-
-                    <h3>
-                        Uniforme
-                        ${index + 1}
-                    </h3>
+        const modelo =  
+            obterModelo(item);  
 
 
-                    <p>
-                        <strong>Nome:</strong>
-                        ${item.nome || ""}
-                    </p>
+        html += `  
+
+            <div class="card">  
+
+                <h3>  
+
+                    Uniforme  
+                    ${index + 1}  
+
+                </h3>  
 
 
-                    <p>
-                        <strong>Número:</strong>
-                        ${item.numero || ""}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Nome:  
+                    </strong>  
+
+                    ${item.nome || ""}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>Categoria:</strong>
-                        ${item.categoria || ""}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Número:  
+                    </strong>  
+
+                    ${item.numero || ""}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>Função:</strong>
-                        ${item.funcao || ""}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Categoria:  
+                    </strong>  
+
+                    ${item.categoria || ""}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>Modelo:</strong>
-                        ${modelo}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Função:  
+                    </strong>  
+
+                    ${item.funcao || ""}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>
-                            Tamanho da camisa:
-                        </strong>
-                        ${item.tamanhoCamisa || ""}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Modelo:  
+                    </strong>  
+
+                    ${modelo}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>
-                            Peça inferior:
-                        </strong>
-                        ${item.inferior || "Nenhum"}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Tamanho da camisa:  
+                    </strong>  
+
+                    ${item.tamanhoCamisa || ""}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>
-                            Tamanho inferior:
-                        </strong>
-                        ${item.tamanhoInferior || "N/A"}
-                    </p>
+                <p>  
+
+                    <strong>  
+                        Peça inferior:  
+                    </strong>  
+
+                    ${item.inferior || "Nenhum"}  
+
+                </p>  
 
 
-                    <p>
-                        <strong>Valor:</strong>
-                        ${formatarMoeda(
-                            Number(item.valor) || 0
-                        )}
-                    </p>
+                <p>  
 
-                </div>
+                    <strong>  
+                        Tamanho inferior:  
+                    </strong>  
 
-            `;
+                    ${item.tamanhoInferior || "N/A"}  
 
-        }
-    );
+                </p>  
 
 
-    area.innerHTML =
-        html;
+                <p>  
+
+                    <strong>  
+                        Valor:  
+                    </strong>  
+
+                    ${formatarMoeda(  
+                        Number(  
+                            item.valor  
+                        ) || 0  
+                    )}  
+
+                </p>  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML =  
+    html;
 
 }
-
 
 // ======================================================
 // PAGAMENTOS
@@ -802,524 +855,538 @@ function mostrarUniformes() {
 
 function mostrarPagamentos() {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    if (
-        pedidos.length === 0
-    ) {
+if (  
+    pedidos.length === 0  
+) {  
 
-        area.innerHTML = `
+    area.innerHTML = `  
 
-            <div class="empty">
+        <div class="empty">  
 
-                Nenhum pagamento encontrado.
+            Nenhum pagamento encontrado.  
 
-            </div>
+        </div>  
 
-        `;
+    `;  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    let html = "";
+let html = "";  
 
 
-    pedidos.forEach(
-        function(pedido, index) {
+pedidos.forEach(  
+    function(pedido, index) {  
 
-            const total =
-                obterValorTotalPedido(
-                    pedido
-                );
+        const total =  
+            obterValorTotalPedido(  
+                pedido  
+            );  
 
-            const pago =
-                obterValorPagoPedido(
-                    pedido
-                );
 
-            const restante =
-                obterRestantePedido(
-                    pedido
-                );
+        const pago =  
+            obterValorPagoPedido(  
+                pedido  
+            );  
 
-            const status =
-                obterStatusPedido(
-                    pedido
-                );
 
+        const restante =  
+            obterRestantePedido(  
+                pedido  
+            );  
 
-            html += `
 
-                <div
-                    class="pagamento-card"
-                >
+        const status =  
+            obterStatusPedido(  
+                pedido  
+            );  
 
-                    <h3>
 
-                        💰 Pedido
-                        ${pedido.idPedido || ""}
+        let classeStatus = '';  
+        let iconeStatus = '';  
 
-                    </h3>
+        if (status === 'Pago' || status.includes('🟢')) {  
+            classeStatus = 'pago';  
+            iconeStatus = '🟢';  
+        } else if (status === 'Pagamento parcial' || status.includes('🟡')) {  
+            classeStatus = 'parcial';  
+            iconeStatus = '🟡';  
+        } else {  
+            classeStatus = 'nao-pago';  
+            iconeStatus = '🔴';  
+        }  
 
 
-                    <div
-                        class="pagamento-linha"
-                    >
+        html += `  
 
-                        <strong>
-                            Responsável:
-                        </strong>
+            <div  
+                class="pagamento-card"  
+            >  
 
-                        ${pedido.responsavel || ""}
+                <h3>  
 
-                    </div>
+                    💰 Pedido  
+                    ${pedido.idPedido || ""}  
 
+                </h3>  
 
-                    <div
-                        class="pagamento-linha"
-                    >
 
-                        <strong>
-                            Valor total:
-                        </strong>
+                <div  
+                    class="pagamento-linha"  
+                >  
 
-                        ${formatarMoeda(total)}
+                    <strong>  
+                        Responsável:  
+                    </strong>  
 
-                    </div>
+                    ${pedido.responsavel || ""}  
 
+                </div>  
 
-                    <div
-                        class="pagamento-linha"
-                    >
 
-                        <strong>
-                            Já pago:
-                        </strong>
+                <div  
+                    class="pagamento-linha"  
+                >  
 
-                        ${formatarMoeda(pago)}
+                    <strong>  
+                        Valor total:  
+                    </strong>  
 
-                    </div>
+                    ${formatarMoeda(total)}  
 
+                </div>  
 
-                    <div
-                        class="pagamento-linha"
-                    >
 
-                        <strong>
-                            Restante:
-                        </strong>
+                <div  
+                    class="pagamento-linha"  
+                >  
 
-                        <span
-                            id="restante-${index}"
-                        >
-                            ${formatarMoeda(restante)}
-                        </span>
+                    <strong>  
+                        Já pago:  
+                    </strong>  
 
-                    </div>
+                    ${formatarMoeda(pago)}  
 
+                </div>  
 
-                    <div
-                        class="pagamento-linha"
-                    >
 
-                        <strong>
-                            Status:
-                        </strong>
+                <div  
+                    class="pagamento-linha"  
+                >  
 
-                        <span
-                            id="status-${index}"
-                        >
+                    <strong>  
+                        Restante:  
+                    </strong>  
 
-                            ${mostrarStatusTag(status)}
+                    <span  
+                        id="restante-${index}"  
+                    >  
+                        ${formatarMoeda(restante)}  
+                    </span>  
 
-                        </span>
+                </div>  
 
-                    </div>
 
+                <div  
+                    class="pagamento-linha"  
+                >  
 
-                    ${
-                        restante > 0
+                    <strong>  
+                        Status:  
+                    </strong>  
 
-                        ?
+                    <span  
+                        id="status-${index}"  
+                        class="pagamento-status ${classeStatus}"  
+                    >  
+                        ${iconeStatus} ${status.replace(/^[🟢🟡🔴]\s*/, '')}  
+                    </span>  
 
-                        `
+                </div>  
 
-                        <div
-                            class="pagamento-form"
-                        >
 
-                            <label>
+                ${  
+                    restante > 0  
 
-                                Valor recebido agora
+                    ?  
 
-                            </label>
+                    `  
 
+                    <div  
+                        class="pagamento-form"  
+                    >  
 
-                            <input
-                                type="number"
-                                id="pagamento-${index}"
-                                min="0"
-                                max="${restante}"
-                                step="0.01"
-                                placeholder="Ex.: 25,00"
-                            >
+                        <label>  
 
+                            Valor recebido agora  
 
-                            <button
-                                type="button"
-                                class="
-                                    admin-button
-                                    pagamento-registrar
-                                "
-                                onclick="
-                                    registrarPagamento(
-                                        ${index}
-                                    )
-                                "
-                            >
+                        </label>  
 
-                                💰 LANÇAR PAGAMENTO
 
-                            </button>
+                        <input  
 
-                        </div>
+                            type="number"  
 
-                        `
+                            id="pagamento-${index}"  
 
-                        :
+                            min="0"  
 
-                        `
+                            max="${restante}"  
 
-                        <div
-                            style="
-                                margin-top:15px;
-                                padding:12px;
-                                background:#e8f5e9;
-                                border-radius:10px;
-                                text-align:center;
-                                font-weight:bold;
-                            "
-                        >
+                            step="0.01"  
 
-                            ✅ Pedido totalmente pago
+                            placeholder="Ex.: 25,00"  
 
-                        </div>
+                        >  
 
-                        `
-                    }
 
-                </div>
+                        <button  
 
-            `;
+                            type="button"  
 
-        }
-    );
+                            class="  
+                                admin-button  
+                                pagamento-registrar  
+                            "  
 
+                            onclick="  
+                                registrarPagamento(  
+                                    ${index}  
+                                )  
+                            "  
 
-    area.innerHTML =
-        html;
+                        >  
+
+                            💰 LANÇAR PAGAMENTO  
+
+                        </button>  
+
+                    </div>  
+
+                    `  
+
+                    :  
+
+                    `  
+
+                    <div  
+                        style="  
+                            margin-top:15px;  
+                            padding:12px;  
+                            background:#e8f5e9;  
+                            border-radius:10px;  
+                            text-align:center;  
+                            font-weight:bold;  
+                        "  
+                    >  
+
+                        ✅ Pedido totalmente pago  
+
+                    </div>  
+
+                    `  
+                }  
+
+            </div>  
+
+        `;  
+
+    }  
+);  
+
+
+area.innerHTML =  
+    html;
 
 }
-
 
 // ======================================================
 // REGISTRAR PAGAMENTO
 // ======================================================
 
 async function registrarPagamento(
-    index
+index
 ) {
 
-    const pedido =
-        pedidos[index];
+const pedido =  
+    pedidos[index];  
 
 
-    if (!pedido) {
+if (!pedido) {  
 
-        alert(
-            "Pedido não encontrado."
-        );
+    alert(  
+        "Pedido não encontrado."  
+    );  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    const campo =
-        document.getElementById(
-            `pagamento-${index}`
-        );
+const campo =  
+    document.getElementById(  
+        `pagamento-${index}`  
+    );  
 
 
-    if (!campo) {
+if (!campo) {  
 
-        alert(
-            "Campo de pagamento não encontrado."
-        );
+    alert(  
+        "Campo de pagamento não encontrado."  
+    );  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    const valor =
-        Number(
-            String(
-                campo.value
-            )
-            .replace(",", ".")
-        );
+const valor =  
+    Number(  
+        String(  
+            campo.value  
+        )  
+        .replace(",", ".")  
+    );  
 
 
-    if (
-        !valor ||
-        valor <= 0
-    ) {
+if (  
+    !valor ||  
+    valor <= 0  
+) {  
 
-        alert(
-            "Digite um valor de pagamento."
-        );
+    alert(  
+        "Digite um valor de pagamento."  
+    );  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    const total =
-        obterValorTotalPedido(
-            pedido
-        );
+const total =  
+    obterValorTotalPedido(  
+        pedido  
+    );  
 
 
-    const pagoAtual =
-        obterValorPagoPedido(
-            pedido
-        );
+const pagoAtual =  
+    obterValorPagoPedido(  
+        pedido  
+    );  
 
 
-    const restanteAtual =
-        obterRestantePedido(
-            pedido
-        );
+const restanteAtual =  
+    obterRestantePedido(  
+        pedido  
+    );  
 
 
-    if (
-        valor > restanteAtual
-    ) {
+if (  
+    valor > restanteAtual  
+) {  
 
-        alert(
-            "O valor informado é maior que o restante do pedido."
-        );
+    alert(  
+        "O valor informado é maior que o restante do pedido."  
+    );  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    const novoPago =
-        pagoAtual + valor;
+const novoPago =  
+    pagoAtual + valor;  
 
 
-    const novoRestante =
-        Math.max(
-            total - novoPago,
-            0
-        );
+const novoRestante =  
+    Math.max(  
+        total - novoPago,  
+        0  
+    );  
 
 
-    const novoStatus =
-        novoRestante <= 0
-            ? "Pago"
-            : "Pagamento parcial";
+const novoStatus =  
+    novoRestante <= 0  
+        ? "Pago"  
+        : "Pagamento parcial";  
 
 
-    const botao =
-        campo.parentElement
-            ?.querySelector(
-                "button"
-            );
+const botao =  
+    campo.parentElement  
+        ?.querySelector(  
+            "button"  
+        );  
 
 
-    if (botao) {
+if (botao) {  
 
-        botao.disabled =
-            true;
+    botao.disabled =  
+        true;  
 
-        botao.innerText =
-            "⏳ REGISTRANDO...";
+    botao.innerText =  
+        "⏳ REGISTRANDO...";  
 
-    }
+}  
 
 
-    try {
+try {  
 
-        const corpo = {
+    const corpo = {  
 
-            acao:
-                "registrarPagamento",
+        acao:  
+            "registrarPagamento",  
 
-            idPedido:
-                String(
-                    pedido.idPedido || ""
-                ),
+        idPedido:  
+            String(  
+                pedido.idPedido || ""  
+            ),  
 
-            responsavel:
-                String(
-                    pedido.responsavel || ""
-                ),
+        responsavel:  
+            String(  
+                pedido.responsavel || ""  
+            ),  
 
-            valorPago:
-                Number(
-                    valor.toFixed(2)
-                )
+        valorPago:  
+            Number(  
+                valor.toFixed(2)  
+            )  
 
-        };
+    };  
 
 
-        console.log(
-            "ENVIANDO PAGAMENTO:",
-            corpo
-        );
+    const resposta =  
+        await fetch(  
+            URL_APPS_SCRIPT,  
+            {  
 
+                method:  
+                    "POST",  
 
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT,
-                {
+                headers: {  
 
-                    method:
-                        "POST",
+                    "Content-Type":  
+                        "text/plain;charset=utf-8"  
 
-                    headers: {
+                },  
 
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
+                body:  
+                    JSON.stringify(  
+                        corpo  
+                    )  
 
-                    },
+            }  
+        );  
 
-                    body:
-                        JSON.stringify(
-                            corpo
-                        )
 
-                }
-            );
+    const dados =  
+        await resposta.json();  
 
 
-        const dados =
-            await resposta.json();
+    if (  
+        !dados ||  
+        dados.result !== "success"  
+    ) {  
 
+        throw new Error(  
+            dados?.message ||  
+            "O pagamento não foi registrado."  
+        );  
 
-        console.log(
-            "RESPOSTA DO APPS SCRIPT:",
-            dados
-        );
+    }  
 
 
-        if (
-            !dados ||
-            dados.result !== "success"
-        ) {
+    pedido.status =  
+        dados.status ||  
+        novoStatus;  
 
-            throw new Error(
-                dados?.message ||
-                "O pagamento não foi registrado."
-            );
 
-        }
+    pedido.pago =  
+        Number(  
+            dados.pago  
+        );  
 
 
-        pedido.status =
-            dados.status ||
-            novoStatus;
+    pedido.restante =  
+        Number(  
+            dados.restante  
+        );  
 
 
-        pedido.pago =
-            Number(
-                dados.pago
-            );
+    if (  
+        Number.isNaN(  
+            pedido.pago  
+        )  
+    ) {  
 
+        pedido.pago =  
+            novoPago;  
 
-        pedido.restante =
-            Number(
-                dados.restante
-            );
+    }  
 
 
-        if (
-            Number.isNaN(
-                pedido.pago
-            )
-        ) {
+    if (  
+        Number.isNaN(  
+            pedido.restante  
+        )  
+    ) {  
 
-            pedido.pago =
-                novoPago;
+        pedido.restante =  
+            novoRestante;  
 
-        }
+    }  
 
 
-        if (
-            Number.isNaN(
-                pedido.restante
-            )
-        ) {
+    atualizarResumo();  
 
-            pedido.restante =
-                novoRestante;
 
-        }
+    mostrarPagamentos();  
 
 
-        atualizarResumo();
+    alert(  
+        "Pagamento registrado com sucesso!"  
+    );  
 
 
-        mostrarPagamentos();
+}  
 
+catch (erro) {  
 
-        alert(
-            "Pagamento registrado com sucesso!"
-        );
+    console.error(  
+        "ERRO AO REGISTRAR PAGAMENTO:",  
+        erro  
+    );  
 
 
-    }
+    alert(  
+        "Não foi possível registrar o pagamento.\n\n" +  
+        erro.message  
+    );  
 
-    catch (erro) {
 
-        console.error(
-            "ERRO AO REGISTRAR PAGAMENTO:",
-            erro
-        );
+    if (botao) {  
 
+        botao.disabled =  
+            false;  
 
-        alert(
-            "Não foi possível registrar o pagamento.\n\n" +
-            erro.message
-        );
+        botao.innerText =  
+            "💰 LANÇAR PAGAMENTO";  
 
-
-        if (botao) {
-
-            botao.disabled =
-                false;
-
-            botao.innerText =
-                "💰 LANÇAR PAGAMENTO";
-
-        }
-
-    }
+    }  
 
 }
 
+}
 
 // ======================================================
 // PRODUÇÃO
@@ -1327,362 +1394,371 @@ async function registrarPagamento(
 
 function mostrarProducao() {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    if (
-        !itens ||
-        itens.length === 0
-    ) {
+if (  
+    !itens ||  
+    itens.length === 0  
+) {  
 
-        area.innerHTML = `
+    area.innerHTML = `  
 
-            <div class="empty">
+        <div class="empty">  
 
-                Nenhum uniforme encontrado
-                para produção.
+            Nenhum uniforme encontrado  
+            para produção.  
 
-            </div>
+        </div>  
 
-        `;
+    `;  
 
-        return;
+    return;  
 
-    }
+}  
 
 
-    const totalUniformes =
-        itens.length;
+const totalUniformes =  
+    itens.length;  
 
 
-    let totalCamisas = 0;
-    let totalBabyLook = 0;
-    let totalInferiores = 0;
+let totalCamisas = 0;  
 
+let totalBabyLook = 0;  
 
-    itens.forEach(
-        function(item) {
+let totalInferiores = 0;  
 
-            const modelo =
-                obterModelo(item)
-                    .toLowerCase();
 
+itens.forEach(  
+    function(item) {  
 
-            if (
-                modelo.includes("baby")
-            ) {
+        const modelo =  
+            obterModelo(item)  
+                .toLowerCase();  
 
-                totalBabyLook++;
 
-            }
+        if (  
+            modelo.includes("baby")  
+        ) {  
 
-            else {
+            totalBabyLook++;  
 
-                totalCamisas++;
+        }  
 
-            }
+        else {  
 
+            totalCamisas++;  
 
-            const inferior =
-                String(
-                    item.inferior || ""
-                )
-                .trim()
-                .toLowerCase();
+        }  
 
 
-            if (
-                inferior !== "" &&
-                inferior !== "nenhum" &&
-                inferior !== "n/a"
-            ) {
+        const inferior =  
+            String(  
+                item.inferior || ""  
+            )  
+            .trim()  
+            .toLowerCase();  
 
-                totalInferiores++;
 
-            }
+        if (  
+            inferior !== "" &&  
+            inferior !== "nenhum" &&  
+            inferior !== "n/a"  
+        ) {  
 
-        }
-    );
+            totalInferiores++;  
 
+        }  
 
-    let html = `
+    }  
+);  
 
-        <div class="card">
 
-            <h2>
-                🏭 Lista de Produção
-            </h2>
+let html = `  
 
+    <div class="card">  
 
-            <p>
-                <strong>
-                    Total de uniformes:
-                </strong>
+        <h2>  
+            🏭 Lista de Produção  
+        </h2>  
 
-                ${totalUniformes}
 
-            </p>
+        <p>  
 
+            <strong>  
+                Total de uniformes:  
+            </strong>  
 
-            <p>
-                <strong>
-                    Camisas:
-                </strong>
+            ${totalUniformes}  
 
-                ${totalCamisas}
+        </p>  
 
-            </p>
 
+        <p>  
 
-            <p>
-                <strong>
-                    Baby Look:
-                </strong>
+            <strong>  
+                Camisas:  
+            </strong>  
 
-                ${totalBabyLook}
+            ${totalCamisas}  
 
-            </p>
+        </p>  
 
 
-            <p>
-                <strong>
-                    Peças inferiores:
-                </strong>
+        <p>  
 
-                ${totalInferiores}
+            <strong>  
+                Baby Look:  
+            </strong>  
 
-            </p>
+            ${totalBabyLook}  
 
-        </div>
+        </p>  
 
 
-        <div class="card">
+        <p>  
 
-            <h3>
-                👕 Lista
-            </h3>
+            <strong>  
+                Peças inferiores:  
+            </strong>  
 
+            ${totalInferiores}  
 
-            <div
-                style="
-                    overflow-x:auto;
-                "
-            >
+        </p>  
 
-                <table
-                    style="
-                        width:100%;
-                        border-collapse:collapse;
-                        min-width:750px;
-                    "
-                >
+    </div>  
 
-                    <thead>
 
-                        <tr
-                            style="
-                                background:#000;
-                                color:#fff;
-                            "
-                        >
+    <div class="card">  
 
-                            <th style="padding:12px;text-align:left;">
-                                Nome
-                            </th>
+        <h3>  
+            👕 Lista  
+        </h3>  
 
-                            <th style="padding:12px;text-align:center;">
-                                Nº
-                            </th>
 
-                            <th style="padding:12px;text-align:left;">
-                                Função
-                            </th>
+        <div  
+            style="  
+                overflow-x:auto;  
+            "  
+        >  
 
-                            <th style="padding:12px;text-align:left;">
-                                Modelo
-                            </th>
+            <table  
+                style="  
+                    width:100%;  
+                    border-collapse:collapse;  
+                    min-width:750px;  
+                "  
+            >  
 
-                            <th style="padding:12px;text-align:center;">
-                                Tam. camisa
-                            </th>
+                <thead>  
 
-                            <th style="padding:12px;text-align:left;">
-                                Peça inferior
-                            </th>
+                    <tr  
+                        style="  
+                            background:#000;  
+                            color:#fff;  
+                        "  
+                    >  
 
-                            <th style="padding:12px;text-align:center;">
-                                Tam. inferior
-                            </th>
+                        <th style="padding:12px;text-align:left;">  
+                            Nome  
+                        </th>  
 
-                        </tr>
+                        <th style="padding:12px;text-align:center;">  
+                            Nº  
+                        </th>  
 
-                    </thead>
+                        <th style="padding:12px;text-align:left;">  
+                            Função  
+                        </th>  
 
+                        <th style="padding:12px;text-align:left;">  
+                            Modelo  
+                        </th>  
 
-                    <tbody>
+                        <th style="padding:12px;text-align:center;">  
+                            Tam. camisa  
+                        </th>  
 
-    `;
+                        <th style="padding:12px;text-align:left;">  
+                            Peça inferior  
+                        </th>  
 
+                        <th style="padding:12px;text-align:center;">  
+                            Tam. inferior  
+                        </th>  
 
-    itens.forEach(
-        function(item) {
+                    </tr>  
 
-            const nome =
-                item.nome || "";
+                </thead>  
 
-            const numero =
-                item.numero || "";
 
-            const funcao =
-                item.funcao || "";
+                <tbody>  
 
+`;  
 
-            let modelo =
-                obterModelo(item);
 
+itens.forEach(  
+    function(item) {  
 
-            if (
-                modelo
-                    .toLowerCase()
-                    .includes("baby")
-            ) {
+        const nome =  
+            item.nome || "";  
 
-                modelo =
-                    "Baby Look";
 
-            }
+        const numero =  
+            item.numero || "";  
 
-            else {
 
-                modelo =
-                    "Camisa";
+        const funcao =  
+            item.funcao || "";  
 
-            }
 
+        let modelo =  
+            obterModelo(item);  
 
-            const tamanhoCamisa =
-                item.tamanhoCamisa || "";
 
-            const inferior =
-                item.inferior || "Nenhum";
+        if (  
+            modelo  
+                .toLowerCase()  
+                .includes("baby")  
+        ) {  
 
-            const tamanhoInferior =
-                item.tamanhoInferior || "N/A";
+            modelo =  
+                "Baby Look";  
 
+        }  
 
-            html += `
+        else {  
 
-                <tr
-                    style="
-                        border-bottom:1px solid #ddd;
-                    "
-                >
+            modelo =  
+                "Camisa";  
 
-                    <td style="padding:12px;">
-                        <strong>
-                            ${nome}
-                        </strong>
-                    </td>
+        }  
 
 
-                    <td
-                        style="
-                            padding:12px;
-                            text-align:center;
-                            font-weight:bold;
-                        "
-                    >
-                        ${numero}
-                    </td>
+        const tamanhoCamisa =  
+            item.tamanhoCamisa || "";  
 
 
-                    <td style="padding:12px;">
-                        ${funcao}
-                    </td>
+        const inferior =  
+            item.inferior || "Nenhum";  
 
 
-                    <td style="padding:12px;">
-                        ${modelo}
-                    </td>
+        const tamanhoInferior =  
+            item.tamanhoInferior || "N/A";  
 
 
-                    <td
-                        style="
-                            padding:12px;
-                            text-align:center;
-                        "
-                    >
-                        ${tamanhoCamisa}
-                    </td>
+        html += `  
 
+            <tr  
+                style="  
+                    border-bottom:1px solid #ddd;  
+                "  
+            >  
 
-                    <td style="padding:12px;">
-                        ${inferior}
-                    </td>
+                <td style="padding:12px;">  
+                    <strong>  
+                        ${nome}  
+                    </strong>  
+                </td>  
 
 
-                    <td
-                        style="
-                            padding:12px;
-                            text-align:center;
-                        "
-                    >
-                        ${tamanhoInferior}
-                    </td>
+                <td  
+                    style="  
+                        padding:12px;  
+                        text-align:center;  
+                        font-weight:bold;  
+                    "  
+                >  
+                    ${numero}  
+                </td>  
 
-                </tr>
 
-            `;
+                <td style="padding:12px;">  
+                    ${funcao}  
+                </td>  
 
-        }
-    );
 
+                <td style="padding:12px;">  
+                    ${modelo}  
+                </td>  
 
-    html += `
 
-                    </tbody>
+                <td  
+                    style="  
+                        padding:12px;  
+                        text-align:center;  
+                    "  
+                >  
+                    ${tamanhoCamisa}  
+                </td>  
 
-                </table>
 
-            </div>
+                <td style="padding:12px;">  
+                    ${inferior}  
+                </td>  
 
-        </div>
 
+                <td  
+                    style="  
+                        padding:12px;  
+                        text-align:center;  
+                    "  
+                >  
+                    ${tamanhoInferior}  
+                </td>  
 
-        <div class="card">
+            </tr>  
 
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    background:#ff007f;
-                "
-                onclick="
-                    exportarProducaoPlanilha()
-                "
-            >
+        `;  
 
-                📊 EXPORTAR PARA PLANILHA
+    }  
+);  
 
-            </button>
 
-        </div>
+html += `  
 
-    `;
+                </tbody>  
 
+            </table>  
 
-    area.innerHTML =
-        html;
+        </div>  
+
+    </div>  
+
+
+    <div class="card">  
+
+        <button  
+            type="button"  
+            class="admin-button"  
+            style="  
+                width:100%;  
+                background:#ff007f;  
+            "  
+            onclick="  
+                exportarProducaoPlanilha()  
+            "  
+        >  
+
+            📊 EXPORTAR PARA PLANILHA  
+
+        </button>  
+
+    </div>  
+
+`;  
+
+
+area.innerHTML =  
+    html;
 
 }
-
 
 // ======================================================
 // EXPORTAR PRODUÇÃO
@@ -1690,153 +1766,149 @@ function mostrarProducao() {
 
 function exportarProducaoPlanilha() {
 
-    if (
-        !itens ||
-        itens.length === 0
-    ) {
+if (  
+    !itens ||  
+    itens.length === 0  
+) {  
 
-        alert(
-            "Não há uniformes para exportar."
-        );
+    alert(  
+        "Não há uniformes para exportar."  
+    );  
 
-        return;
+    return;  
 
-    }
-
-
-    let csv = "";
+}  
 
 
-    csv +=
-        "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
+let csv = "";  
 
 
-    itens.forEach(
-        function(item) {
-
-            csv +=
-                "CAMISA;" +
-                escaparCSV(
-                    item.nome || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.numero || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.funcao || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    obterModelo(item)
-                ) +
-                ";" +
-                escaparCSV(
-                    item.tamanhoCamisa || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.inferior || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.tamanhoInferior || ""
-                ) +
-                "\n";
-
-        }
-    );
+csv +=  
+    "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";  
 
 
-    const blob =
-        new Blob(
-            [
-                "\uFEFF" +
-                csv
-            ],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
+itens.forEach(  
+    function(item) {  
+
+        csv +=  
+            "CAMISA;" +  
+            escaparCSV(  
+                item.nome || ""  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                item.numero || ""  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                item.funcao || ""  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                obterModelo(item)  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                item.tamanhoCamisa || ""  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                item.inferior || ""  
+            ) +  
+            ";" +  
+            escaparCSV(  
+                item.tamanhoInferior || ""  
+            ) +  
+            "\n";  
+
+    }  
+);  
 
 
-    const url =
-        URL.createObjectURL(
-            blob
-        );
+const blob =  
+    new Blob(  
+        [  
+            "\uFEFF" +  
+            csv  
+        ],  
+        {  
+            type:  
+                "text/csv;charset=utf-8;"  
+        }  
+    );  
 
 
-    const link =
-        document.createElement(
-            "a"
-        );
+const url =  
+    URL.createObjectURL(  
+        blob  
+    );  
 
 
-    link.href =
-        url;
+const link =  
+    document.createElement(  
+        "a"  
+    );  
 
 
-    link.download =
-        "lista-producao-volei-terapia.csv";
+link.href =  
+    url;  
 
 
-    document.body.appendChild(
-        link
-    );
+link.download =  
+    "lista-producao-volei-terapia.csv";  
 
 
-    link.click();
+document.body.appendChild(  
+    link  
+);  
 
 
-    document.body.removeChild(
-        link
-    );
+link.click();  
 
 
-    URL.revokeObjectURL(
-        url
-    );
+document.body.removeChild(  
+    link  
+);  
 
 
-    alert(
-        "Lista de produção exportada com sucesso!"
-    );
+URL.revokeObjectURL(  
+    url  
+);  
+
+
+alert(  
+    "Lista de produção exportada com sucesso!"  
+);
 
 }
-
 
 // ======================================================
 // ESCAPAR CSV
 // ======================================================
 
-function escaparCSV(
-    valor
-) {
+function escaparCSV(valor) {
 
-    if (
-        valor === undefined ||
-        valor === null
-    ) {
+if (  
+    valor === undefined ||  
+    valor === null  
+) {  
 
-        return "";
+    return "";  
 
-    }
+}  
 
 
-    return String(valor)
-        .replace(
-            /"/g,
-            '""'
-        )
-        .replace(
-            /;/g,
-            ","
-        );
+return String(valor)  
+    .replace(  
+        /"/g,  
+        '""'  
+    )  
+    .replace(  
+        /;/g,  
+        ","  
+    );
 
 }
-
 
 // ======================================================
 // CONFIGURAÇÕES
@@ -1844,332 +1916,335 @@ function escaparCSV(
 
 function mostrarConfiguracoes() {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    area.innerHTML = `
+area.innerHTML = `  
 
-        <div class="card">
+    <div class="card">  
 
-            <h2>
-                ⚙️ Configurações
-            </h2>
+        <h2>  
+            ⚙️ Configurações  
+        </h2>  
 
-
-            <p
-                style="
-                    color:#777;
-                "
-            >
 
-                Gerencie os valores e as principais
-                configurações do sistema.
+        <p  
+            style="  
+                color:#777;  
+            "  
+        >  
 
-            </p>
+            Gerencie os valores e as principais  
+            configurações do sistema.  
 
-        </div>
+        </p>  
 
+    </div>  
 
-        <div class="card">
 
-            <h3>
-                💰 Valores das peças
-            </h3>
-
-
-            <div
-                style="
-                    display:grid;
-                    gap:12px;
-                "
-            >
-
-                <div>
+    <div class="card">  
 
-                    <label>
-                        Camisa
-                    </label>
+        <h3>  
+            💰 Valores das peças  
+        </h3>  
 
-                    <input
-                        id="configCamisa"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Baby Look
-                    </label>
-
-                    <input
-                        id="configBabyLook"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Calção masculino
-                    </label>
-
-                    <input
-                        id="configCalcaoMasc"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Calção feminino
-                    </label>
-
-                    <input
-                        id="configCalcaoFem"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Short Doll
-                    </label>
-
-                    <input
-                        id="configShortDoll"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="30"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Short Suplex
-                    </label>
-
-                    <input
-                        id="configShortSuplex"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                🏐 Configurações do sistema
-            </h3>
-
-
-            <label>
-                Nome do time
-            </label>
-
-
-            <input
-                id="configNomeTime"
-                type="text"
-                value="Vôlei Terapia"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                "
-            >
-
-        </div>
-
-
-        <div class="card">
-
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    background:#ff007f;
-                "
-                onclick="
-                    salvarConfiguracoes()
-                "
-            >
-
-                💾 SALVAR ALTERAÇÕES
-
-            </button>
-
-
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    margin-top:10px;
-                    background:#555;
-                "
-                onclick="
-                    restaurarConfiguracoes()
-                "
-            >
-
-                🔄 RESTAURAR PADRÃO
-
-            </button>
-
-        </div>
-
-    `;
+
+        <div  
+            style="  
+                display:grid;  
+                gap:12px;  
+            "  
+        >  
+
+            <div>  
+
+                <label>  
+                    Camisa  
+                </label>  
+
+
+                <input  
+                    id="configCamisa"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="75"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+
+            <div>  
+
+                <label>  
+                    Baby Look  
+                </label>  
+
+
+                <input  
+                    id="configBabyLook"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="75"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+
+            <div>  
+
+                <label>  
+                    Calção masculino  
+                </label>  
+
+
+                <input  
+                    id="configCalcaoMasc"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="35"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+
+            <div>  
+
+                <label>  
+                    Calção feminino  
+                </label>  
+
+
+                <input  
+                    id="configCalcaoFem"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="35"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+
+            <div>  
+
+                <label>  
+                    Short Doll  
+                </label>  
+
+
+                <input  
+                    id="configShortDoll"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="30"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+
+            <div>  
+
+                <label>  
+                    Short Suplex  
+                </label>  
+
+
+                <input  
+                    id="configShortSuplex"  
+                    type="number"  
+                    min="0"  
+                    step="0.01"  
+                    value="35"  
+                    style="  
+                        width:100%;  
+                        box-sizing:border-box;  
+                        padding:12px;  
+                        border:1px solid #ccc;  
+                        border-radius:10px;  
+                        font-size:16px;  
+                    "  
+                >  
+
+            </div>  
+
+        </div>  
+
+    </div>  
+
+
+    <div class="card">  
+
+        <h3>  
+            🏐 Configurações do sistema  
+        </h3>  
+
+
+        <label>  
+            Nome do time  
+        </label>  
+
+
+        <input  
+            id="configNomeTime"  
+            type="text"  
+            value="Vôlei Terapia"  
+            style="  
+                width:100%;  
+                box-sizing:border-box;  
+                padding:12px;  
+                border:1px solid #ccc;  
+                border-radius:10px;  
+                font-size:16px;  
+            "  
+        >  
+
+    </div>  
+
+
+    <div class="card">  
+
+        <button  
+            type="button"  
+            class="admin-button"  
+            style="  
+                width:100%;  
+                background:#ff007f;  
+            "  
+            onclick="  
+                salvarConfiguracoes()  
+            "  
+        >  
+
+            💾 SALVAR ALTERAÇÕES  
+
+        </button>  
+
+
+        <button  
+            type="button"  
+            class="admin-button"  
+            style="  
+                width:100%;  
+                margin-top:10px;  
+                background:#555;  
+            "  
+            onclick="  
+                restaurarConfiguracoes()  
+            "  
+        >  
+
+            🔄 RESTAURAR PADRÃO  
+
+        </button>  
+
+    </div>  
+
+`;
 
 }
-
 
 // ======================================================
 // MENSAGEM
 // ======================================================
 
 function mostrarMensagem(
-    texto
+texto
 ) {
 
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
+const area =  
+    document.getElementById(  
+        "conteudoAdmin"  
+    );  
 
 
-    if (!area) return;
+if (!area) return;  
 
 
-    area.innerHTML = `
+area.innerHTML = `  
 
-        <div class="empty">
+    <div class="empty">  
 
-            ${texto}
+        ${texto}  
 
-        </div>
+    </div>  
 
-    `;
+`;
 
 }
-
 
 // ======================================================
 // FORMATAR MOEDA
 // ======================================================
 
 function formatarMoeda(
-    valor
+valor
 ) {
 
-    return Number(
-        valor || 0
-    ).toLocaleString(
-        "pt-BR",
-        {
-            style:
-                "currency",
+return Number(  
+    valor || 0  
+).toLocaleString(  
+    "pt-BR",  
+    {  
+        style:  
+            "currency",  
 
-            currency:
-                "BRL"
+        currency:  
+            "BRL"  
 
-        }
-    );
+    }  
+);
 
 }
-
 
 // ======================================================
 // VOLTAR AO INÍCIO
@@ -2177,21 +2252,21 @@ function formatarMoeda(
 
 function voltarInicio() {
 
-    window.location.href =
-        "index.html";
+window.location.href =  
+    "index.html";
 
 }
-
 
 // ======================================================
 // INICIAR ADMIN
 // ======================================================
 
 document.addEventListener(
-    "DOMContentLoaded",
-    function() {
+"DOMContentLoaded",
+function() {
 
-        carregarDados();
+carregarDados();  
 
-    }
+}
+
 );
