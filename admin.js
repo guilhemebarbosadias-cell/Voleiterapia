@@ -2,6 +2,10 @@
 // ADMIN - VÔLEI TERAPIA
 // ======================================================
 
+// ======================================================
+// URL DO GOOGLE APPS SCRIPT
+// ======================================================
+
 const URL_APPS_SCRIPT =
 "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
@@ -98,7 +102,8 @@ async function carregarDados() {
                             pedido.parcelas || "",
 
                         status:
-                            pedido.status || "Não pago",
+                            pedido.status ||
+                            "Não pago",
 
                         pago:
                             Number(
@@ -189,7 +194,6 @@ function obterRestantePedido(
             pedido
         );
 
-
     return Math.max(
         total - pago,
         0
@@ -255,55 +259,6 @@ function obterStatusPedido(
 
 
 // ======================================================
-// CLASSE DA TAG DE STATUS
-// ======================================================
-
-function obterClasseStatus(
-    status
-) {
-
-    const texto =
-        String(
-            status || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    if (
-        texto === "pago"
-    ) {
-
-        return "pago";
-
-    }
-
-
-    if (
-        texto === "pagamento parcial"
-    ) {
-
-        return "parcial";
-
-    }
-
-
-    if (
-        texto === "não pago" ||
-        texto === "nao pago"
-    ) {
-
-        return "nao-pago";
-
-    }
-
-
-    return "";
-
-}
-
-
-// ======================================================
 // TAG COLORIDA DE STATUS
 // ======================================================
 
@@ -311,49 +266,29 @@ function criarTagStatus(
     status
 ) {
 
-    const classe =
-        obterClasseStatus(
-            status
-        );
+    const texto =
+        status || "Não pago";
 
 
-    if (!classe) {
-
-        return `
-            <span
-                class="pagamento-status"
-            >
-                ${status}
-            </span>
-        `;
-
-    }
-
-
-    let icone = "";
+    let classe =
+        "nao-pago";
 
 
     if (
-        classe === "pago"
+        texto === "Pago"
     ) {
 
-        icone = "✓";
+        classe =
+            "pago";
 
     }
 
     else if (
-        classe === "parcial"
+        texto === "Pagamento parcial"
     ) {
 
-        icone = "◐";
-
-    }
-
-    else if (
-        classe === "nao-pago"
-    ) {
-
-        icone = "✕";
+        classe =
+            "parcial";
 
     }
 
@@ -364,7 +299,7 @@ function criarTagStatus(
             class="pagamento-status ${classe}"
         >
 
-            ${icone} ${status}
+            ${texto}
 
         </span>
 
@@ -969,6 +904,11 @@ function mostrarUniformes() {
 // ======================================================
 // PAGAMENTOS
 // ======================================================
+//
+// O pagamento continua sendo lançado
+// dentro do pedido.
+// Não criamos uma nova aba separada.
+// ======================================================
 
 function mostrarPagamentos() {
 
@@ -1418,6 +1358,10 @@ async function registrarPagamento(
         }
 
 
+        // ==================================================
+        // USAR RESPOSTA REAL DO APPS SCRIPT
+        // ==================================================
+
         pedido.status =
             dados.status ||
             novoStatus;
@@ -1460,7 +1404,6 @@ async function registrarPagamento(
 
 
         atualizarResumo();
-
 
         mostrarPagamentos();
 
@@ -1600,6 +1543,7 @@ function mostrarProducao() {
                 🏭 Lista de Produção
             </h2>
 
+
             <p>
 
                 <strong>
@@ -1609,6 +1553,7 @@ function mostrarProducao() {
                 ${totalUniformes}
 
             </p>
+
 
             <p>
 
@@ -1620,6 +1565,7 @@ function mostrarProducao() {
 
             </p>
 
+
             <p>
 
                 <strong>
@@ -1629,6 +1575,7 @@ function mostrarProducao() {
                 ${totalBabyLook}
 
             </p>
+
 
             <p>
 
@@ -1771,6 +1718,7 @@ function mostrarProducao() {
                         </strong>
                     </td>
 
+
                     <td
                         style="
                             padding:12px;
@@ -1781,13 +1729,16 @@ function mostrarProducao() {
                         ${numero}
                     </td>
 
+
                     <td style="padding:12px;">
                         ${funcao}
                     </td>
 
+
                     <td style="padding:12px;">
                         ${modelo}
                     </td>
+
 
                     <td
                         style="
@@ -1798,9 +1749,11 @@ function mostrarProducao() {
                         ${tamanhoCamisa}
                     </td>
 
+
                     <td style="padding:12px;">
                         ${inferior}
                     </td>
+
 
                     <td
                         style="
@@ -1986,9 +1939,7 @@ function exportarProducaoPlanilha() {
 // ESCAPAR CSV
 // ======================================================
 
-function escaparCSV(
-    valor
-) {
+function escaparCSV(valor) {
 
     if (
         valor === undefined ||
@@ -2034,6 +1985,7 @@ function mostrarConfiguracoes() {
             <h2>
                 ⚙️ Configurações
             </h2>
+
 
             <p
                 style="
@@ -2223,9 +2175,11 @@ function mostrarConfiguracoes() {
                 🏐 Configurações do sistema
             </h3>
 
+
             <label>
                 Nome do time
             </label>
+
 
             <input
                 id="configNomeTime"
