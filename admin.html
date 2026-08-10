@@ -252,191 +252,232 @@ body{
 }
 
 </style></head><body><header class="admin-header"><div class="admin-logo">
-
     Vôlei<span>Terapia</span>
-
 </div>
 
 <div class="admin-subtitle">
-
     Painel de Administração
-
 </div>
 
 </header><main class="admin-container"><!-- =====================================================
      RESUMO
-     ===================================================== --><section><div class="admin-grid"><div class="admin-card">
+     ===================================================== --><section><div class="admin-grid">
 
-    <h3>Pedidos</h3>
 
-    <div
-        id="totalPedidos"
-        class="admin-number"
-    >
-        0
+    <div class="admin-card">
+
+        <h3>
+            Pedidos
+        </h3>
+
+        <div
+            id="totalPedidos"
+            class="admin-number"
+        >
+            0
+        </div>
+
     </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            Uniformes
+        </h3>
+
+        <div
+            id="totalUniformes"
+            class="admin-number"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            Valor total
+        </h3>
+
+        <div
+            id="valorTotal"
+            class="admin-number"
+        >
+            R$ 0,00
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            Em aberto
+        </h3>
+
+        <div
+            id="valorPendente"
+            class="admin-number"
+        >
+            R$ 0,00
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            💵 Recebido
+        </h3>
+
+        <div
+            id="valorRecebido"
+            class="admin-number"
+        >
+            R$ 0,00
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            🟡 Pagamentos parciais
+        </h3>
+
+        <div
+            id="pedidosParciais"
+            class="admin-number"
+        >
+            0
+        </div>
+
+    </div>
+
+
+    <div class="admin-card">
+
+        <h3>
+            ❌ Não pagos
+        </h3>
+
+        <div
+            id="pedidosNaoPagos"
+            class="admin-number"
+        >
+            0
+        </div>
+
+    </div>
+
 
 </div>
 
-
-<div class="admin-card">
-
-    <h3>Uniformes</h3>
-
-    <div
-        id="totalUniformes"
-        class="admin-number"
-    >
-        0
-    </div>
-
-</div>
-
-
-<div class="admin-card">
-
-    <h3>Valor total</h3>
-
-    <div
-        id="valorTotal"
-        class="admin-number"
-    >
-        R$ 0,00
-    </div>
-
-</div>
-
-
-<div class="admin-card">
-
-    <h3>Em aberto</h3>
-
-    <div
-        id="valorPendente"
-        class="admin-number"
-    >
-        R$ 0,00
-    </div>
-
-</div>
-
-
-<div class="admin-card">
-
-    <h3>💵 Recebido</h3>
-
-    <div
-        id="valorRecebido"
-        class="admin-number"
-    >
-        R$ 0,00
-    </div>
-
-</div>
-
-
-<div class="admin-card">
-
-    <h3>🟡 Pagamentos parciais</h3>
-
-    <div
-        id="pedidosParciais"
-        class="admin-number"
-    >
-        0
-    </div>
-
-</div>
-
-
-<div class="admin-card">
-
-    <h3>❌ Não pagos</h3>
-
-    <div
-        id="pedidosNaoPagos"
-        class="admin-number"
-    >
-        0
-    </div>
-
-</div>
-
-</div></section><!-- =====================================================
+</section><!-- =====================================================
      MENU
-     ===================================================== --><section class="section"><h2 class="section-title">Administração
-
-</h2><div class="admin-menu"><button
-    class="admin-button"
-    onclick="mostrarPedidos()"
->
-
-    <span>📋</span>
-
-    Pedidos
-
-</button>
+     ===================================================== --><section class="section"><h2 class="section-title">
+    Administração
+</h2>
 
 
-<button
-    class="admin-button"
-    onclick="mostrarUniformes()"
->
-
-    <span>👕</span>
-
-    Uniformes
-
-</button>
+<div class="admin-menu">
 
 
-<button
-    class="admin-button"
-    onclick="mostrarPagamentos()"
->
+    <button
+        class="admin-button"
+        onclick="mostrarPedidos()"
+    >
 
-    <span>💰</span>
+        <span>
+            📋
+        </span>
 
-    Pagamentos
+        Pedidos
 
-</button>
-
-
-<button
-    class="admin-button"
-    onclick="mostrarProducao()"
->
-
-    <span>🏭</span>
-
-    Produção
-
-</button>
+    </button>
 
 
-<button
-    class="admin-button"
-    onclick="mostrarConfiguracoes()"
->
+    <button
+        class="admin-button"
+        onclick="mostrarUniformes()"
+    >
 
-    <span>⚙️</span>
+        <span>
+            👕
+        </span>
 
-    Configurações
+        Uniformes
 
-</button>
+    </button>
 
-</div></section><!-- =====================================================
+
+    <button
+        class="admin-button"
+        onclick="mostrarPagamentos()"
+    >
+
+        <span>
+            💰
+        </span>
+
+        Pagamentos
+
+    </button>
+
+
+    <button
+        class="admin-button"
+        onclick="mostrarProducao()"
+    >
+
+        <span>
+            🏭
+        </span>
+
+        Produção
+
+    </button>
+
+
+    <button
+        class="admin-button"
+        onclick="mostrarConfiguracoes()"
+    >
+
+        <span>
+            ⚙️
+        </span>
+
+        Configurações
+
+    </button>
+
+
+</div>
+
+</section><!-- =====================================================
      ÁREA DE CONTEÚDO
      ===================================================== --><section class="section"><div
     id="conteudoAdmin"
     class="admin-list"
-><div class="empty">
+>
 
-    Selecione uma opção acima.
+    <div class="empty">
+
+        Selecione uma opção acima.
+
+    </div>
 
 </div>
 
-</div></section><button
+</section><!-- =====================================================
+     VOLTAR
+     ===================================================== --><button
 class="admin-button logout"
 onclick="voltarInicio()"
 
