@@ -19,6 +19,66 @@ let itens = [];
 
 
 // ======================================================
+// CONVERTER VALORES DA PLANILHA
+// Aceita:
+// 75
+// "75"
+// "75,00"
+// "R$ 75,00"
+// "R$ 1.250,50"
+// ======================================================
+
+function converterNumero(valor) {
+
+    if (
+        valor === undefined ||
+        valor === null ||
+        valor === ""
+    ) {
+        return 0;
+    }
+
+    if (typeof valor === "number") {
+        return isNaN(valor) ? 0 : valor;
+    }
+
+    let texto = String(valor).trim();
+
+    if (!texto) {
+        return 0;
+    }
+
+    // Remove R$, espaços e outros caracteres
+    texto = texto.replace(/[^\d,.-]/g, "");
+
+    // Caso brasileiro: 1.250,50
+    if (
+        texto.includes(",") &&
+        texto.includes(".")
+    ) {
+
+        texto = texto.replace(/\./g, "");
+        texto = texto.replace(",", ".");
+
+    }
+
+    // Caso brasileiro simples: 25,50
+    else if (texto.includes(",")) {
+
+        texto = texto.replace(",", ".");
+
+    }
+
+    const numero = Number(texto);
+
+    return isNaN(numero)
+        ? 0
+        : numero;
+
+}
+
+
+// ======================================================
 // CARREGAR DADOS
 // ======================================================
 
@@ -28,16 +88,20 @@ async function carregarDados() {
 
         const resposta =
             await fetch(
-                URL_APPS_SCRIPT + "?acao=admin"
+                URL_APPS_SCRIPT +
+                "?acao=admin"
             );
+
 
         const dados =
             await resposta.json();
+
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
             dados
         );
+
 
         if (
             !dados ||
@@ -51,17 +115,21 @@ async function carregarDados() {
 
         }
 
+
         pedidos =
             Array.isArray(dados.pedidos)
                 ? dados.pedidos
                 : [];
+
 
         itens =
             Array.isArray(dados.itens)
                 ? dados.itens
                 : [];
 
+
         atualizarResumo();
+
 
     } catch (erro) {
 
@@ -69,6 +137,7 @@ async function carregarDados() {
             "ERRO AO CARREGAR ADMIN:",
             erro
         );
+
 
         mostrarMensagem(
             "Não foi possível carregar os dados da administração."
@@ -80,14 +149,31 @@ async function carregarDados() {
 
 
 // ======================================================
+// PEGAR ID DO PEDIDO
+// ======================================================
+
+function obterIdPedido(pedido) {
+
+    return String(
+        pedido?.idPedido ||
+        pedido?.IDPedido ||
+        pedido?.id ||
+        pedido?.ID ||
+        ""
+    ).trim();
+
+}
+
+
+// ======================================================
 // PEGAR VALOR TOTAL
 // ======================================================
 
 function obterValorTotalPedido(pedido) {
 
-    return Number(
+    return converterNumero(
         pedido?.valorTotal
-    ) || 0;
+    );
 
 }
 
@@ -98,9 +184,9 @@ function obterValorTotalPedido(pedido) {
 
 function obterValorPagoPedido(pedido) {
 
-    return Number(
+    return converterNumero(
         pedido?.Pago
-    ) || 0;
+    );
 
 }
 
@@ -112,36 +198,48 @@ function obterValorPagoPedido(pedido) {
 function obterRestantePedido(pedido) {
 
     const total =
-        obterValorTotalPedido(pedido);
+        obterValorTotalPedido(
+            pedido
+        );
+
 
     const pago =
-        obterValorPagoPedido(pedido);
+        obterValorPagoPedido(
+            pedido
+        );
 
-    const restante =
-        total - pago;
 
     return Math.max(
         0,
-        restante
+        total - pago
     );
 
 }
 
 
 // ======================================================
-// OBTER STATUS CORRETO
+// STATUS
 // ======================================================
 
 function obterStatusPedido(pedido) {
 
     const total =
-        obterValorTotalPedido(pedido);
+        obterValorTotalPedido(
+            pedido
+        );
+
 
     const pago =
-        obterValorPagoPedido(pedido);
+        obterValorPagoPedido(
+            pedido
+        );
+
 
     const restante =
-        obterRestantePedido(pedido);
+        obterRestantePedido(
+            pedido
+        );
+
 
     if (total <= 0) {
 
@@ -149,11 +247,13 @@ function obterStatusPedido(pedido) {
 
     }
 
+
     if (restante <= 0) {
 
         return "Pago";
 
     }
+
 
     if (pago > 0) {
 
@@ -161,13 +261,14 @@ function obterStatusPedido(pedido) {
 
     }
 
+
     return "Não pago";
 
 }
 
 
 // ======================================================
-// ATUALIZAR RESUMO FINANCEIRO
+// ATUALIZAR RESUMO
 // ======================================================
 
 function atualizarResumo() {
@@ -177,30 +278,36 @@ function atualizarResumo() {
             "totalPedidos"
         );
 
+
     const totalUniformes =
         document.getElementById(
             "totalUniformes"
         );
+
 
     const valorTotal =
         document.getElementById(
             "valorTotal"
         );
 
+
     const valorPendente =
         document.getElementById(
             "valorPendente"
         );
+
 
     const valorRecebido =
         document.getElementById(
             "valorRecebido"
         );
 
+
     const parciais =
         document.getElementById(
             "pedidosParciais"
         );
+
 
     const naoPagos =
         document.getElementById(
@@ -209,14 +316,11 @@ function atualizarResumo() {
 
 
     let totalVendido = 0;
-
     let totalRecebido = 0;
-
     let totalAberto = 0;
 
-    let pedidosParciais = 0;
-
-    let pedidosNaoPagos = 0;
+    let quantidadeParciais = 0;
+    let quantidadeNaoPagos = 0;
 
 
     pedidos.forEach(
@@ -227,10 +331,12 @@ function atualizarResumo() {
                     pedido
                 );
 
+
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
+
 
             const restante =
                 obterRestantePedido(
@@ -239,9 +345,7 @@ function atualizarResumo() {
 
 
             totalVendido += total;
-
             totalRecebido += pago;
-
             totalAberto += restante;
 
 
@@ -251,7 +355,7 @@ function atualizarResumo() {
                 restante > 0
             ) {
 
-                pedidosParciais++;
+                quantidadeParciais++;
 
             }
 
@@ -260,7 +364,7 @@ function atualizarResumo() {
                 pago <= 0
             ) {
 
-                pedidosNaoPagos++;
+                quantidadeNaoPagos++;
 
             }
 
@@ -317,7 +421,7 @@ function atualizarResumo() {
     if (parciais) {
 
         parciais.innerText =
-            pedidosParciais;
+            quantidadeParciais;
 
     }
 
@@ -325,7 +429,7 @@ function atualizarResumo() {
     if (naoPagos) {
 
         naoPagos.innerText =
-            pedidosNaoPagos;
+            quantidadeNaoPagos;
 
     }
 
@@ -334,15 +438,18 @@ function atualizarResumo() {
         "===== RESUMO FINANCEIRO ====="
     );
 
+
     console.log(
         "Total vendido:",
         totalVendido
     );
 
+
     console.log(
         "Total recebido:",
         totalRecebido
     );
+
 
     console.log(
         "Total em aberto:",
@@ -362,6 +469,7 @@ function mostrarPedidos() {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -385,23 +493,26 @@ function mostrarPedidos() {
     pedidos.forEach(
         function(pedido) {
 
-            const status =
-                obterStatusPedido(
-                    pedido
-                );
-
             const total =
                 obterValorTotalPedido(
                     pedido
                 );
+
 
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
 
+
             const restante =
                 obterRestantePedido(
+                    pedido
+                );
+
+
+            const status =
+                obterStatusPedido(
                     pedido
                 );
 
@@ -412,7 +523,7 @@ function mostrarPedidos() {
 
                     <h3>
                         Pedido
-                        ${pedido.idPedido || ""}
+                        ${obterIdPedido(pedido)}
                     </h3>
 
                     <p>
@@ -481,19 +592,12 @@ function obterModelo(item) {
     const possibilidades = [
 
         item.modelo,
-
         item.modeloCamisa,
-
         item["Modelo"],
-
         item["MODELO"],
-
         item["Modelo da camisa"],
-
         item["Modelo da Camisa"],
-
         item["modelo da camisa"],
-
         item["modeloCamisa"]
 
     ];
@@ -537,6 +641,7 @@ function mostrarUniformes() {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -615,7 +720,9 @@ function mostrarUniformes() {
                     <p>
                         <strong>Valor:</strong>
                         ${formatarMoeda(
-                            Number(item.valor) || 0
+                            converterNumero(
+                                item.valor
+                            )
                         )}
                     </p>
 
@@ -635,9 +742,7 @@ function mostrarUniformes() {
 
 // ======================================================
 // PAGAMENTOS
-// ======================================================
-// O PAGAMENTO É LANÇADO DIRETAMENTE NO PEDIDO.
-// NÃO EXISTE UMA NOVA ABA DE LANÇAMENTO.
+// PAGAMENTO DENTRO DO PRÓPRIO PEDIDO
 // ======================================================
 
 function mostrarPagamentos() {
@@ -646,6 +751,7 @@ function mostrarPagamentos() {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -674,15 +780,18 @@ function mostrarPagamentos() {
                     pedido
                 );
 
+
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
 
+
             const restante =
                 obterRestantePedido(
                     pedido
                 );
+
 
             const status =
                 obterStatusPedido(
@@ -690,22 +799,38 @@ function mostrarPagamentos() {
                 );
 
 
+            let classeStatus =
+                "nao-pago";
+
+
+            if (status === "Pago") {
+
+                classeStatus =
+                    "pago";
+
+            }
+
+            else if (
+                status === "Pagamento parcial"
+            ) {
+
+                classeStatus =
+                    "parcial";
+
+            }
+
+
             html += `
 
-                <div
-                    class="card"
-                    style="
-                        margin-bottom:15px;
-                    "
-                >
+                <div class="pagamento-card">
 
                     <h3>
                         💰 Pedido
-                        ${pedido.idPedido || ""}
+                        ${obterIdPedido(pedido)}
                     </h3>
 
 
-                    <p>
+                    <div class="pagamento-linha">
 
                         <strong>
                             Responsável:
@@ -713,10 +838,10 @@ function mostrarPagamentos() {
 
                         ${pedido.responsavel || ""}
 
-                    </p>
+                    </div>
 
 
-                    <p>
+                    <div class="pagamento-linha">
 
                         <strong>
                             Valor total:
@@ -724,10 +849,10 @@ function mostrarPagamentos() {
 
                         ${formatarMoeda(total)}
 
-                    </p>
+                    </div>
 
 
-                    <p>
+                    <div class="pagamento-linha">
 
                         <strong>
                             Já pago:
@@ -735,10 +860,10 @@ function mostrarPagamentos() {
 
                         ${formatarMoeda(pago)}
 
-                    </p>
+                    </div>
 
 
-                    <p>
+                    <div class="pagamento-linha">
 
                         <strong>
                             Restante:
@@ -750,10 +875,10 @@ function mostrarPagamentos() {
                             ${formatarMoeda(restante)}
                         </span>
 
-                    </p>
+                    </div>
 
 
-                    <p>
+                    <div class="pagamento-linha">
 
                         <strong>
                             Status:
@@ -761,11 +886,15 @@ function mostrarPagamentos() {
 
                         <span
                             id="status-${index}"
+                            class="
+                                pagamento-status
+                                ${classeStatus}
+                            "
                         >
                             ${status}
                         </span>
 
-                    </p>
+                    </div>
 
 
                     ${
@@ -774,24 +903,12 @@ function mostrarPagamentos() {
 
                         `
 
-                        <div
-                            style="
-                                margin-top:15px;
-                                padding-top:15px;
-                                border-top:1px solid #ddd;
-                            "
-                        >
+                        <div class="pagamento-form">
 
                             <label
-                                style="
-                                    display:block;
-                                    font-weight:bold;
-                                    margin-bottom:6px;
-                                "
+                                for="pagamento-${index}"
                             >
-
                                 Valor recebido agora
-
                             </label>
 
 
@@ -799,37 +916,20 @@ function mostrarPagamentos() {
                                 type="number"
                                 id="pagamento-${index}"
                                 min="0"
-                                max="${restante}"
+                                max="${restante.toFixed(2)}"
                                 step="0.01"
                                 placeholder="Ex.: 25,00"
-                                style="
-                                    width:100%;
-                                    box-sizing:border-box;
-                                    padding:12px;
-                                    border:1px solid #ccc;
-                                    border-radius:10px;
-                                    font-size:16px;
-                                "
                             >
 
 
                             <button
                                 type="button"
-                                class="admin-button"
-                                style="
-                                    width:100%;
-                                    margin-top:10px;
-                                    background:#ff007f;
-                                "
+                                class="admin-button pagamento-registrar"
                                 onclick="
-                                    registrarPagamento(
-                                        ${index}
-                                    )
+                                    registrarPagamento(${index})
                                 "
                             >
-
                                 💰 LANÇAR PAGAMENTO
-
                             </button>
 
                         </div>
@@ -911,15 +1011,12 @@ async function registrarPagamento(index) {
 
 
     const valor =
-        Number(
-            String(
-                campo.value
-            ).replace(",", ".")
+        converterNumero(
+            campo.value
         );
 
 
     if (
-        !valor ||
         valor <= 0
     ) {
 
@@ -961,6 +1058,23 @@ async function registrarPagamento(index) {
     }
 
 
+    const idPedido =
+        obterIdPedido(
+            pedido
+        );
+
+
+    if (!idPedido) {
+
+        alert(
+            "Este pedido não possui ID."
+        );
+
+        return;
+
+    }
+
+
     const novoPago =
         pagoAtual + valor;
 
@@ -976,14 +1090,18 @@ async function registrarPagamento(index) {
         "Não pago";
 
 
-    if (novoRestante <= 0) {
+    if (
+        novoRestante <= 0
+    ) {
 
         novoStatus =
             "Pago";
 
     }
 
-    else if (novoPago > 0) {
+    else if (
+        novoPago > 0
+    ) {
 
         novoStatus =
             "Pagamento parcial";
@@ -1011,14 +1129,6 @@ async function registrarPagamento(index) {
 
     try {
 
-        /*
-         * O Apps Script recebe:
-         *
-         * acao=lancarPagamento
-         * idPedido
-         * valor
-         */
-
         const parametros =
             new URLSearchParams({
 
@@ -1026,12 +1136,22 @@ async function registrarPagamento(index) {
                     "lancarPagamento",
 
                 idPedido:
-                    pedido.idPedido || "",
+                    idPedido,
 
                 valor:
                     valor.toFixed(2)
 
             });
+
+
+        console.log(
+            "ENVIANDO PAGAMENTO:",
+            {
+                idPedido,
+                valor:
+                    valor.toFixed(2)
+            }
+        );
 
 
         const resposta =
@@ -1066,29 +1186,31 @@ async function registrarPagamento(index) {
 
 
         // ==================================================
-        // ATUALIZAR PEDIDO LOCALMENTE
+        // ATUALIZAR LOCALMENTE
         // ==================================================
 
         pedido.Pago =
             novoPago;
 
+
         pedido.Restante =
             novoRestante;
+
 
         pedido.Status =
             novoStatus;
 
 
-        // ==================================================
-        // ATUALIZAR RESUMO
-        // ==================================================
-
         atualizarResumo();
 
 
         // ==================================================
-        // RECARREGAR ABA DE PAGAMENTOS
+        // IMPORTANTE:
+        // BUSCAR NOVAMENTE DA PLANILHA
         // ==================================================
+
+        await carregarDados();
+
 
         mostrarPagamentos();
 
@@ -1138,6 +1260,7 @@ function mostrarProducao() {
             "conteudoAdmin"
         );
 
+
     if (!area) return;
 
 
@@ -1167,9 +1290,7 @@ function mostrarProducao() {
 
 
     let totalCamisas = 0;
-
     let totalBabyLook = 0;
-
     let totalInferiores = 0;
 
 
@@ -1271,11 +1392,7 @@ function mostrarProducao() {
                 👕 Lista
             </h3>
 
-            <div
-                style="
-                    overflow-x:auto;
-                "
-            >
+            <div style="overflow-x:auto;">
 
                 <table
                     style="
@@ -1333,16 +1450,6 @@ function mostrarProducao() {
     itens.forEach(
         function(item) {
 
-            const nome =
-                item.nome || "";
-
-            const numero =
-                item.numero || "";
-
-            const funcao =
-                item.funcao || "";
-
-
             let modelo =
                 obterModelo(item);
 
@@ -1366,18 +1473,6 @@ function mostrarProducao() {
             }
 
 
-            const tamanhoCamisa =
-                item.tamanhoCamisa || "";
-
-
-            const inferior =
-                item.inferior || "Nenhum";
-
-
-            const tamanhoInferior =
-                item.tamanhoInferior || "N/A";
-
-
             html += `
 
                 <tr
@@ -1388,7 +1483,7 @@ function mostrarProducao() {
 
                     <td style="padding:12px;">
                         <strong>
-                            ${nome}
+                            ${item.nome || ""}
                         </strong>
                     </td>
 
@@ -1399,11 +1494,11 @@ function mostrarProducao() {
                             font-weight:bold;
                         "
                     >
-                        ${numero}
+                        ${item.numero || ""}
                     </td>
 
                     <td style="padding:12px;">
-                        ${funcao}
+                        ${item.funcao || ""}
                     </td>
 
                     <td style="padding:12px;">
@@ -1416,11 +1511,11 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
-                        ${tamanhoCamisa}
+                        ${item.tamanhoCamisa || ""}
                     </td>
 
                     <td style="padding:12px;">
-                        ${inferior}
+                        ${item.inferior || "Nenhum"}
                     </td>
 
                     <td
@@ -1429,7 +1524,7 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
-                        ${tamanhoInferior}
+                        ${item.tamanhoInferior || "N/A"}
                     </td>
 
                 </tr>
@@ -1460,9 +1555,7 @@ function mostrarProducao() {
                     width:100%;
                     background:#ff007f;
                 "
-                onclick="
-                    exportarProducaoPlanilha()
-                "
+                onclick="exportarProducaoPlanilha()"
             >
 
                 📊 EXPORTAR PARA PLANILHA
@@ -1500,9 +1593,7 @@ function exportarProducaoPlanilha() {
     }
 
 
-    let csv = "";
-
-    csv +=
+    let csv =
         "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
 
 
@@ -1627,194 +1718,119 @@ function mostrarConfiguracoes() {
             "conteudoAdmin"
         );
 
+
     if (!area) return;
 
 
     area.innerHTML = `
 
-        <div class="card">
+        <div class="config-card">
 
             <h2>
                 ⚙️ Configurações
             </h2>
 
             <p style="color:#777;">
-
                 Gerencie os valores e as principais
                 configurações do sistema.
-
             </p>
 
         </div>
 
 
-        <div class="card">
+        <div class="config-card">
 
             <h3>
                 💰 Valores das peças
             </h3>
 
-            <div style="display:grid;gap:12px;">
 
-                <div>
+            <label>
+                Camisa
+            </label>
 
-                    <label>
-                        Camisa
-                    </label>
-
-                    <input
-                        id="configCamisa"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
+            <input
+                id="configCamisa"
+                type="number"
+                min="0"
+                step="0.01"
+                value="75"
+            >
 
 
-                <div>
+            <label>
+                Baby Look
+            </label>
 
-                    <label>
-                        Baby Look
-                    </label>
-
-                    <input
-                        id="configBabyLook"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
+            <input
+                id="configBabyLook"
+                type="number"
+                min="0"
+                step="0.01"
+                value="75"
+            >
 
 
-                <div>
+            <label>
+                Calção masculino
+            </label>
 
-                    <label>
-                        Calção masculino
-                    </label>
-
-                    <input
-                        id="configCalcaoMasc"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
+            <input
+                id="configCalcaoMasc"
+                type="number"
+                min="0"
+                step="0.01"
+                value="35"
+            >
 
 
-                <div>
+            <label>
+                Calção feminino
+            </label>
 
-                    <label>
-                        Calção feminino
-                    </label>
-
-                    <input
-                        id="configCalcaoFem"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
+            <input
+                id="configCalcaoFem"
+                type="number"
+                min="0"
+                step="0.01"
+                value="35"
+            >
 
 
-                <div>
+            <label>
+                Short Doll
+            </label>
 
-                    <label>
-                        Short Doll
-                    </label>
-
-                    <input
-                        id="configShortDoll"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="30"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
+            <input
+                id="configShortDoll"
+                type="number"
+                min="0"
+                step="0.01"
+                value="30"
+            >
 
 
-                <div>
+            <label>
+                Short Suplex
+            </label>
 
-                    <label>
-                        Short Suplex
-                    </label>
-
-                    <input
-                        id="configShortSuplex"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-            </div>
+            <input
+                id="configShortSuplex"
+                type="number"
+                min="0"
+                step="0.01"
+                value="35"
+            >
 
         </div>
 
 
-        <div class="card">
+        <div class="config-card">
 
             <h3>
                 🏐 Configurações do sistema
             </h3>
+
 
             <label>
                 Nome do time
@@ -1824,20 +1840,12 @@ function mostrarConfiguracoes() {
                 id="configNomeTime"
                 type="text"
                 value="Vôlei Terapia"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                "
             >
 
         </div>
 
 
-        <div class="card">
+        <div class="config-card">
 
             <button
                 type="button"
@@ -1877,6 +1885,61 @@ function mostrarConfiguracoes() {
 
 
 // ======================================================
+// CONFIGURAÇÕES - SALVAR
+// ======================================================
+
+function salvarConfiguracoes() {
+
+    alert(
+        "As configurações serão disponibilizadas para edição do sistema em uma próxima etapa."
+    );
+
+}
+
+
+// ======================================================
+// CONFIGURAÇÕES - RESTAURAR
+// ======================================================
+
+function restaurarConfiguracoes() {
+
+    const valores = {
+
+        configCamisa: 75,
+        configBabyLook: 75,
+        configCalcaoMasc: 35,
+        configCalcaoFem: 35,
+        configShortDoll: 30,
+        configShortSuplex: 35,
+        configNomeTime: "Vôlei Terapia"
+
+    };
+
+
+    Object.keys(valores)
+        .forEach(
+            function(id) {
+
+                const campo =
+                    document.getElementById(
+                        id
+                    );
+
+
+                if (campo) {
+
+                    campo.value =
+                        valores[id];
+
+                }
+
+            }
+        );
+
+}
+
+
+// ======================================================
 // MENSAGEM
 // ======================================================
 
@@ -1886,6 +1949,7 @@ function mostrarMensagem(texto) {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -1909,13 +1973,15 @@ function mostrarMensagem(texto) {
 
 function formatarMoeda(valor) {
 
-    return Number(
-        valor || 0
+    return converterNumero(
+        valor
     ).toLocaleString(
         "pt-BR",
         {
-            style:"currency",
-            currency:"BRL"
+            style:
+                "currency",
+            currency:
+                "BRL"
         }
     );
 
