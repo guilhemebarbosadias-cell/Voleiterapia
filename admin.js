@@ -1622,4 +1622,576 @@ function mostrarProducao() {
                     </td>
 
 
-                    <td style="
+                    <td style="padding:12px;">
+                        ${inferior}
+                    </td>
+
+
+                    <td
+                        style="
+                            padding:12px;
+                            text-align:center;
+                        "
+                    >
+                        ${tamanhoInferior}
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="
+                    exportarProducaoPlanilha()
+                "
+            >
+
+                📊 EXPORTAR PARA PLANILHA
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    area.innerHTML =
+        html;
+
+}
+
+
+// ======================================================
+// EXPORTAR PRODUÇÃO
+// ======================================================
+
+function exportarProducaoPlanilha() {
+
+    if (
+        !itens ||
+        itens.length === 0
+    ) {
+
+        alert(
+            "Não há uniformes para exportar."
+        );
+
+        return;
+
+    }
+
+
+    let csv = "";
+
+
+    csv +=
+        "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
+
+
+    itens.forEach(
+        function(item) {
+
+            csv +=
+                "CAMISA;" +
+                escaparCSV(
+                    item.nome || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.numero || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.funcao || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    obterModelo(item)
+                ) +
+                ";" +
+                escaparCSV(
+                    item.tamanhoCamisa || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.inferior || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.tamanhoInferior || ""
+                ) +
+                "\n";
+
+        }
+    );
+
+
+    const blob =
+        new Blob(
+            [
+                "\uFEFF" +
+                csv
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
+
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+
+    link.download =
+        "lista-producao-volei-terapia.csv";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    document.body.removeChild(
+        link
+    );
+
+
+    URL.revokeObjectURL(
+        url
+    );
+
+
+    alert(
+        "Lista de produção exportada com sucesso!"
+    );
+
+}
+
+
+// ======================================================
+// ESCAPAR CSV
+// ======================================================
+
+function escaparCSV(
+    valor
+) {
+
+    if (
+        valor === undefined ||
+        valor === null
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(valor)
+        .replace(
+            /"/g,
+            '""'
+        )
+        .replace(
+            /;/g,
+            ","
+        );
+
+}
+
+
+// ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+
+function mostrarConfiguracoes() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    area.innerHTML = `
+
+        <div class="card">
+
+            <h2>
+                ⚙️ Configurações
+            </h2>
+
+
+            <p
+                style="
+                    color:#777;
+                "
+            >
+
+                Gerencie os valores e as principais
+                configurações do sistema.
+
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                💰 Valores das peças
+            </h3>
+
+
+            <div
+                style="
+                    display:grid;
+                    gap:12px;
+                "
+            >
+
+                <div>
+
+                    <label>
+                        Camisa
+                    </label>
+
+                    <input
+                        id="configCamisa"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Baby Look
+                    </label>
+
+                    <input
+                        id="configBabyLook"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Calção masculino
+                    </label>
+
+                    <input
+                        id="configCalcaoMasc"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Calção feminino
+                    </label>
+
+                    <input
+                        id="configCalcaoFem"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Short Doll
+                    </label>
+
+                    <input
+                        id="configShortDoll"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="30"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Short Suplex
+                    </label>
+
+                    <input
+                        id="configShortSuplex"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🏐 Configurações do sistema
+            </h3>
+
+
+            <label>
+                Nome do time
+            </label>
+
+
+            <input
+                id="configNomeTime"
+                type="text"
+                value="Vôlei Terapia"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                "
+            >
+
+        </div>
+
+
+        <div class="card">
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="
+                    salvarConfiguracoes()
+                "
+            >
+
+                💾 SALVAR ALTERAÇÕES
+
+            </button>
+
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    margin-top:10px;
+                    background:#555;
+                "
+                onclick="
+                    restaurarConfiguracoes()
+                "
+            >
+
+                🔄 RESTAURAR PADRÃO
+
+            </button>
+
+        </div>
+
+    `;
+
+}
+
+
+// ======================================================
+// MENSAGEM
+// ======================================================
+
+function mostrarMensagem(
+    texto
+) {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    area.innerHTML = `
+
+        <div class="empty">
+
+            ${texto}
+
+        </div>
+
+    `;
+
+}
+
+
+// ======================================================
+// FORMATAR MOEDA
+// ======================================================
+
+function formatarMoeda(
+    valor
+) {
+
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "pt-BR",
+        {
+            style:
+                "currency",
+
+            currency:
+                "BRL"
+
+        }
+    );
+
+}
+
+
+// ======================================================
+// VOLTAR AO INÍCIO
+// ======================================================
+
+function voltarInicio() {
+
+    window.location.href =
+        "index.html";
+
+}
+
+
+// ======================================================
+// INICIAR ADMIN
+// ======================================================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function() {
+
+        carregarDados();
+
+    }
+);
