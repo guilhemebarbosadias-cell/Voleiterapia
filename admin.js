@@ -2,10 +2,6 @@
 // ADMIN - VÔLEI TERAPIA
 // ======================================================
 
-// ======================================================
-// URL DO GOOGLE APPS SCRIPT
-// ======================================================
-
 const URL_APPS_SCRIPT =
 "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
@@ -32,16 +28,13 @@ async function carregarDados() {
                 "?acao=admin"
             );
 
-
         const dados =
             await resposta.json();
-
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
             dados
         );
-
 
         if (
             !dados ||
@@ -55,14 +48,12 @@ async function carregarDados() {
 
         }
 
-
         pedidos =
             Array.isArray(
                 dados.pedidos
             )
                 ? dados.pedidos
                 : [];
-
 
         itens =
             Array.isArray(
@@ -73,17 +64,7 @@ async function carregarDados() {
 
 
         // ==================================================
-        // NORMALIZAR OS PEDIDOS
-        // ==================================================
-        //
-        // O Apps Script devolve:
-        //
-        // status
-        // pago
-        // restante
-        //
-        // Mantemos exatamente esses nomes internamente.
-        //
+        // NORMALIZAR PEDIDOS
         // ==================================================
 
         pedidos =
@@ -151,7 +132,6 @@ async function carregarDados() {
             erro
         );
 
-
         mostrarMensagem(
             "Não foi possível carregar os dados da administração."
         );
@@ -204,27 +184,16 @@ function obterRestantePedido(
             pedido
         );
 
-
     const pago =
         obterValorPagoPedido(
             pedido
         );
 
 
-    // Se o Apps Script já enviou
-    // o restante correto, usamos ele.
-    //
-    // Porém recalculamos também para
-    // garantir consistência.
-
-    const restanteCalculado =
-        Math.max(
-            total - pago,
-            0
-        );
-
-
-    return restanteCalculado;
+    return Math.max(
+        total - pago,
+        0
+    );
 
 }
 
@@ -242,12 +211,10 @@ function obterStatusPedido(
             pedido
         );
 
-
     const pago =
         obterValorPagoPedido(
             pedido
         );
-
 
     const restante =
         obterRestantePedido(
@@ -288,6 +255,125 @@ function obterStatusPedido(
 
 
 // ======================================================
+// CLASSE DA TAG DE STATUS
+// ======================================================
+
+function obterClasseStatus(
+    status
+) {
+
+    const texto =
+        String(
+            status || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    if (
+        texto === "pago"
+    ) {
+
+        return "pago";
+
+    }
+
+
+    if (
+        texto === "pagamento parcial"
+    ) {
+
+        return "parcial";
+
+    }
+
+
+    if (
+        texto === "não pago" ||
+        texto === "nao pago"
+    ) {
+
+        return "nao-pago";
+
+    }
+
+
+    return "";
+
+}
+
+
+// ======================================================
+// TAG COLORIDA DE STATUS
+// ======================================================
+
+function criarTagStatus(
+    status
+) {
+
+    const classe =
+        obterClasseStatus(
+            status
+        );
+
+
+    if (!classe) {
+
+        return `
+            <span
+                class="pagamento-status"
+            >
+                ${status}
+            </span>
+        `;
+
+    }
+
+
+    let icone = "";
+
+
+    if (
+        classe === "pago"
+    ) {
+
+        icone = "✓";
+
+    }
+
+    else if (
+        classe === "parcial"
+    ) {
+
+        icone = "◐";
+
+    }
+
+    else if (
+        classe === "nao-pago"
+    ) {
+
+        icone = "✕";
+
+    }
+
+
+    return `
+
+        <span
+            class="pagamento-status ${classe}"
+        >
+
+            ${icone} ${status}
+
+        </span>
+
+    `;
+
+}
+
+
+// ======================================================
 // ATUALIZAR RESUMO FINANCEIRO
 // ======================================================
 
@@ -298,36 +384,30 @@ function atualizarResumo() {
             "totalPedidos"
         );
 
-
     const totalUniformes =
         document.getElementById(
             "totalUniformes"
         );
-
 
     const valorTotal =
         document.getElementById(
             "valorTotal"
         );
 
-
     const valorPendente =
         document.getElementById(
             "valorPendente"
         );
-
 
     const valorRecebido =
         document.getElementById(
             "valorRecebido"
         );
 
-
     const parciais =
         document.getElementById(
             "pedidosParciais"
         );
-
 
     const naoPagos =
         document.getElementById(
@@ -354,12 +434,10 @@ function atualizarResumo() {
                     pedido
                 );
 
-
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
-
 
             const restante =
                 obterRestantePedido(
@@ -370,10 +448,8 @@ function atualizarResumo() {
             totalVendido +=
                 total;
 
-
             totalRecebido +=
                 pago;
-
 
             totalAberto +=
                 restante;
@@ -388,7 +464,6 @@ function atualizarResumo() {
                 pedidosParciais++;
 
             }
-
 
             else if (
                 total > 0 &&
@@ -469,18 +544,15 @@ function atualizarResumo() {
         "===== RESUMO FINANCEIRO ====="
     );
 
-
     console.log(
         "Total vendido:",
         totalVendido
     );
 
-
     console.log(
         "Total recebido:",
         totalRecebido
     );
-
 
     console.log(
         "Total em aberto:",
@@ -500,7 +572,6 @@ function mostrarPedidos() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -535,18 +606,15 @@ function mostrarPedidos() {
                     pedido
                 );
 
-
             const total =
                 obterValorTotalPedido(
                     pedido
                 );
 
-
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
-
 
             const restante =
                 obterRestantePedido(
@@ -649,7 +717,7 @@ function mostrarPedidos() {
                             Status:
                         </strong>
 
-                        ${status}
+                        ${criarTagStatus(status)}
 
                     </p>
 
@@ -737,7 +805,6 @@ function mostrarUniformes() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -902,11 +969,6 @@ function mostrarUniformes() {
 // ======================================================
 // PAGAMENTOS
 // ======================================================
-//
-// O pagamento continua sendo lançado
-// dentro do pedido.
-// Não criamos uma nova aba separada.
-// ======================================================
 
 function mostrarPagamentos() {
 
@@ -914,7 +976,6 @@ function mostrarPagamentos() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -949,18 +1010,15 @@ function mostrarPagamentos() {
                     pedido
                 );
 
-
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
 
-
             const restante =
                 obterRestantePedido(
                     pedido
                 );
-
 
             const status =
                 obterStatusPedido(
@@ -1049,7 +1107,9 @@ function mostrarPagamentos() {
                         <span
                             id="status-${index}"
                         >
-                            ${status}
+
+                            ${criarTagStatus(status)}
+
                         </span>
 
                     </div>
@@ -1153,19 +1213,6 @@ function mostrarPagamentos() {
 
 // ======================================================
 // REGISTRAR PAGAMENTO
-// ======================================================
-//
-// IMPORTANTE:
-//
-// O Apps Script espera DOPOST com JSON:
-//
-// {
-//     acao: "registrarPagamento",
-//     idPedido: "...",
-//     responsavel: "...",
-//     valorPago: 25
-// }
-//
 // ======================================================
 
 async function registrarPagamento(
@@ -1295,16 +1342,6 @@ async function registrarPagamento(
 
     try {
 
-        // ==================================================
-        // ENVIAR PARA O APPS SCRIPT
-        // ==================================================
-        //
-        // NÃO USAR GET AQUI.
-        //
-        // O Apps Script usa doPost().
-        //
-        // ==================================================
-
         const corpo = {
 
             acao:
@@ -1381,10 +1418,6 @@ async function registrarPagamento(
         }
 
 
-        // ==================================================
-        // USAR A RESPOSTA REAL DO APPS SCRIPT
-        // ==================================================
-
         pedido.status =
             dados.status ||
             novoStatus;
@@ -1401,9 +1434,6 @@ async function registrarPagamento(
                 dados.restante
             );
 
-
-        // Segurança caso algum valor
-        // não venha na resposta.
 
         if (
             Number.isNaN(
@@ -1429,16 +1459,8 @@ async function registrarPagamento(
         }
 
 
-        // ==================================================
-        // ATUALIZAR RESUMO
-        // ==================================================
-
         atualizarResumo();
 
-
-        // ==================================================
-        // MOSTRAR NOVAMENTE OS PAGAMENTOS
-        // ==================================================
 
         mostrarPagamentos();
 
@@ -1489,7 +1511,6 @@ function mostrarProducao() {
         document.getElementById(
             "conteudoAdmin"
         );
-
 
     if (!area) return;
 
@@ -1579,7 +1600,6 @@ function mostrarProducao() {
                 🏭 Lista de Produção
             </h2>
 
-
             <p>
 
                 <strong>
@@ -1589,7 +1609,6 @@ function mostrarProducao() {
                 ${totalUniformes}
 
             </p>
-
 
             <p>
 
@@ -1601,7 +1620,6 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
 
                 <strong>
@@ -1611,7 +1629,6 @@ function mostrarProducao() {
                 ${totalBabyLook}
 
             </p>
-
 
             <p>
 
@@ -1700,10 +1717,8 @@ function mostrarProducao() {
             const nome =
                 item.nome || "";
 
-
             const numero =
                 item.numero || "";
-
 
             const funcao =
                 item.funcao || "";
@@ -1735,10 +1750,8 @@ function mostrarProducao() {
             const tamanhoCamisa =
                 item.tamanhoCamisa || "";
 
-
             const inferior =
                 item.inferior || "Nenhum";
-
 
             const tamanhoInferior =
                 item.tamanhoInferior || "N/A";
@@ -1758,7 +1771,6 @@ function mostrarProducao() {
                         </strong>
                     </td>
 
-
                     <td
                         style="
                             padding:12px;
@@ -1769,16 +1781,13 @@ function mostrarProducao() {
                         ${numero}
                     </td>
 
-
                     <td style="padding:12px;">
                         ${funcao}
                     </td>
 
-
                     <td style="padding:12px;">
                         ${modelo}
                     </td>
-
 
                     <td
                         style="
@@ -1789,11 +1798,9 @@ function mostrarProducao() {
                         ${tamanhoCamisa}
                     </td>
 
-
                     <td style="padding:12px;">
                         ${inferior}
                     </td>
-
 
                     <td
                         style="
@@ -1979,7 +1986,9 @@ function exportarProducaoPlanilha() {
 // ESCAPAR CSV
 // ======================================================
 
-function escaparCSV(valor) {
+function escaparCSV(
+    valor
+) {
 
     if (
         valor === undefined ||
@@ -2015,7 +2024,6 @@ function mostrarConfiguracoes() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
 
 
@@ -2026,7 +2034,6 @@ function mostrarConfiguracoes() {
             <h2>
                 ⚙️ Configurações
             </h2>
-
 
             <p
                 style="
@@ -2062,7 +2069,6 @@ function mostrarConfiguracoes() {
                         Camisa
                     </label>
 
-
                     <input
                         id="configCamisa"
                         type="number"
@@ -2087,7 +2093,6 @@ function mostrarConfiguracoes() {
                     <label>
                         Baby Look
                     </label>
-
 
                     <input
                         id="configBabyLook"
@@ -2114,7 +2119,6 @@ function mostrarConfiguracoes() {
                         Calção masculino
                     </label>
 
-
                     <input
                         id="configCalcaoMasc"
                         type="number"
@@ -2139,7 +2143,6 @@ function mostrarConfiguracoes() {
                     <label>
                         Calção feminino
                     </label>
-
 
                     <input
                         id="configCalcaoFem"
@@ -2166,7 +2169,6 @@ function mostrarConfiguracoes() {
                         Short Doll
                     </label>
 
-
                     <input
                         id="configShortDoll"
                         type="number"
@@ -2191,7 +2193,6 @@ function mostrarConfiguracoes() {
                     <label>
                         Short Suplex
                     </label>
-
 
                     <input
                         id="configShortSuplex"
@@ -2222,11 +2223,9 @@ function mostrarConfiguracoes() {
                 🏐 Configurações do sistema
             </h3>
 
-
             <label>
                 Nome do time
             </label>
-
 
             <input
                 id="configNomeTime"
@@ -2301,7 +2300,6 @@ function mostrarMensagem(
             "conteudoAdmin"
         );
 
-
     if (!area) return;
 
 
@@ -2367,4 +2365,3 @@ document.addEventListener(
 
     }
 );
-
