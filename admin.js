@@ -102,8 +102,7 @@ async function carregarDados() {
                             pedido.parcelas || "",
 
                         status:
-                            pedido.status ||
-                            "Não pago",
+                            pedido.status || "Não pago",
 
                         pago:
                             Number(
@@ -259,15 +258,17 @@ function obterStatusPedido(
 
 
 // ======================================================
-// TAG COLORIDA DE STATUS
+// ETIQUETA COLORIDA DO STATUS
 // ======================================================
 
-function criarTagStatus(
+function mostrarStatusTag(
     status
 ) {
 
     const texto =
-        status || "Não pago";
+        String(
+            status || "Não pago"
+        ).trim();
 
 
     let classe =
@@ -298,9 +299,7 @@ function criarTagStatus(
         <span
             class="pagamento-status ${classe}"
         >
-
             ${texto}
-
         </span>
 
     `;
@@ -351,13 +350,9 @@ function atualizarResumo() {
 
 
     let totalVendido = 0;
-
     let totalRecebido = 0;
-
     let totalAberto = 0;
-
     let pedidosParciais = 0;
-
     let pedidosNaoPagos = 0;
 
 
@@ -474,26 +469,6 @@ function atualizarResumo() {
 
     }
 
-
-    console.log(
-        "===== RESUMO FINANCEIRO ====="
-    );
-
-    console.log(
-        "Total vendido:",
-        totalVendido
-    );
-
-    console.log(
-        "Total recebido:",
-        totalRecebido
-    );
-
-    console.log(
-        "Total em aberto:",
-        totalAberto
-    );
-
 }
 
 
@@ -507,6 +482,7 @@ function mostrarPedidos() {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -562,76 +538,44 @@ function mostrarPedidos() {
                 <div class="card">
 
                     <h3>
-
                         Pedido
                         ${pedido.idPedido || ""}
-
                     </h3>
 
 
                     <p>
-
-                        <strong>
-                            Data:
-                        </strong>
-
+                        <strong>Data:</strong>
                         ${pedido.data || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Responsável:
-                        </strong>
-
+                        <strong>Responsável:</strong>
                         ${pedido.responsavel || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Quantidade:
-                        </strong>
-
+                        <strong>Quantidade:</strong>
                         ${pedido.quantidade || 0}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Valor:
-                        </strong>
-
+                        <strong>Valor:</strong>
                         ${formatarMoeda(total)}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Pago:
-                        </strong>
-
+                        <strong>Pago:</strong>
                         ${formatarMoeda(pago)}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Restante:
-                        </strong>
-
+                        <strong>Restante:</strong>
                         ${formatarMoeda(restante)}
-
                     </p>
 
 
@@ -652,7 +596,7 @@ function mostrarPedidos() {
                             Status:
                         </strong>
 
-                        ${criarTagStatus(status)}
+                        ${mostrarStatusTag(status)}
 
                     </p>
 
@@ -682,19 +626,12 @@ function obterModelo(item) {
     const possibilidades = [
 
         item.modelo,
-
         item.modeloCamisa,
-
         item["Modelo"],
-
         item["MODELO"],
-
         item["Modelo da camisa"],
-
         item["Modelo da Camisa"],
-
         item["modelo da camisa"],
-
         item["modeloCamisa"]
 
     ];
@@ -741,6 +678,7 @@ function mostrarUniformes() {
             "conteudoAdmin"
         );
 
+
     if (!area) return;
 
 
@@ -778,113 +716,70 @@ function mostrarUniformes() {
                 <div class="card">
 
                     <h3>
-
                         Uniforme
                         ${index + 1}
-
                     </h3>
 
 
                     <p>
-
-                        <strong>
-                            Nome:
-                        </strong>
-
+                        <strong>Nome:</strong>
                         ${item.nome || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Número:
-                        </strong>
-
+                        <strong>Número:</strong>
                         ${item.numero || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Categoria:
-                        </strong>
-
+                        <strong>Categoria:</strong>
                         ${item.categoria || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Função:
-                        </strong>
-
+                        <strong>Função:</strong>
                         ${item.funcao || ""}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Modelo:
-                        </strong>
-
+                        <strong>Modelo:</strong>
                         ${modelo}
-
                     </p>
 
 
                     <p>
-
                         <strong>
                             Tamanho da camisa:
                         </strong>
-
                         ${item.tamanhoCamisa || ""}
-
                     </p>
 
 
                     <p>
-
                         <strong>
                             Peça inferior:
                         </strong>
-
                         ${item.inferior || "Nenhum"}
-
                     </p>
 
 
                     <p>
-
                         <strong>
                             Tamanho inferior:
                         </strong>
-
                         ${item.tamanhoInferior || "N/A"}
-
                     </p>
 
 
                     <p>
-
-                        <strong>
-                            Valor:
-                        </strong>
-
+                        <strong>Valor:</strong>
                         ${formatarMoeda(
-                            Number(
-                                item.valor
-                            ) || 0
+                            Number(item.valor) || 0
                         )}
-
                     </p>
 
                 </div>
@@ -904,11 +799,6 @@ function mostrarUniformes() {
 // ======================================================
 // PAGAMENTOS
 // ======================================================
-//
-// O pagamento continua sendo lançado
-// dentro do pedido.
-// Não criamos uma nova aba separada.
-// ======================================================
 
 function mostrarPagamentos() {
 
@@ -916,6 +806,7 @@ function mostrarPagamentos() {
         document.getElementById(
             "conteudoAdmin"
         );
+
 
     if (!area) return;
 
@@ -1048,7 +939,7 @@ function mostrarPagamentos() {
                             id="status-${index}"
                         >
 
-                            ${criarTagStatus(status)}
+                            ${mostrarStatusTag(status)}
 
                         </span>
 
@@ -1074,37 +965,26 @@ function mostrarPagamentos() {
 
 
                             <input
-
                                 type="number"
-
                                 id="pagamento-${index}"
-
                                 min="0"
-
                                 max="${restante}"
-
                                 step="0.01"
-
                                 placeholder="Ex.: 25,00"
-
                             >
 
 
                             <button
-
                                 type="button"
-
                                 class="
                                     admin-button
                                     pagamento-registrar
                                 "
-
                                 onclick="
                                     registrarPagamento(
                                         ${index}
                                     )
                                 "
-
                             >
 
                                 💰 LANÇAR PAGAMENTO
@@ -1358,10 +1238,6 @@ async function registrarPagamento(
         }
 
 
-        // ==================================================
-        // USAR RESPOSTA REAL DO APPS SCRIPT
-        // ==================================================
-
         pedido.status =
             dados.status ||
             novoStatus;
@@ -1404,6 +1280,7 @@ async function registrarPagamento(
 
 
         atualizarResumo();
+
 
         mostrarPagamentos();
 
@@ -1455,6 +1332,7 @@ function mostrarProducao() {
             "conteudoAdmin"
         );
 
+
     if (!area) return;
 
 
@@ -1484,9 +1362,7 @@ function mostrarProducao() {
 
 
     let totalCamisas = 0;
-
     let totalBabyLook = 0;
-
     let totalInferiores = 0;
 
 
@@ -1545,7 +1421,6 @@ function mostrarProducao() {
 
 
             <p>
-
                 <strong>
                     Total de uniformes:
                 </strong>
@@ -1556,7 +1431,6 @@ function mostrarProducao() {
 
 
             <p>
-
                 <strong>
                     Camisas:
                 </strong>
@@ -1567,7 +1441,6 @@ function mostrarProducao() {
 
 
             <p>
-
                 <strong>
                     Baby Look:
                 </strong>
@@ -1578,7 +1451,6 @@ function mostrarProducao() {
 
 
             <p>
-
                 <strong>
                     Peças inferiores:
                 </strong>
@@ -1750,572 +1622,4 @@ function mostrarProducao() {
                     </td>
 
 
-                    <td style="padding:12px;">
-                        ${inferior}
-                    </td>
-
-
-                    <td
-                        style="
-                            padding:12px;
-                            text-align:center;
-                        "
-                    >
-                        ${tamanhoInferior}
-                    </td>
-
-                </tr>
-
-            `;
-
-        }
-    );
-
-
-    html += `
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    background:#ff007f;
-                "
-                onclick="
-                    exportarProducaoPlanilha()
-                "
-            >
-
-                📊 EXPORTAR PARA PLANILHA
-
-            </button>
-
-        </div>
-
-    `;
-
-
-    area.innerHTML =
-        html;
-
-}
-
-
-// ======================================================
-// EXPORTAR PRODUÇÃO
-// ======================================================
-
-function exportarProducaoPlanilha() {
-
-    if (
-        !itens ||
-        itens.length === 0
-    ) {
-
-        alert(
-            "Não há uniformes para exportar."
-        );
-
-        return;
-
-    }
-
-
-    let csv = "";
-
-
-    csv +=
-        "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
-
-
-    itens.forEach(
-        function(item) {
-
-            csv +=
-                "CAMISA;" +
-                escaparCSV(
-                    item.nome || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.numero || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.funcao || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    obterModelo(item)
-                ) +
-                ";" +
-                escaparCSV(
-                    item.tamanhoCamisa || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.inferior || ""
-                ) +
-                ";" +
-                escaparCSV(
-                    item.tamanhoInferior || ""
-                ) +
-                "\n";
-
-        }
-    );
-
-
-    const blob =
-        new Blob(
-            [
-                "\uFEFF" +
-                csv
-            ],
-            {
-                type:
-                    "text/csv;charset=utf-8;"
-            }
-        );
-
-
-    const url =
-        URL.createObjectURL(
-            blob
-        );
-
-
-    const link =
-        document.createElement(
-            "a"
-        );
-
-
-    link.href =
-        url;
-
-
-    link.download =
-        "lista-producao-volei-terapia.csv";
-
-
-    document.body.appendChild(
-        link
-    );
-
-
-    link.click();
-
-
-    document.body.removeChild(
-        link
-    );
-
-
-    URL.revokeObjectURL(
-        url
-    );
-
-
-    alert(
-        "Lista de produção exportada com sucesso!"
-    );
-
-}
-
-
-// ======================================================
-// ESCAPAR CSV
-// ======================================================
-
-function escaparCSV(valor) {
-
-    if (
-        valor === undefined ||
-        valor === null
-    ) {
-
-        return "";
-
-    }
-
-
-    return String(valor)
-        .replace(
-            /"/g,
-            '""'
-        )
-        .replace(
-            /;/g,
-            ","
-        );
-
-}
-
-
-// ======================================================
-// CONFIGURAÇÕES
-// ======================================================
-
-function mostrarConfiguracoes() {
-
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
-
-    if (!area) return;
-
-
-    area.innerHTML = `
-
-        <div class="card">
-
-            <h2>
-                ⚙️ Configurações
-            </h2>
-
-
-            <p
-                style="
-                    color:#777;
-                "
-            >
-
-                Gerencie os valores e as principais
-                configurações do sistema.
-
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                💰 Valores das peças
-            </h3>
-
-
-            <div
-                style="
-                    display:grid;
-                    gap:12px;
-                "
-            >
-
-                <div>
-
-                    <label>
-                        Camisa
-                    </label>
-
-                    <input
-                        id="configCamisa"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Baby Look
-                    </label>
-
-                    <input
-                        id="configBabyLook"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="75"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Calção masculino
-                    </label>
-
-                    <input
-                        id="configCalcaoMasc"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Calção feminino
-                    </label>
-
-                    <input
-                        id="configCalcaoFem"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Short Doll
-                    </label>
-
-                    <input
-                        id="configShortDoll"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="30"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-
-                <div>
-
-                    <label>
-                        Short Suplex
-                    </label>
-
-                    <input
-                        id="configShortSuplex"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value="35"
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-                    >
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                🏐 Configurações do sistema
-            </h3>
-
-
-            <label>
-                Nome do time
-            </label>
-
-
-            <input
-                id="configNomeTime"
-                type="text"
-                value="Vôlei Terapia"
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                "
-            >
-
-        </div>
-
-
-        <div class="card">
-
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    background:#ff007f;
-                "
-                onclick="
-                    salvarConfiguracoes()
-                "
-            >
-
-                💾 SALVAR ALTERAÇÕES
-
-            </button>
-
-
-            <button
-                type="button"
-                class="admin-button"
-                style="
-                    width:100%;
-                    margin-top:10px;
-                    background:#555;
-                "
-                onclick="
-                    restaurarConfiguracoes()
-                "
-            >
-
-                🔄 RESTAURAR PADRÃO
-
-            </button>
-
-        </div>
-
-    `;
-
-}
-
-
-// ======================================================
-// MENSAGEM
-// ======================================================
-
-function mostrarMensagem(
-    texto
-) {
-
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
-
-    if (!area) return;
-
-
-    area.innerHTML = `
-
-        <div class="empty">
-
-            ${texto}
-
-        </div>
-
-    `;
-
-}
-
-
-// ======================================================
-// FORMATAR MOEDA
-// ======================================================
-
-function formatarMoeda(
-    valor
-) {
-
-    return Number(
-        valor || 0
-    ).toLocaleString(
-        "pt-BR",
-        {
-            style:
-                "currency",
-
-            currency:
-                "BRL"
-
-        }
-    );
-
-}
-
-
-// ======================================================
-// VOLTAR AO INÍCIO
-// ======================================================
-
-function voltarInicio() {
-
-    window.location.href =
-        "index.html";
-
-}
-
-
-// ======================================================
-// INICIAR ADMIN
-// ======================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    function() {
-
-        carregarDados();
-
-    }
-);
+                    <td style="
