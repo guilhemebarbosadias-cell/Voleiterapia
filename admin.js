@@ -17,252 +17,266 @@ let pedidos = [];
 let itens = [];
 
 // ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+
+let configuracoes = [];
+
+
+// ======================================================
 // CARREGAR DADOS
 // ======================================================
 
 async function carregarDados() {
 
-try {  
+    try {
 
-    const resposta =  
-        await fetch(  
-            URL_APPS_SCRIPT +  
-            "?acao=admin"  
-        );  
-
-
-    const dados =  
-        await resposta.json();  
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT +
+                "?acao=admin"
+            );
 
 
-    console.log(  
-        "DADOS RECEBIDOS DO APPS SCRIPT:",  
-        dados  
-    );  
+        const dados =
+            await resposta.json();
 
 
-    if (  
-        !dados ||  
-        dados.result !== "success"  
-    ) {  
-
-        throw new Error(  
-            dados?.message ||  
-            "Não foi possível carregar os dados."  
-        );  
-
-    }  
+        console.log(
+            "DADOS RECEBIDOS DO APPS SCRIPT:",
+            dados
+        );
 
 
-    pedidos =  
-        Array.isArray(  
-            dados.pedidos  
-        )  
-            ? dados.pedidos  
-            : [];  
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
+
+            throw new Error(
+                dados?.message ||
+                "Não foi possível carregar os dados."
+            );
+
+        }
 
 
-    itens =  
-        Array.isArray(  
-            dados.itens  
-        )  
-            ? dados.itens  
-            : [];  
+        pedidos =
+            Array.isArray(
+                dados.pedidos
+            )
+                ? dados.pedidos
+                : [];
 
 
-    // ==================================================  
-    // NORMALIZAR OS PEDIDOS  
-    // ==================================================  
-
-    pedidos =  
-        pedidos.map(  
-            function(pedido) {  
-
-                return {  
-
-                    ...pedido,  
-
-                    idPedido:  
-                        pedido.idPedido || "",  
-
-                    data:  
-                        pedido.data || "",  
-
-                    responsavel:  
-                        pedido.responsavel || "",  
-
-                    quantidade:  
-                        Number(  
-                            pedido.quantidade  
-                        ) || 0,  
-
-                    valorTotal:  
-                        Number(  
-                            pedido.valorTotal  
-                        ) || 0,  
-
-                    parcelas:  
-                        pedido.parcelas || "",  
-
-                    status:  
-                        pedido.status || "Não pago",  
-
-                    pago:  
-                        Number(  
-                            pedido.pago  
-                        ) || 0,  
-
-                    restante:  
-                        Number(  
-                            pedido.restante  
-                        ) || 0  
-
-                };  
-
-            }  
-        );  
+        itens =
+            Array.isArray(
+                dados.itens
+            )
+                ? dados.itens
+                : [];
 
 
-    atualizarResumo();  
+        // ==================================================
+        // NORMALIZAR OS PEDIDOS
+        // ==================================================
+
+        pedidos =
+            pedidos.map(
+                function(pedido) {
+
+                    return {
+
+                        ...pedido,
+
+                        idPedido:
+                            pedido.idPedido || "",
+
+                        data:
+                            pedido.data || "",
+
+                        responsavel:
+                            pedido.responsavel || "",
+
+                        quantidade:
+                            Number(
+                                pedido.quantidade
+                            ) || 0,
+
+                        valorTotal:
+                            Number(
+                                pedido.valorTotal
+                            ) || 0,
+
+                        parcelas:
+                            pedido.parcelas || "",
+
+                        status:
+                            pedido.status || "Não pago",
+
+                        pago:
+                            Number(
+                                pedido.pago
+                            ) || 0,
+
+                        restante:
+                            Number(
+                                pedido.restante
+                            ) || 0
+
+                    };
+
+                }
+            );
 
 
-    console.log(  
-        "PEDIDOS NORMALIZADOS:",  
-        pedidos  
-    );  
+        atualizarResumo();
 
 
-} catch (erro) {  
-
-    console.error(  
-        "ERRO AO CARREGAR ADMIN:",  
-        erro  
-    );  
+        console.log(
+            "PEDIDOS NORMALIZADOS:",
+            pedidos
+        );
 
 
-    mostrarMensagem(  
-        "Não foi possível carregar os dados da administração."  
-    );  
+    }
+
+    catch (erro) {
+
+        console.error(
+            "ERRO AO CARREGAR ADMIN:",
+            erro
+        );
+
+
+        mostrarMensagem(
+            "Não foi possível carregar os dados da administração."
+        );
+
+    }
 
 }
 
-}
 
 // ======================================================
 // PEGAR VALOR TOTAL
 // ======================================================
 
 function obterValorTotalPedido(
-pedido
+    pedido
 ) {
 
-return Number(  
-    pedido?.valorTotal  
-) || 0;
+    return Number(
+        pedido?.valorTotal
+    ) || 0;
 
 }
+
 
 // ======================================================
 // PEGAR VALOR PAGO
 // ======================================================
 
 function obterValorPagoPedido(
-pedido
+    pedido
 ) {
 
-return Number(  
-    pedido?.pago  
-) || 0;
+    return Number(
+        pedido?.pago
+    ) || 0;
 
 }
+
 
 // ======================================================
 // CALCULAR RESTANTE
 // ======================================================
 
 function obterRestantePedido(
-pedido
+    pedido
 ) {
 
-const total =  
-    obterValorTotalPedido(  
-        pedido  
-    );  
+    const total =
+        obterValorTotalPedido(
+            pedido
+        );
 
 
-const pago =  
-    obterValorPagoPedido(  
-        pedido  
-    );  
+    const pago =
+        obterValorPagoPedido(
+            pedido
+        );
 
 
-const restanteCalculado =  
-    Math.max(  
-        total - pago,  
-        0  
-    );  
+    const restanteCalculado =
+        Math.max(
+            total - pago,
+            0
+        );
 
 
-return restanteCalculado;
+    return restanteCalculado;
 
 }
+
 
 // ======================================================
 // OBTER STATUS CORRETO
 // ======================================================
 
 function obterStatusPedido(
-pedido
+    pedido
 ) {
 
-const total =  
-    obterValorTotalPedido(  
-        pedido  
-    );  
+    const total =
+        obterValorTotalPedido(
+            pedido
+        );
 
 
-const pago =  
-    obterValorPagoPedido(  
-        pedido  
-    );  
+    const pago =
+        obterValorPagoPedido(
+            pedido
+        );
 
 
-const restante =  
-    obterRestantePedido(  
-        pedido  
-    );  
+    const restante =
+        obterRestantePedido(
+            pedido
+        );
 
 
-if (  
-    total <= 0  
-) {  
+    if (
+        total <= 0
+    ) {
 
-    return "Sem valor";  
+        return "Sem valor";
 
-}  
-
-
-if (  
-    restante <= 0  
-) {  
-
-    return "Pago";  
-
-}  
+    }
 
 
-if (  
-    pago > 0  
-) {  
+    if (
+        restante <= 0
+    ) {
 
-    return "Pagamento parcial";  
+        return "Pago";
 
-}  
+    }
 
 
-return "Não pago";
+    if (
+        pago > 0
+    ) {
+
+        return "Pagamento parcial";
+
+    }
+
+
+    return "Não pago";
 
 }
+
 
 // ======================================================
 // ATUALIZAR RESUMO FINANCEIRO
@@ -270,178 +284,179 @@ return "Não pago";
 
 function atualizarResumo() {
 
-const totalPedidos =  
-    document.getElementById(  
-        "totalPedidos"  
-    );  
+    const totalPedidos =
+        document.getElementById(
+            "totalPedidos"
+        );
 
 
-const totalUniformes =  
-    document.getElementById(  
-        "totalUniformes"  
-    );  
+    const totalUniformes =
+        document.getElementById(
+            "totalUniformes"
+        );
 
 
-const valorTotal =  
-    document.getElementById(  
-        "valorTotal"  
-    );  
+    const valorTotal =
+        document.getElementById(
+            "valorTotal"
+        );
 
 
-const valorPendente =  
-    document.getElementById(  
-        "valorPendente"  
-    );  
+    const valorPendente =
+        document.getElementById(
+            "valorPendente"
+        );
 
 
-const valorRecebido =  
-    document.getElementById(  
-        "valorRecebido"  
-    );  
+    const valorRecebido =
+        document.getElementById(
+            "valorRecebido"
+        );
 
 
-const parciais =  
-    document.getElementById(  
-        "pedidosParciais"  
-    );  
+    const parciais =
+        document.getElementById(
+            "pedidosParciais"
+        );
 
 
-const naoPagos =  
-    document.getElementById(  
-        "pedidosNaoPagos"  
-    );  
+    const naoPagos =
+        document.getElementById(
+            "pedidosNaoPagos"
+        );
 
 
-let totalVendido = 0;  
+    let totalVendido = 0;
 
-let totalRecebido = 0;  
+    let totalRecebido = 0;
 
-let totalAberto = 0;  
+    let totalAberto = 0;
 
-let pedidosParciais = 0;  
+    let pedidosParciais = 0;
 
-let pedidosNaoPagos = 0;  
+    let pedidosNaoPagos = 0;
 
 
-pedidos.forEach(  
-    function(pedido) {  
+    pedidos.forEach(
+        function(pedido) {
 
-        const total =  
-            obterValorTotalPedido(  
-                pedido  
-            );  
+            const total =
+                obterValorTotalPedido(
+                    pedido
+                );
 
 
-        const pago =  
-            obterValorPagoPedido(  
-                pedido  
-            );  
+            const pago =
+                obterValorPagoPedido(
+                    pedido
+                );
 
 
-        const restante =  
-            obterRestantePedido(  
-                pedido  
-            );  
+            const restante =
+                obterRestantePedido(
+                    pedido
+                );
 
 
-        totalVendido +=  
-            total;  
+            totalVendido +=
+                total;
 
 
-        totalRecebido +=  
-            pago;  
+            totalRecebido +=
+                pago;
 
 
-        totalAberto +=  
-            restante;  
+            totalAberto +=
+                restante;
 
 
-        if (  
-            total > 0 &&  
-            pago > 0 &&  
-            restante > 0  
-        ) {  
+            if (
+                total > 0 &&
+                pago > 0 &&
+                restante > 0
+            ) {
 
-            pedidosParciais++;  
+                pedidosParciais++;
 
-        }  
+            }
 
 
-        else if (  
-            total > 0 &&  
-            pago <= 0  
-        ) {  
+            else if (
+                total > 0 &&
+                pago <= 0
+            ) {
 
-            pedidosNaoPagos++;  
+                pedidosNaoPagos++;
 
-        }  
+            }
 
-    }  
-);  
+        }
+    );
 
 
-if (totalPedidos) {  
+    if (totalPedidos) {
 
-    totalPedidos.innerText =  
-        pedidos.length;  
+        totalPedidos.innerText =
+            pedidos.length;
 
-}  
+    }
 
 
-if (totalUniformes) {  
+    if (totalUniformes) {
 
-    totalUniformes.innerText =  
-        itens.length;  
+        totalUniformes.innerText =
+            itens.length;
 
-}  
+    }
 
 
-if (valorTotal) {  
+    if (valorTotal) {
 
-    valorTotal.innerText =  
-        formatarMoeda(  
-            totalVendido  
-        );  
+        valorTotal.innerText =
+            formatarMoeda(
+                totalVendido
+            );
 
-}  
+    }
 
 
-if (valorRecebido) {  
+    if (valorRecebido) {
 
-    valorRecebido.innerText =  
-        formatarMoeda(  
-            totalRecebido  
-        );  
+        valorRecebido.innerText =
+            formatarMoeda(
+                totalRecebido
+            );
 
-}  
+    }
 
 
-if (valorPendente) {  
+    if (valorPendente) {
 
-    valorPendente.innerText =  
-        formatarMoeda(  
-            totalAberto  
-        );  
+        valorPendente.innerText =
+            formatarMoeda(
+                totalAberto
+            );
 
-}  
+    }
 
 
-if (parciais) {  
+    if (parciais) {
 
-    parciais.innerText =  
-        pedidosParciais;  
+        parciais.innerText =
+            pedidosParciais;
 
-}  
+    }
 
 
-if (naoPagos) {  
+    if (naoPagos) {
 
-    naoPagos.innerText =  
-        pedidosNaoPagos;  
+        naoPagos.innerText =
+            pedidosNaoPagos;
 
-}  
+    }
 
 }
+
 
 // ======================================================
 // PEDIDOS
@@ -449,175 +464,176 @@ if (naoPagos) {
 
 function mostrarPedidos() {
 
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
 
-if (!area) return;  
+    if (!area) return;
 
 
-if (  
-    pedidos.length === 0  
-) {  
+    if (
+        pedidos.length === 0
+    ) {
 
-    area.innerHTML = `  
+        area.innerHTML = `
 
-        <div class="empty">  
+            <div class="empty">
 
-            Nenhum pedido encontrado.  
+                Nenhum pedido encontrado.
 
-        </div>  
+            </div>
 
-    `;  
+        `;
 
-    return;  
+        return;
 
-}  
+    }
 
 
-let html = "";  
+    let html = "";
 
 
-pedidos.forEach(  
-    function(pedido) {  
+    pedidos.forEach(
+        function(pedido) {
 
-        const status =  
-            obterStatusPedido(  
-                pedido  
-            );  
+            const status =
+                obterStatusPedido(
+                    pedido
+                );
 
 
-        const total =  
-            obterValorTotalPedido(  
-                pedido  
-            );  
+            const total =
+                obterValorTotalPedido(
+                    pedido
+                );
 
 
-        const pago =  
-            obterValorPagoPedido(  
-                pedido  
-            );  
+            const pago =
+                obterValorPagoPedido(
+                    pedido
+                );
 
 
-        const restante =  
-            obterRestantePedido(  
-                pedido  
-            );  
+            const restante =
+                obterRestantePedido(
+                    pedido
+                );
 
 
-        html += `  
+            html += `
 
-            <div class="card">  
+                <div class="card">
 
-                <h3>  
+                    <h3>
 
-                    Pedido  
-                    ${pedido.idPedido || ""}  
+                        Pedido
+                        ${pedido.idPedido || ""}
 
-                </h3>  
+                    </h3>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Data:  
-                    </strong>  
+                        <strong>
+                            Data:
+                        </strong>
 
-                    ${pedido.data || ""}  
+                        ${pedido.data || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Responsável:  
-                    </strong>  
+                        <strong>
+                            Responsável:
+                        </strong>
 
-                    ${pedido.responsavel || ""}  
+                        ${pedido.responsavel || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Quantidade:  
-                    </strong>  
+                        <strong>
+                            Quantidade:
+                        </strong>
 
-                    ${pedido.quantidade || 0}  
+                        ${pedido.quantidade || 0}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Valor:  
-                    </strong>  
+                        <strong>
+                            Valor:
+                        </strong>
 
-                    ${formatarMoeda(total)}  
+                        ${formatarMoeda(total)}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Pago:  
-                    </strong>  
+                        <strong>
+                            Pago:
+                        </strong>
 
-                    ${formatarMoeda(pago)}  
+                        ${formatarMoeda(pago)}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Restante:  
-                    </strong>  
+                        <strong>
+                            Restante:
+                        </strong>
 
-                    ${formatarMoeda(restante)}  
+                        ${formatarMoeda(restante)}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Parcelas:  
-                    </strong>  
+                        <strong>
+                            Parcelas:
+                        </strong>
 
-                    ${pedido.parcelas || ""}  
+                        ${pedido.parcelas || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Status:  
-                    </strong>  
+                        <strong>
+                            Status:
+                        </strong>
 
-                    ${status}  
+                        ${status}
 
-                </p>  
+                    </p>
 
-            </div>  
+                </div>
 
-        `;  
+            `;
 
-    }  
-);  
+        }
+    );
 
 
-area.innerHTML =  
-    html;
+    area.innerHTML =
+        html;
 
 }
+
 
 // ======================================================
 // MODELO
@@ -625,58 +641,59 @@ area.innerHTML =
 
 function obterModelo(item) {
 
-if (!item) return "";  
+    if (!item) return "";
 
 
-const possibilidades = [  
+    const possibilidades = [
 
-    item.modelo,  
+        item.modelo,
 
-    item.modeloCamisa,  
+        item.modeloCamisa,
 
-    item["Modelo"],  
+        item["Modelo"],
 
-    item["MODELO"],  
+        item["MODELO"],
 
-    item["Modelo da camisa"],  
+        item["Modelo da camisa"],
 
-    item["Modelo da Camisa"],  
+        item["Modelo da Camisa"],
 
-    item["modelo da camisa"],  
+        item["modelo da camisa"],
 
-    item["modeloCamisa"]  
+        item["modeloCamisa"]
 
-];  
-
-
-for (  
-    let i = 0;  
-    i < possibilidades.length;  
-    i++  
-) {  
-
-    const valor =  
-        possibilidades[i];  
+    ];
 
 
-    if (  
-        valor !== undefined &&  
-        valor !== null &&  
-        String(valor).trim() !== ""  
-    ) {  
+    for (
+        let i = 0;
+        i < possibilidades.length;
+        i++
+    ) {
 
-        return String(  
-            valor  
-        ).trim();  
-
-    }  
-
-}  
+        const valor =
+            possibilidades[i];
 
 
-return "Não informado";
+        if (
+            valor !== undefined &&
+            valor !== null &&
+            String(valor).trim() !== ""
+        ) {
+
+            return String(
+                valor
+            ).trim();
+
+        }
+
+    }
+
+
+    return "Não informado";
 
 }
+
 
 // ======================================================
 // UNIFORMES
@@ -684,170 +701,171 @@ return "Não informado";
 
 function mostrarUniformes() {
 
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
 
-if (!area) return;  
+    if (!area) return;
 
 
-if (  
-    itens.length === 0  
-) {  
+    if (
+        itens.length === 0
+    ) {
 
-    area.innerHTML = `  
+        area.innerHTML = `
 
-        <div class="empty">  
+            <div class="empty">
 
-            Nenhum uniforme encontrado.  
+                Nenhum uniforme encontrado.
 
-        </div>  
+            </div>
 
-    `;  
+        `;
 
-    return;  
+        return;
 
-}  
+    }
 
 
-let html = "";  
+    let html = "";
 
 
-itens.forEach(  
-    function(item, index) {  
+    itens.forEach(
+        function(item, index) {
 
-        const modelo =  
-            obterModelo(item);  
+            const modelo =
+                obterModelo(item);
 
 
-        html += `  
+            html += `
 
-            <div class="card">  
+                <div class="card">
 
-                <h3>  
+                    <h3>
 
-                    Uniforme  
-                    ${index + 1}  
+                        Uniforme
+                        ${index + 1}
 
-                </h3>  
+                    </h3>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Nome:  
-                    </strong>  
+                        <strong>
+                            Nome:
+                        </strong>
 
-                    ${item.nome || ""}  
+                        ${item.nome || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Número:  
-                    </strong>  
+                        <strong>
+                            Número:
+                        </strong>
 
-                    ${item.numero || ""}  
+                        ${item.numero || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Categoria:  
-                    </strong>  
+                        <strong>
+                            Categoria:
+                        </strong>
 
-                    ${item.categoria || ""}  
+                        ${item.categoria || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Função:  
-                    </strong>  
+                        <strong>
+                            Função:
+                        </strong>
 
-                    ${item.funcao || ""}  
+                        ${item.funcao || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Modelo:  
-                    </strong>  
+                        <strong>
+                            Modelo:
+                        </strong>
 
-                    ${modelo}  
+                        ${modelo}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Tamanho da camisa:  
-                    </strong>  
+                        <strong>
+                            Tamanho da camisa:
+                        </strong>
 
-                    ${item.tamanhoCamisa || ""}  
+                        ${item.tamanhoCamisa || ""}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Peça inferior:  
-                    </strong>  
+                        <strong>
+                            Peça inferior:
+                        </strong>
 
-                    ${item.inferior || "Nenhum"}  
+                        ${item.inferior || "Nenhum"}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Tamanho inferior:  
-                    </strong>  
+                        <strong>
+                            Tamanho inferior:
+                        </strong>
 
-                    ${item.tamanhoInferior || "N/A"}  
+                        ${item.tamanhoInferior || "N/A"}
 
-                </p>  
+                    </p>
 
 
-                <p>  
+                    <p>
 
-                    <strong>  
-                        Valor:  
-                    </strong>  
+                        <strong>
+                            Valor:
+                        </strong>
 
-                    ${formatarMoeda(  
-                        Number(  
-                            item.valor  
-                        ) || 0  
-                    )}  
+                        ${formatarMoeda(
+                            Number(
+                                item.valor
+                            ) || 0
+                        )}
 
-                </p>  
+                    </p>
 
-            </div>  
+                </div>
 
-        `;  
+            `;
 
-    }  
-);  
+        }
+    );
 
 
-area.innerHTML =  
-    html;
+    area.innerHTML =
+        html;
 
 }
+
 
 // ======================================================
 // PAGAMENTOS
@@ -855,538 +873,568 @@ area.innerHTML =
 
 function mostrarPagamentos() {
 
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
 
-if (!area) return;  
+    if (!area) return;
 
 
-if (  
-    pedidos.length === 0  
-) {  
+    if (
+        pedidos.length === 0
+    ) {
 
-    area.innerHTML = `  
+        area.innerHTML = `
 
-        <div class="empty">  
+            <div class="empty">
 
-            Nenhum pagamento encontrado.  
+                Nenhum pagamento encontrado.
 
-        </div>  
+            </div>
 
-    `;  
+        `;
 
-    return;  
+        return;
 
-}  
+    }
 
 
-let html = "";  
+    let html = "";
 
 
-pedidos.forEach(  
-    function(pedido, index) {  
+    pedidos.forEach(
+        function(pedido, index) {
 
-        const total =  
-            obterValorTotalPedido(  
-                pedido  
-            );  
+            const total =
+                obterValorTotalPedido(
+                    pedido
+                );
 
 
-        const pago =  
-            obterValorPagoPedido(  
-                pedido  
-            );  
+            const pago =
+                obterValorPagoPedido(
+                    pedido
+                );
 
 
-        const restante =  
-            obterRestantePedido(  
-                pedido  
-            );  
+            const restante =
+                obterRestantePedido(
+                    pedido
+                );
 
 
-        const status =  
-            obterStatusPedido(  
-                pedido  
-            );  
+            const status =
+                obterStatusPedido(
+                    pedido
+                );
 
 
-        let classeStatus = '';  
-        let iconeStatus = '';  
+            let classeStatus = '';
 
-        if (status === 'Pago' || status.includes('🟢')) {  
-            classeStatus = 'pago';  
-            iconeStatus = '🟢';  
-        } else if (status === 'Pagamento parcial' || status.includes('🟡')) {  
-            classeStatus = 'parcial';  
-            iconeStatus = '🟡';  
-        } else {  
-            classeStatus = 'nao-pago';  
-            iconeStatus = '🔴';  
-        }  
+            let iconeStatus = '';
 
 
-        html += `  
+            if (
+                status === 'Pago' ||
+                status.includes('🟢')
+            ) {
 
-            <div  
-                class="pagamento-card"  
-            >  
+                classeStatus =
+                    'pago';
 
-                <h3>  
+                iconeStatus =
+                    '🟢';
 
-                    💰 Pedido  
-                    ${pedido.idPedido || ""}  
+            }
 
-                </h3>  
+            else if (
+                status === 'Pagamento parcial' ||
+                status.includes('🟡')
+            ) {
 
+                classeStatus =
+                    'parcial';
 
-                <div  
-                    class="pagamento-linha"  
-                >  
+                iconeStatus =
+                    '🟡';
 
-                    <strong>  
-                        Responsável:  
-                    </strong>  
+            }
 
-                    ${pedido.responsavel || ""}  
+            else {
 
-                </div>  
+                classeStatus =
+                    'nao-pago';
 
+                iconeStatus =
+                    '🔴';
 
-                <div  
-                    class="pagamento-linha"  
-                >  
+            }
 
-                    <strong>  
-                        Valor total:  
-                    </strong>  
 
-                    ${formatarMoeda(total)}  
+            html += `
 
-                </div>  
+                <div
+                    class="pagamento-card"
+                >
 
+                    <h3>
 
-                <div  
-                    class="pagamento-linha"  
-                >  
+                        💰 Pedido
+                        ${pedido.idPedido || ""}
 
-                    <strong>  
-                        Já pago:  
-                    </strong>  
+                    </h3>
 
-                    ${formatarMoeda(pago)}  
 
-                </div>  
+                    <div
+                        class="pagamento-linha"
+                    >
 
+                        <strong>
+                            Responsável:
+                        </strong>
 
-                <div  
-                    class="pagamento-linha"  
-                >  
+                        ${pedido.responsavel || ""}
 
-                    <strong>  
-                        Restante:  
-                    </strong>  
+                    </div>
 
-                    <span  
-                        id="restante-${index}"  
-                    >  
-                        ${formatarMoeda(restante)}  
-                    </span>  
 
-                </div>  
+                    <div
+                        class="pagamento-linha"
+                    >
 
+                        <strong>
+                            Valor total:
+                        </strong>
 
-                <div  
-                    class="pagamento-linha"  
-                >  
+                        ${formatarMoeda(total)}
 
-                    <strong>  
-                        Status:  
-                    </strong>  
+                    </div>
 
-                    <span  
-                        id="status-${index}"  
-                        class="pagamento-status ${classeStatus}"  
-                    >  
-                        ${iconeStatus} ${status.replace(/^[🟢🟡🔴]\s*/, '')}  
-                    </span>  
 
-                </div>  
+                    <div
+                        class="pagamento-linha"
+                    >
 
+                        <strong>
+                            Já pago:
+                        </strong>
 
-                ${  
-                    restante > 0  
+                        ${formatarMoeda(pago)}
 
-                    ?  
+                    </div>
 
-                    `  
 
-                    <div  
-                        class="pagamento-form"  
-                    >  
+                    <div
+                        class="pagamento-linha"
+                    >
 
-                        <label>  
+                        <strong>
+                            Restante:
+                        </strong>
 
-                            Valor recebido agora  
+                        <span
+                            id="restante-${index}"
+                        >
+                            ${formatarMoeda(restante)}
+                        </span>
 
-                        </label>  
+                    </div>
 
 
-                        <input  
+                    <div
+                        class="pagamento-linha"
+                    >
 
-                            type="number"  
+                        <strong>
+                            Status:
+                        </strong>
 
-                            id="pagamento-${index}"  
+                        <span
+                            id="status-${index}"
+                            class="pagamento-status ${classeStatus}"
+                        >
+                            ${iconeStatus}
+                            ${status.replace(/^[🟢🟡🔴]\s*/, '')}
+                        </span>
 
-                            min="0"  
+                    </div>
 
-                            max="${restante}"  
 
-                            step="0.01"  
+                    ${
+                        restante > 0
 
-                            placeholder="Ex.: 25,00"  
+                        ?
 
-                        >  
+                        `
 
+                        <div
+                            class="pagamento-form"
+                        >
 
-                        <button  
+                            <label>
 
-                            type="button"  
+                                Valor recebido agora
 
-                            class="  
-                                admin-button  
-                                pagamento-registrar  
-                            "  
+                            </label>
 
-                            onclick="  
-                                registrarPagamento(  
-                                    ${index}  
-                                )  
-                            "  
 
-                        >  
+                            <input
 
-                            💰 LANÇAR PAGAMENTO  
+                                type="number"
 
-                        </button>  
+                                id="pagamento-${index}"
 
-                    </div>  
+                                min="0"
 
-                    `  
+                                max="${restante}"
 
-                    :  
+                                step="0.01"
 
-                    `  
+                                placeholder="Ex.: 25,00"
 
-                    <div  
-                        style="  
-                            margin-top:15px;  
-                            padding:12px;  
-                            background:#e8f5e9;  
-                            border-radius:10px;  
-                            text-align:center;  
-                            font-weight:bold;  
-                        "  
-                    >  
+                            >
 
-                        ✅ Pedido totalmente pago  
 
-                    </div>  
+                            <button
 
-                    `  
-                }  
+                                type="button"
 
-            </div>  
+                                class="
+                                    admin-button
+                                    pagamento-registrar
+                                "
 
-        `;  
+                                onclick="
+                                    registrarPagamento(
+                                        ${index}
+                                    )
+                                "
 
-    }  
-);  
+                            >
 
+                                💰 LANÇAR PAGAMENTO
 
-area.innerHTML =  
-    html;
+                            </button>
+
+                        </div>
+
+                        `
+
+                        :
+
+                        `
+
+                        <div
+                            style="
+                                margin-top:15px;
+                                padding:12px;
+                                background:#e8f5e9;
+                                border-radius:10px;
+                                text-align:center;
+                                font-weight:bold;
+                            "
+                        >
+
+                            ✅ Pedido totalmente pago
+
+                        </div>
+
+                        `
+                    }
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    area.innerHTML =
+        html;
 
 }
+
 
 // ======================================================
 // REGISTRAR PAGAMENTO
 // ======================================================
 
 async function registrarPagamento(
-index
+    index
 ) {
 
-const pedido =  
-    pedidos[index];  
+    const pedido =
+        pedidos[index];
 
 
-if (!pedido) {  
+    if (!pedido) {
 
-    alert(  
-        "Pedido não encontrado."  
-    );  
+        alert(
+            "Pedido não encontrado."
+        );
 
-    return;  
+        return;
 
-}  
+    }
 
 
-const campo =  
-    document.getElementById(  
-        `pagamento-${index}`  
-    );  
+    const campo =
+        document.getElementById(
+            `pagamento-${index}`
+        );
 
 
-if (!campo) {  
+    if (!campo) {
 
-    alert(  
-        "Campo de pagamento não encontrado."  
-    );  
+        alert(
+            "Campo de pagamento não encontrado."
+        );
 
-    return;  
+        return;
 
-}  
+    }
 
 
-const valor =  
-    Number(  
-        String(  
-            campo.value  
-        )  
-        .replace(",", ".")  
-    );  
+    const valor =
+        Number(
+            String(
+                campo.value
+            )
+            .replace(",", ".")
+        );
 
 
-if (  
-    !valor ||  
-    valor <= 0  
-) {  
+    if (
+        !valor ||
+        valor <= 0
+    ) {
 
-    alert(  
-        "Digite um valor de pagamento."  
-    );  
+        alert(
+            "Digite um valor de pagamento."
+        );
 
-    return;  
+        return;
 
-}  
+    }
 
 
-const total =  
-    obterValorTotalPedido(  
-        pedido  
-    );  
+    const total =
+        obterValorTotalPedido(
+            pedido
+        );
 
 
-const pagoAtual =  
-    obterValorPagoPedido(  
-        pedido  
-    );  
+    const pagoAtual =
+        obterValorPagoPedido(
+            pedido
+        );
 
 
-const restanteAtual =  
-    obterRestantePedido(  
-        pedido  
-    );  
+    const restanteAtual =
+        obterRestantePedido(
+            pedido
+        );
 
 
-if (  
-    valor > restanteAtual  
-) {  
+    if (
+        valor > restanteAtual
+    ) {
 
-    alert(  
-        "O valor informado é maior que o restante do pedido."  
-    );  
+        alert(
+            "O valor informado é maior que o restante do pedido."
+        );
 
-    return;  
+        return;
 
-}  
+    }
 
 
-const novoPago =  
-    pagoAtual + valor;  
+    const novoPago =
+        pagoAtual + valor;
 
 
-const novoRestante =  
-    Math.max(  
-        total - novoPago,  
-        0  
-    );  
+    const novoRestante =
+        Math.max(
+            total - novoPago,
+            0
+        );
 
 
-const novoStatus =  
-    novoRestante <= 0  
-        ? "Pago"  
-        : "Pagamento parcial";  
+    const novoStatus =
+        novoRestante <= 0
+            ? "Pago"
+            : "Pagamento parcial";
 
 
-const botao =  
-    campo.parentElement  
-        ?.querySelector(  
-            "button"  
-        );  
+    const botao =
+        campo.parentElement
+            ?.querySelector(
+                "button"
+            );
 
 
-if (botao) {  
+    if (botao) {
 
-    botao.disabled =  
-        true;  
+        botao.disabled =
+            true;
 
-    botao.innerText =  
-        "⏳ REGISTRANDO...";  
+        botao.innerText =
+            "⏳ REGISTRANDO...";
 
-}  
+    }
 
 
-try {  
+    try {
 
-    const corpo = {  
+        const corpo = {
 
-        acao:  
-            "registrarPagamento",  
+            acao:
+                "registrarPagamento",
 
-        idPedido:  
-            String(  
-                pedido.idPedido || ""  
-            ),  
+            idPedido:
+                String(
+                    pedido.idPedido || ""
+                ),
 
-        responsavel:  
-            String(  
-                pedido.responsavel || ""  
-            ),  
+            responsavel:
+                String(
+                    pedido.responsavel || ""
+                ),
 
-        valorPago:  
-            Number(  
-                valor.toFixed(2)  
-            )  
+            valorPago:
+                Number(
+                    valor.toFixed(2)
+                )
 
-    };  
+        };
 
 
-    const resposta =  
-        await fetch(  
-            URL_APPS_SCRIPT,  
-            {  
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT,
+                {
 
-                method:  
-                    "POST",  
+                    method:
+                        "POST",
 
-                headers: {  
+                    headers: {
 
-                    "Content-Type":  
-                        "text/plain;charset=utf-8"  
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
 
-                },  
+                    },
 
-                body:  
-                    JSON.stringify(  
-                        corpo  
-                    )  
+                    body:
+                        JSON.stringify(
+                            corpo
+                        )
 
-            }  
-        );  
+                }
+            );
 
 
-    const dados =  
-        await resposta.json();  
+        const dados =
+            await resposta.json();
 
 
-    if (  
-        !dados ||  
-        dados.result !== "success"  
-    ) {  
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
 
-        throw new Error(  
-            dados?.message ||  
-            "O pagamento não foi registrado."  
-        );  
+            throw new Error(
+                dados?.message ||
+                "O pagamento não foi registrado."
+            );
 
-    }  
+        }
 
 
-    pedido.status =  
-        dados.status ||  
-        novoStatus;  
+        pedido.status =
+            dados.status ||
+            novoStatus;
 
 
-    pedido.pago =  
-        Number(  
-            dados.pago  
-        );  
+        pedido.pago =
+            Number(
+                dados.pago
+            );
 
 
-    pedido.restante =  
-        Number(  
-            dados.restante  
-        );  
+        pedido.restante =
+            Number(
+                dados.restante
+            );
 
 
-    if (  
-        Number.isNaN(  
-            pedido.pago  
-        )  
-    ) {  
+        if (
+            Number.isNaN(
+                pedido.pago
+            )
+        ) {
 
-        pedido.pago =  
-            novoPago;  
+            pedido.pago =
+                novoPago;
 
-    }  
+        }
 
 
-    if (  
-        Number.isNaN(  
-            pedido.restante  
-        )  
-    ) {  
+        if (
+            Number.isNaN(
+                pedido.restante
+            )
+        ) {
 
-        pedido.restante =  
-            novoRestante;  
+            pedido.restante =
+                novoRestante;
 
-    }  
+        }
 
 
-    atualizarResumo();  
+        atualizarResumo();
 
 
-    mostrarPagamentos();  
+        mostrarPagamentos();
 
 
-    alert(  
-        "Pagamento registrado com sucesso!"  
-    );  
+        alert(
+            "Pagamento registrado com sucesso!"
+        );
 
 
-}  
+    }
 
-catch (erro) {  
+    catch (erro) {
 
-    console.error(  
-        "ERRO AO REGISTRAR PAGAMENTO:",  
-        erro  
-    );  
+        console.error(
+            "ERRO AO REGISTRAR PAGAMENTO:",
+            erro
+        );
 
 
-    alert(  
-        "Não foi possível registrar o pagamento.\n\n" +  
-        erro.message  
-    );  
+        alert(
+            "Não foi possível registrar o pagamento.\n\n" +
+            erro.message
+        );
 
 
-    if (botao) {  
+        if (botao) {
 
-        botao.disabled =  
-            false;  
+            botao.disabled =
+                false;
 
-        botao.innerText =  
-            "💰 LANÇAR PAGAMENTO";  
+            botao.innerText =
+                "💰 LANÇAR PAGAMENTO";
 
-    }  
+        }
+
+    }
 
 }
 
-}
 
 // ======================================================
 // PRODUÇÃO
@@ -1394,371 +1442,374 @@ catch (erro) {
 
 function mostrarProducao() {
 
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
 
-if (!area) return;  
+    if (!area) return;
 
 
-if (  
-    !itens ||  
-    itens.length === 0  
-) {  
+    if (
+        !itens ||
+        itens.length === 0
+    ) {
 
-    area.innerHTML = `  
+        area.innerHTML = `
 
-        <div class="empty">  
+            <div class="empty">
 
-            Nenhum uniforme encontrado  
-            para produção.  
+                Nenhum uniforme encontrado
+                para produção.
 
-        </div>  
+            </div>
 
-    `;  
+        `;
 
-    return;  
+        return;
 
-}  
+    }
 
 
-const totalUniformes =  
-    itens.length;  
+    const totalUniformes =
+        itens.length;
 
 
-let totalCamisas = 0;  
+    let totalCamisas = 0;
 
-let totalBabyLook = 0;  
+    let totalBabyLook = 0;
 
-let totalInferiores = 0;  
+    let totalInferiores = 0;
 
 
-itens.forEach(  
-    function(item) {  
+    itens.forEach(
+        function(item) {
 
-        const modelo =  
-            obterModelo(item)  
-                .toLowerCase();  
+            const modelo =
+                obterModelo(item)
+                    .toLowerCase();
 
 
-        if (  
-            modelo.includes("baby")  
-        ) {  
+            if (
+                modelo.includes("baby")
+            ) {
 
-            totalBabyLook++;  
+                totalBabyLook++;
 
-        }  
+            }
 
-        else {  
+            else {
 
-            totalCamisas++;  
+                totalCamisas++;
 
-        }  
+            }
 
 
-        const inferior =  
-            String(  
-                item.inferior || ""  
-            )  
-            .trim()  
-            .toLowerCase();  
+            const inferior =
+                String(
+                    item.inferior || ""
+                )
+                .trim()
+                .toLowerCase();
 
 
-        if (  
-            inferior !== "" &&  
-            inferior !== "nenhum" &&  
-            inferior !== "n/a"  
-        ) {  
+            if (
+                inferior !== "" &&
+                inferior !== "nenhum" &&
+                inferior !== "n/a"
+            ) {
 
-            totalInferiores++;  
+                totalInferiores++;
 
-        }  
+            }
 
-    }  
-);  
+        }
+    );
 
 
-let html = `  
+    let html = `
 
-    <div class="card">  
+        <div class="card">
 
-        <h2>  
-            🏭 Lista de Produção  
-        </h2>  
+            <h2>
+                🏭 Lista de Produção
+            </h2>
 
 
-        <p>  
+            <p>
 
-            <strong>  
-                Total de uniformes:  
-            </strong>  
+                <strong>
+                    Total de uniformes:
+                </strong>
 
-            ${totalUniformes}  
+                ${totalUniformes}
 
-        </p>  
+            </p>
 
 
-        <p>  
+            <p>
 
-            <strong>  
-                Camisas:  
-            </strong>  
+                <strong>
+                    Camisas:
+                </strong>
 
-            ${totalCamisas}  
+                ${totalCamisas}
 
-        </p>  
+            </p>
 
 
-        <p>  
+            <p>
 
-            <strong>  
-                Baby Look:  
-            </strong>  
+                <strong>
+                    Baby Look:
+                </strong>
 
-            ${totalBabyLook}  
+                ${totalBabyLook}
 
-        </p>  
+            </p>
 
 
-        <p>  
+            <p>
 
-            <strong>  
-                Peças inferiores:  
-            </strong>  
+                <strong>
+                    Peças inferiores:
+                </strong>
 
-            ${totalInferiores}  
+                ${totalInferiores}
 
-        </p>  
+            </p>
 
-    </div>  
+        </div>
 
 
-    <div class="card">  
+        <div class="card">
 
-        <h3>  
-            👕 Lista  
-        </h3>  
+            <h3>
+                👕 Lista
+            </h3>
 
 
-        <div  
-            style="  
-                overflow-x:auto;  
-            "  
-        >  
+            <div
+                style="
+                    overflow-x:auto;
+                "
+            >
 
-            <table  
-                style="  
-                    width:100%;  
-                    border-collapse:collapse;  
-                    min-width:750px;  
-                "  
-            >  
+                <table
+                    style="
+                        width:100%;
+                        border-collapse:collapse;
+                        min-width:750px;
+                    "
+                >
 
-                <thead>  
+                    <thead>
 
-                    <tr  
-                        style="  
-                            background:#000;  
-                            color:#fff;  
-                        "  
-                    >  
+                        <tr
+                            style="
+                                background:#000;
+                                color:#fff;
+                            "
+                        >
 
-                        <th style="padding:12px;text-align:left;">  
-                            Nome  
-                        </th>  
+                            <th style="padding:12px;text-align:left;">
+                                Nome
+                            </th>
 
-                        <th style="padding:12px;text-align:center;">  
-                            Nº  
-                        </th>  
+                            <th style="padding:12px;text-align:center;">
+                                Nº
+                            </th>
 
-                        <th style="padding:12px;text-align:left;">  
-                            Função  
-                        </th>  
+                            <th style="padding:12px;text-align:left;">
+                                Função
+                            </th>
 
-                        <th style="padding:12px;text-align:left;">  
-                            Modelo  
-                        </th>  
+                            <th style="padding:12px;text-align:left;">
+                                Modelo
+                            </th>
 
-                        <th style="padding:12px;text-align:center;">  
-                            Tam. camisa  
-                        </th>  
+                            <th style="padding:12px;text-align:center;">
+                                Tam. camisa
+                            </th>
 
-                        <th style="padding:12px;text-align:left;">  
-                            Peça inferior  
-                        </th>  
+                            <th style="padding:12px;text-align:left;">
+                                Peça inferior
+                            </th>
 
-                        <th style="padding:12px;text-align:center;">  
-                            Tam. inferior  
-                        </th>  
+                            <th style="padding:12px;text-align:center;">
+                                Tam. inferior
+                            </th>
 
-                    </tr>  
+                        </tr>
 
-                </thead>  
+                    </thead>
 
 
-                <tbody>  
+                    <tbody>
 
-`;  
+    `;
 
 
-itens.forEach(  
-    function(item) {  
+    itens.forEach(
+        function(item) {
 
-        const nome =  
-            item.nome || "";  
+            const nome =
+                item.nome || "";
 
 
-        const numero =  
-            item.numero || "";  
+            const numero =
+                item.numero || "";
 
 
-        const funcao =  
-            item.funcao || "";  
+            const funcao =
+                item.funcao || "";
 
 
-        let modelo =  
-            obterModelo(item);  
+            let modelo =
+                obterModelo(item);
 
 
-        if (  
-            modelo  
-                .toLowerCase()  
-                .includes("baby")  
-        ) {  
+            if (
+                modelo
+                    .toLowerCase()
+                    .includes("baby")
+            ) {
 
-            modelo =  
-                "Baby Look";  
+                modelo =
+                    "Baby Look";
 
-        }  
+            }
 
-        else {  
+            else {
 
-            modelo =  
-                "Camisa";  
+                modelo =
+                    "Camisa";
 
-        }  
+            }
 
 
-        const tamanhoCamisa =  
-            item.tamanhoCamisa || "";  
+            const tamanhoCamisa =
+                item.tamanhoCamisa || "";
 
 
-        const inferior =  
-            item.inferior || "Nenhum";  
+            const inferior =
+                item.inferior || "Nenhum";
 
 
-        const tamanhoInferior =  
-            item.tamanhoInferior || "N/A";  
+            const tamanhoInferior =
+                item.tamanhoInferior || "N/A";
 
 
-        html += `  
+            html += `
 
-            <tr  
-                style="  
-                    border-bottom:1px solid #ddd;  
-                "  
-            >  
+                <tr
+                    style="
+                        border-bottom:1px solid #ddd;
+                    "
+                >
 
-                <td style="padding:12px;">  
-                    <strong>  
-                        ${nome}  
-                    </strong>  
-                </td>  
+                    <td style="padding:12px;">
 
+                        <strong>
+                            ${nome}
+                        </strong>
 
-                <td  
-                    style="  
-                        padding:12px;  
-                        text-align:center;  
-                        font-weight:bold;  
-                    "  
-                >  
-                    ${numero}  
-                </td>  
+                    </td>
 
 
-                <td style="padding:12px;">  
-                    ${funcao}  
-                </td>  
+                    <td
+                        style="
+                            padding:12px;
+                            text-align:center;
+                            font-weight:bold;
+                        "
+                    >
+                        ${numero}
+                    </td>
 
 
-                <td style="padding:12px;">  
-                    ${modelo}  
-                </td>  
+                    <td style="padding:12px;">
+                        ${funcao}
+                    </td>
 
 
-                <td  
-                    style="  
-                        padding:12px;  
-                        text-align:center;  
-                    "  
-                >  
-                    ${tamanhoCamisa}  
-                </td>  
+                    <td style="padding:12px;">
+                        ${modelo}
+                    </td>
 
 
-                <td style="padding:12px;">  
-                    ${inferior}  
-                </td>  
+                    <td
+                        style="
+                            padding:12px;
+                            text-align:center;
+                        "
+                    >
+                        ${tamanhoCamisa}
+                    </td>
 
 
-                <td  
-                    style="  
-                        padding:12px;  
-                        text-align:center;  
-                    "  
-                >  
-                    ${tamanhoInferior}  
-                </td>  
+                    <td style="padding:12px;">
+                        ${inferior}
+                    </td>
 
-            </tr>  
 
-        `;  
+                    <td
+                        style="
+                            padding:12px;
+                            text-align:center;
+                        "
+                    >
+                        ${tamanhoInferior}
+                    </td>
 
-    }  
-);  
+                </tr>
 
+            `;
 
-html += `  
+        }
+    );
 
-                </tbody>  
 
-            </table>  
+    html += `
 
-        </div>  
+                    </tbody>
 
-    </div>  
+                </table>
 
+            </div>
 
-    <div class="card">  
+        </div>
 
-        <button  
-            type="button"  
-            class="admin-button"  
-            style="  
-                width:100%;  
-                background:#ff007f;  
-            "  
-            onclick="  
-                exportarProducaoPlanilha()  
-            "  
-        >  
 
-            📊 EXPORTAR PARA PLANILHA  
+        <div class="card">
 
-        </button>  
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="
+                    exportarProducaoPlanilha()
+                "
+            >
 
-    </div>  
+                📊 EXPORTAR PARA PLANILHA
 
-`;  
+            </button>
 
+        </div>
 
-area.innerHTML =  
-    html;
+    `;
+
+
+    area.innerHTML =
+        html;
 
 }
+
 
 // ======================================================
 // EXPORTAR PRODUÇÃO
@@ -1766,121 +1817,122 @@ area.innerHTML =
 
 function exportarProducaoPlanilha() {
 
-if (  
-    !itens ||  
-    itens.length === 0  
-) {  
+    if (
+        !itens ||
+        itens.length === 0
+    ) {
 
-    alert(  
-        "Não há uniformes para exportar."  
-    );  
+        alert(
+            "Não há uniformes para exportar."
+        );
 
-    return;  
+        return;
 
-}  
-
-
-let csv = "";  
+    }
 
 
-csv +=  
-    "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";  
+    let csv = "";
 
 
-itens.forEach(  
-    function(item) {  
-
-        csv +=  
-            "CAMISA;" +  
-            escaparCSV(  
-                item.nome || ""  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                item.numero || ""  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                item.funcao || ""  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                obterModelo(item)  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                item.tamanhoCamisa || ""  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                item.inferior || ""  
-            ) +  
-            ";" +  
-            escaparCSV(  
-                item.tamanhoInferior || ""  
-            ) +  
-            "\n";  
-
-    }  
-);  
+    csv +=
+        "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
 
 
-const blob =  
-    new Blob(  
-        [  
-            "\uFEFF" +  
-            csv  
-        ],  
-        {  
-            type:  
-                "text/csv;charset=utf-8;"  
-        }  
-    );  
+    itens.forEach(
+        function(item) {
+
+            csv +=
+                "CAMISA;" +
+                escaparCSV(
+                    item.nome || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.numero || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.funcao || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    obterModelo(item)
+                ) +
+                ";" +
+                escaparCSV(
+                    item.tamanhoCamisa || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.inferior || ""
+                ) +
+                ";" +
+                escaparCSV(
+                    item.tamanhoInferior || ""
+                ) +
+                "\n";
+
+        }
+    );
 
 
-const url =  
-    URL.createObjectURL(  
-        blob  
-    );  
+    const blob =
+        new Blob(
+            [
+                "\uFEFF" +
+                csv
+            ],
+            {
+                type:
+                    "text/csv;charset=utf-8;"
+            }
+        );
 
 
-const link =  
-    document.createElement(  
-        "a"  
-    );  
+    const url =
+        URL.createObjectURL(
+            blob
+        );
 
 
-link.href =  
-    url;  
+    const link =
+        document.createElement(
+            "a"
+        );
 
 
-link.download =  
-    "lista-producao-volei-terapia.csv";  
+    link.href =
+        url;
 
 
-document.body.appendChild(  
-    link  
-);  
+    link.download =
+        "lista-producao-volei-terapia.csv";
 
 
-link.click();  
+    document.body.appendChild(
+        link
+    );
 
 
-document.body.removeChild(  
-    link  
-);  
+    link.click();
 
 
-URL.revokeObjectURL(  
-    url  
-);  
+    document.body.removeChild(
+        link
+    );
 
 
-alert(  
-    "Lista de produção exportada com sucesso!"  
-);
+    URL.revokeObjectURL(
+        url
+    );
+
+
+    alert(
+        "Lista de produção exportada com sucesso!"
+    );
 
 }
+
 
 // ======================================================
 // ESCAPAR CSV
@@ -1888,363 +1940,1284 @@ alert(
 
 function escaparCSV(valor) {
 
-if (  
-    valor === undefined ||  
-    valor === null  
-) {  
+    if (
+        valor === undefined ||
+        valor === null
+    ) {
 
-    return "";  
+        return "";
 
-}  
+    }
 
 
-return String(valor)  
-    .replace(  
-        /"/g,  
-        '""'  
-    )  
-    .replace(  
-        /;/g,  
-        ","  
+    return String(valor)
+        .replace(
+            /"/g,
+            '""'
+        )
+        .replace(
+            /;/g,
+            ","
+        );
+
+}
+
+
+// ======================================================
+// ======================================================
+// CONFIGURAÇÕES
+// ======================================================
+// ======================================================
+
+
+// ======================================================
+// NORMALIZAR CONFIGURAÇÕES
+// ======================================================
+
+function normalizarConfiguracoes(
+    lista
+) {
+
+    if (
+        !Array.isArray(lista)
+    ) {
+
+        return [];
+
+    }
+
+
+    return lista
+        .map(
+            function(config) {
+
+                if (
+                    !config
+                ) {
+
+                    return null;
+
+                }
+
+
+                const item =
+                    String(
+                        config.item ??
+                        config.nome ??
+                        config.nomeItem ??
+                        ""
+                    ).trim();
+
+
+                const valor =
+                    Number(
+                        String(
+                            config.valor ??
+                            ""
+                        )
+                        .replace(
+                            ",",
+                            "."
+                        )
+                    );
+
+
+                if (
+                    item === ""
+                ) {
+
+                    return null;
+
+                }
+
+
+                return {
+
+                    item:
+                        item,
+
+                    valor:
+                        Number.isFinite(
+                            valor
+                        )
+                            ? valor
+                            : 0
+
+                };
+
+            }
+        )
+        .filter(
+            function(config) {
+
+                return config !== null;
+
+            }
+        );
+
+}
+
+
+// ======================================================
+// ENCONTRAR CONFIGURAÇÃO
+// ======================================================
+
+function obterValorConfiguracao(
+    nome
+) {
+
+    const nomeNormalizado =
+        String(
+            nome || ""
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const encontrada =
+        configuracoes.find(
+            function(config) {
+
+                return (
+                    String(
+                        config.item || ""
+                    )
+                    .trim()
+                    .toLowerCase() ===
+                    nomeNormalizado
+                );
+
+            }
+        );
+
+
+    if (
+        !encontrada
+    ) {
+
+        return 0;
+
+    }
+
+
+    return Number(
+        encontrada.valor
+    ) || 0;
+
+}
+
+
+// ======================================================
+// CARREGAR CONFIGURAÇÕES DA PLANILHA
+// ======================================================
+
+async function carregarConfiguracoes() {
+
+    try {
+
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT +
+                "?acao=consultarConfiguracoes"
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        console.log(
+            "CONFIGURAÇÕES RECEBIDAS:",
+            dados
+        );
+
+
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
+
+            throw new Error(
+                dados?.message ||
+                "Não foi possível carregar as configurações."
+            );
+
+        }
+
+
+        /*
+         * O Apps Script pode retornar:
+         *
+         * dados.configuracoes
+         *
+         * ou
+         *
+         * dados.config
+         *
+         */
+
+
+        const listaRecebida =
+            Array.isArray(
+                dados.configuracoes
+            )
+                ? dados.configuracoes
+
+                : Array.isArray(
+                    dados.config
+                )
+                    ? dados.config
+
+                    : [];
+
+
+        configuracoes =
+            normalizarConfiguracoes(
+                listaRecebida
+            );
+
+
+        console.log(
+            "CONFIGURAÇÕES NORMALIZADAS:",
+            configuracoes
+        );
+
+
+        return configuracoes;
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "ERRO AO CARREGAR CONFIGURAÇÕES:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível carregar os valores da aba Configurações.\n\n" +
+            erro.message
+        );
+
+
+        return [];
+
+    }
+
+}
+
+
+// ======================================================
+// MOSTRAR CONFIGURAÇÕES
+// ======================================================
+
+async function mostrarConfiguracoes() {
+
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
+
+
+    if (!area) return;
+
+
+    /*
+     * Primeiro mostra uma mensagem enquanto
+     * os valores são buscados na planilha.
+     */
+
+    area.innerHTML = `
+
+        <div class="card">
+
+            <h2>
+                ⚙️ Configurações
+            </h2>
+
+            <p
+                style="
+                    color:#777;
+                "
+            >
+
+                Carregando valores da planilha...
+
+            </p>
+
+        </div>
+
+    `;
+
+
+    await carregarConfiguracoes();
+
+
+    /*
+     * Se não houver nada na planilha,
+     * mostramos uma tela vazia.
+     */
+
+    if (
+        configuracoes.length === 0
+    ) {
+
+        area.innerHTML = `
+
+            <div class="card">
+
+                <h2>
+                    ⚙️ Configurações
+                </h2>
+
+
+                <p
+                    style="
+                        color:#777;
+                    "
+                >
+
+                    Nenhuma configuração encontrada
+                    na aba Configurações.
+
+                </p>
+
+
+                <p
+                    style="
+                        color:#777;
+                    "
+                >
+
+                    Confira se a aba possui:
+
+                    <br><br>
+
+                    <strong>
+                        A1 = Item
+                    </strong>
+
+                    <br>
+
+                    <strong>
+                        B1 = Valor
+                    </strong>
+
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <button
+                    type="button"
+                    class="admin-button"
+                    style="
+                        width:100%;
+                        background:#ff007f;
+                    "
+                    onclick="
+                        restaurarConfiguracoes()
+                    "
+                >
+
+                    🔄 RESTAURAR PADRÃO
+
+                </button>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = `
+
+        <div class="card">
+
+            <h2>
+                ⚙️ Configurações
+            </h2>
+
+
+            <p
+                style="
+                    color:#777;
+                "
+            >
+
+                Os valores abaixo são carregados
+                diretamente da aba
+                <strong>Configurações</strong>
+                da planilha.
+
+            </p>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                💰 Valores das peças
+            </h3>
+
+
+            <div
+                style="
+                    display:grid;
+                    gap:12px;
+                "
+            >
+
+    `;
+
+
+    configuracoes.forEach(
+        function(config, index) {
+
+            const idCampo =
+                "configValor_" +
+                index;
+
+
+            html += `
+
+                <div>
+
+                    <label
+                        for="${idCampo}"
+                        style="
+                            display:block;
+                            margin-bottom:6px;
+                            font-weight:bold;
+                        "
+                    >
+
+                        ${config.item}
+
+                    </label>
+
+
+                    <input
+
+                        id="${idCampo}"
+
+                        class="campo-configuracao"
+
+                        data-index="${index}"
+
+                        type="number"
+
+                        min="0"
+
+                        step="0.01"
+
+                        value="${Number(
+                            config.valor
+                        ).toFixed(2)}"
+
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+
+                    >
+
+                </div>
+
+            `;
+
+        }
+    );
+
+
+    html += `
+
+            </div>
+
+        </div>
+
+
+        <div class="card">
+
+            <h3>
+                🏐 Configurações do sistema
+            </h3>
+
+
+            <label
+                for="configNomeTime"
+                style="
+                    display:block;
+                    margin-bottom:6px;
+                    font-weight:bold;
+                "
+            >
+
+                Nome do time
+
+            </label>
+
+
+            <input
+
+                id="configNomeTime"
+
+                type="text"
+
+                value="Vôlei Terapia"
+
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                "
+
+            >
+
+        </div>
+
+
+        <div class="card">
+
+            <button
+
+                type="button"
+
+                class="admin-button"
+
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+
+                onclick="
+                    salvarConfiguracoes()
+                "
+
+            >
+
+                💾 SALVAR ALTERAÇÕES
+
+            </button>
+
+
+            <button
+
+                type="button"
+
+                class="admin-button"
+
+                style="
+                    width:100%;
+                    margin-top:10px;
+                    background:#555;
+                "
+
+                onclick="
+                    restaurarConfiguracoes()
+                "
+
+            >
+
+                🔄 RESTAURAR PADRÃO
+
+            </button>
+
+        </div>
+
+    `;
+
+
+    area.innerHTML =
+        html;
+
+}
+
+
+// ======================================================
+// SALVAR CONFIGURAÇÕES
+// ======================================================
+
+async function salvarConfiguracoes() {
+
+    try {
+
+        /*
+         * Se a tela ainda não tiver carregado
+         * as configurações, não tenta salvar.
+         */
+
+        if (
+            !Array.isArray(
+                configuracoes
+            ) ||
+            configuracoes.length === 0
+        ) {
+
+            alert(
+                "Nenhuma configuração carregada para salvar."
+            );
+
+            return;
+
+        }
+
+
+        const novosValores = [];
+
+
+        configuracoes.forEach(
+            function(config, index) {
+
+                const campo =
+                    document.getElementById(
+                        "configValor_" +
+                        index
+                    );
+
+
+                if (!campo) {
+
+                    return;
+
+                }
+
+
+                const valor =
+                    Number(
+                        String(
+                            campo.value
+                        )
+                        .replace(
+                            ",",
+                            "."
+                        )
+                    );
+
+
+                novosValores.push({
+
+                    item:
+                        config.item,
+
+                    valor:
+                        Number.isFinite(
+                            valor
+                        )
+                            ? Number(
+                                valor.toFixed(2)
+                            )
+                            : 0
+
+                });
+
+            }
+        );
+
+
+        if (
+            novosValores.length === 0
+        ) {
+
+            alert(
+                "Nenhum valor foi encontrado para salvar."
+            );
+
+            return;
+
+        }
+
+
+        const nomeTimeCampo =
+            document.getElementById(
+                "configNomeTime"
+            );
+
+
+        const nomeTime =
+            nomeTimeCampo
+                ? String(
+                    nomeTimeCampo.value || ""
+                ).trim()
+                : "Vôlei Terapia";
+
+
+        const botao =
+            document.querySelector(
+                'button[onclick="salvarConfiguracoes()"]'
+            );
+
+
+        if (botao) {
+
+            botao.disabled =
+                true;
+
+            botao.innerText =
+                "⏳ SALVANDO...";
+
+        }
+
+
+        /*
+         * Envia para o Apps Script.
+         *
+         * O Apps Script deverá receber:
+         *
+         * acao: "salvarConfiguracoes"
+         *
+         * configuracoes: [
+         *   {
+         *      item: "Camisa",
+         *      valor: 75
+         *   }
+         * ]
+         *
+         * nomeTime: "Vôlei Terapia"
+         */
+
+
+        const corpo = {
+
+            acao:
+                "salvarConfiguracoes",
+
+            configuracoes:
+                novosValores,
+
+            nomeTime:
+                nomeTime
+
+        };
+
+
+        console.log(
+            "ENVIANDO CONFIGURAÇÕES:",
+            corpo
+        );
+
+
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            corpo
+                        )
+
+                }
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        console.log(
+            "RESPOSTA AO SALVAR CONFIGURAÇÕES:",
+            dados
+        );
+
+
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
+
+            throw new Error(
+                dados?.message ||
+                "O Apps Script não confirmou o salvamento."
+            );
+
+        }
+
+
+        /*
+         * Atualiza o array local.
+         */
+
+        configuracoes =
+            normalizarConfiguracoes(
+                novosValores
+            );
+
+
+        alert(
+            "Configurações salvas com sucesso!"
+        );
+
+
+        /*
+         * Reabre a tela para confirmar
+         * os valores que ficaram salvos.
+         */
+
+        await mostrarConfiguracoes();
+
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "ERRO AO SALVAR CONFIGURAÇÕES:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível salvar as configurações.\n\n" +
+            erro.message
+        );
+
+
+        const botao =
+            document.querySelector(
+                'button[onclick="salvarConfiguracoes()"]'
+            );
+
+
+        if (botao) {
+
+            botao.disabled =
+                false;
+
+            botao.innerText =
+                "💾 SALVAR ALTERAÇÕES";
+
+        }
+
+    }
+
+}
+
+
+// ======================================================
+// RESTAURAR CONFIGURAÇÕES
+// ======================================================
+
+async function restaurarConfiguracoes() {
+
+    const confirmar =
+        confirm(
+            "Deseja restaurar os valores padrão?"
+        );
+
+
+    if (!confirmar) {
+
+        return;
+
+    }
+
+
+    /*
+     * Estes são os valores padrão.
+     *
+     * Se você adicionar novos itens na planilha,
+     * eles não serão apagados por esta função.
+     * Os itens existentes abaixo serão apenas
+     * recolocados nos valores padrão.
+     */
+
+    const padroes = {
+
+        "camisa":
+            75,
+
+        "baby look":
+            75,
+
+        "calção masculino":
+            35,
+
+        "calcão masculino":
+            35,
+
+        "calção feminino":
+            35,
+
+        "calcão feminino":
+            35,
+
+        "short doll":
+            30,
+
+        "suplex":
+            35,
+
+        "short suplex":
+            35
+
+    };
+
+
+    try {
+
+        const novosValores =
+            configuracoes.map(
+                function(config) {
+
+                    const nome =
+                        String(
+                            config.item || ""
+                        )
+                        .trim()
+                        .toLowerCase();
+
+
+                    let valor =
+                        Number(
+                            config.valor
+                        ) || 0;
+
+
+                    if (
+                        Object.prototype.hasOwnProperty.call(
+                            padroes,
+                            nome
+                        )
+                    ) {
+
+                        valor =
+                            padroes[nome];
+
+                    }
+
+
+                    return {
+
+                        item:
+                            config.item,
+
+                        valor:
+                            valor
+
+                    };
+
+                }
+            );
+
+
+        const botao =
+            document.querySelector(
+                'button[onclick="restaurarConfiguracoes()"]'
+            );
+
+
+        if (botao) {
+
+            botao.disabled =
+                true;
+
+            botao.innerText =
+                "⏳ RESTAURANDO...";
+
+        }
+
+
+        const corpo = {
+
+            acao:
+                "salvarConfiguracoes",
+
+            configuracoes:
+                novosValores,
+
+            nomeTime:
+                "Vôlei Terapia"
+
+        };
+
+
+        const resposta =
+            await fetch(
+                URL_APPS_SCRIPT,
+                {
+
+                    method:
+                        "POST",
+
+                    headers: {
+
+                        "Content-Type":
+                            "text/plain;charset=utf-8"
+
+                    },
+
+                    body:
+                        JSON.stringify(
+                            corpo
+                        )
+
+                }
+            );
+
+
+        const dados =
+            await resposta.json();
+
+
+        if (
+            !dados ||
+            dados.result !== "success"
+        ) {
+
+            throw new Error(
+                dados?.message ||
+                "Não foi possível restaurar os valores."
+            );
+
+        }
+
+
+        configuracoes =
+            normalizarConfiguracoes(
+                novosValores
+            );
+
+
+        alert(
+            "Valores padrão restaurados com sucesso!"
+        );
+
+
+        await mostrarConfiguracoes();
+
+
+    }
+
+    catch (erro) {
+
+        console.error(
+            "ERRO AO RESTAURAR CONFIGURAÇÕES:",
+            erro
+        );
+
+
+        alert(
+            "Não foi possível restaurar as configurações.\n\n" +
+            erro.message
+        );
+
+    }
+
+}
+
+
+// ======================================================
+// PEGAR VALOR DE UMA PEÇA
+// ======================================================
+
+function obterValorPeca(
+    nomePeca
+) {
+
+    return obterValorConfiguracao(
+        nomePeca
     );
 
 }
 
+
 // ======================================================
-// CONFIGURAÇÕES
+// FUNÇÕES DE ATALHO DOS VALORES
 // ======================================================
 
-function mostrarConfiguracoes() {
-
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
-
-
-if (!area) return;  
-
-
-area.innerHTML = `  
-
-    <div class="card">  
-
-        <h2>  
-            ⚙️ Configurações  
-        </h2>  
-
-
-        <p  
-            style="  
-                color:#777;  
-            "  
-        >  
-
-            Gerencie os valores e as principais  
-            configurações do sistema.  
-
-        </p>  
-
-    </div>  
-
-
-    <div class="card">  
-
-        <h3>  
-            💰 Valores das peças  
-        </h3>  
-
-
-        <div  
-            style="  
-                display:grid;  
-                gap:12px;  
-            "  
-        >  
-
-            <div>  
-
-                <label>  
-                    Camisa  
-                </label>  
-
-
-                <input  
-                    id="configCamisa"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="75"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-
-            <div>  
-
-                <label>  
-                    Baby Look  
-                </label>  
-
-
-                <input  
-                    id="configBabyLook"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="75"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-
-            <div>  
-
-                <label>  
-                    Calção masculino  
-                </label>  
-
-
-                <input  
-                    id="configCalcaoMasc"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="35"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-
-            <div>  
-
-                <label>  
-                    Calção feminino  
-                </label>  
-
-
-                <input  
-                    id="configCalcaoFem"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="35"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-
-            <div>  
-
-                <label>  
-                    Short Doll  
-                </label>  
-
-
-                <input  
-                    id="configShortDoll"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="30"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-
-            <div>  
-
-                <label>  
-                    Short Suplex  
-                </label>  
-
-
-                <input  
-                    id="configShortSuplex"  
-                    type="number"  
-                    min="0"  
-                    step="0.01"  
-                    value="35"  
-                    style="  
-                        width:100%;  
-                        box-sizing:border-box;  
-                        padding:12px;  
-                        border:1px solid #ccc;  
-                        border-radius:10px;  
-                        font-size:16px;  
-                    "  
-                >  
-
-            </div>  
-
-        </div>  
-
-    </div>  
-
-
-    <div class="card">  
-
-        <h3>  
-            🏐 Configurações do sistema  
-        </h3>  
-
-
-        <label>  
-            Nome do time  
-        </label>  
-
-
-        <input  
-            id="configNomeTime"  
-            type="text"  
-            value="Vôlei Terapia"  
-            style="  
-                width:100%;  
-                box-sizing:border-box;  
-                padding:12px;  
-                border:1px solid #ccc;  
-                border-radius:10px;  
-                font-size:16px;  
-            "  
-        >  
-
-    </div>  
-
-
-    <div class="card">  
-
-        <button  
-            type="button"  
-            class="admin-button"  
-            style="  
-                width:100%;  
-                background:#ff007f;  
-            "  
-            onclick="  
-                salvarConfiguracoes()  
-            "  
-        >  
-
-            💾 SALVAR ALTERAÇÕES  
-
-        </button>  
-
-
-        <button  
-            type="button"  
-            class="admin-button"  
-            style="  
-                width:100%;  
-                margin-top:10px;  
-                background:#555;  
-            "  
-            onclick="  
-                restaurarConfiguracoes()  
-            "  
-        >  
-
-            🔄 RESTAURAR PADRÃO  
-
-        </button>  
-
-    </div>  
-
-`;
+function obterValorCamisa() {
+
+    return obterValorPeca(
+        "Camisa"
+    );
 
 }
+
+
+function obterValorBabyLook() {
+
+    return obterValorPeca(
+        "Baby Look"
+    );
+
+}
+
+
+function obterValorCalcaoMasculino() {
+
+    return obterValorPeca(
+        "Calção masculino"
+    );
+
+}
+
+
+function obterValorCalcaoFeminino() {
+
+    return obterValorPeca(
+        "Calção feminino"
+    );
+
+}
+
+
+function obterValorShortDoll() {
+
+    return obterValorPeca(
+        "Short Doll"
+    );
+
+}
+
+
+function obterValorSuplex() {
+
+    let valor =
+        obterValorPeca(
+            "Suplex"
+        );
+
+
+    if (
+        valor <= 0
+    ) {
+
+        valor =
+            obterValorPeca(
+                "Short Suplex"
+            );
+
+    }
+
+
+    return valor;
+
+}
+
+
+// ======================================================
+// MOSTRAR VALORES CARREGADOS NO CONSOLE
+// ======================================================
+
+function mostrarValoresConfiguracaoNoConsole() {
+
+    console.log(
+        "VALOR CAMISA:",
+        obterValorCamisa()
+    );
+
+
+    console.log(
+        "VALOR BABY LOOK:",
+        obterValorBabyLook()
+    );
+
+
+    console.log(
+        "VALOR CALÇÃO MASCULINO:",
+        obterValorCalcaoMasculino()
+    );
+
+
+    console.log(
+        "VALOR CALÇÃO FEMININO:",
+        obterValorCalcaoFeminino()
+    );
+
+
+    console.log(
+        "VALOR SHORT DOLL:",
+        obterValorShortDoll()
+    );
+
+
+    console.log(
+        "VALOR SUPLEX:",
+        obterValorSuplex()
+    );
+
+}
+
 
 // ======================================================
 // MENSAGEM
 // ======================================================
 
 function mostrarMensagem(
-texto
+    texto
 ) {
 
-const area =  
-    document.getElementById(  
-        "conteudoAdmin"  
-    );  
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
+        );
 
 
-if (!area) return;  
+    if (!area) return;
 
 
-area.innerHTML = `  
+    area.innerHTML = `
 
-    <div class="empty">  
+        <div class="empty">
 
-        ${texto}  
+            ${texto}
 
-    </div>  
+        </div>
 
-`;
+    `;
 
 }
+
 
 // ======================================================
 // FORMATAR MOEDA
 // ======================================================
 
 function formatarMoeda(
-valor
+    valor
 ) {
 
-return Number(  
-    valor || 0  
-).toLocaleString(  
-    "pt-BR",  
-    {  
-        style:  
-            "currency",  
+    return Number(
+        valor || 0
+    ).toLocaleString(
+        "pt-BR",
+        {
+            style:
+                "currency",
 
-        currency:  
-            "BRL"  
+            currency:
+                "BRL"
 
-    }  
-);
+        }
+    );
 
 }
+
 
 // ======================================================
 // VOLTAR AO INÍCIO
@@ -2252,21 +3225,21 @@ return Number(
 
 function voltarInicio() {
 
-window.location.href =  
-    "index.html";
+    window.location.href =
+        "index.html";
 
 }
+
 
 // ======================================================
 // INICIAR ADMIN
 // ======================================================
 
 document.addEventListener(
-"DOMContentLoaded",
-function() {
+    "DOMContentLoaded",
+    function() {
 
-carregarDados();  
+        carregarDados();
 
-}
-
+    }
 );
