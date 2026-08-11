@@ -17,13 +17,6 @@ let pedidos = [];
 let itens = [];
 
 // ======================================================
-// CONFIGURAÇÕES
-// ======================================================
-
-let configuracoes = [];
-
-
-// ======================================================
 // CARREGAR DADOS
 // ======================================================
 
@@ -37,16 +30,13 @@ async function carregarDados() {
                 "?acao=admin"
             );
 
-
         const dados =
             await resposta.json();
-
 
         console.log(
             "DADOS RECEBIDOS DO APPS SCRIPT:",
             dados
         );
-
 
         if (
             !dados ||
@@ -60,7 +50,6 @@ async function carregarDados() {
 
         }
 
-
         pedidos =
             Array.isArray(
                 dados.pedidos
@@ -68,14 +57,12 @@ async function carregarDados() {
                 ? dados.pedidos
                 : [];
 
-
         itens =
             Array.isArray(
                 dados.itens
             )
                 ? dados.itens
                 : [];
-
 
         // ==================================================
         // NORMALIZAR OS PEDIDOS
@@ -112,7 +99,8 @@ async function carregarDados() {
                             pedido.parcelas || "",
 
                         status:
-                            pedido.status || "Não pago",
+                            pedido.status ||
+                            "Não pago",
 
                         pago:
                             Number(
@@ -129,15 +117,12 @@ async function carregarDados() {
                 }
             );
 
-
         atualizarResumo();
-
 
         console.log(
             "PEDIDOS NORMALIZADOS:",
             pedidos
         );
-
 
     }
 
@@ -148,7 +133,6 @@ async function carregarDados() {
             erro
         );
 
-
         mostrarMensagem(
             "Não foi possível carregar os dados da administração."
         );
@@ -156,7 +140,6 @@ async function carregarDados() {
     }
 
 }
-
 
 // ======================================================
 // PEGAR VALOR TOTAL
@@ -172,7 +155,6 @@ function obterValorTotalPedido(
 
 }
 
-
 // ======================================================
 // PEGAR VALOR PAGO
 // ======================================================
@@ -187,7 +169,6 @@ function obterValorPagoPedido(
 
 }
 
-
 // ======================================================
 // CALCULAR RESTANTE
 // ======================================================
@@ -201,12 +182,10 @@ function obterRestantePedido(
             pedido
         );
 
-
     const pago =
         obterValorPagoPedido(
             pedido
         );
-
 
     const restanteCalculado =
         Math.max(
@@ -214,11 +193,9 @@ function obterRestantePedido(
             0
         );
 
-
     return restanteCalculado;
 
 }
-
 
 // ======================================================
 // OBTER STATUS CORRETO
@@ -233,18 +210,15 @@ function obterStatusPedido(
             pedido
         );
 
-
     const pago =
         obterValorPagoPedido(
             pedido
         );
 
-
     const restante =
         obterRestantePedido(
             pedido
         );
-
 
     if (
         total <= 0
@@ -254,7 +228,6 @@ function obterStatusPedido(
 
     }
 
-
     if (
         restante <= 0
     ) {
@@ -262,7 +235,6 @@ function obterStatusPedido(
         return "Pago";
 
     }
-
 
     if (
         pago > 0
@@ -272,11 +244,9 @@ function obterStatusPedido(
 
     }
 
-
     return "Não pago";
 
 }
-
 
 // ======================================================
 // ATUALIZAR RESUMO FINANCEIRO
@@ -289,53 +259,41 @@ function atualizarResumo() {
             "totalPedidos"
         );
 
-
     const totalUniformes =
         document.getElementById(
             "totalUniformes"
         );
-
 
     const valorTotal =
         document.getElementById(
             "valorTotal"
         );
 
-
     const valorPendente =
         document.getElementById(
             "valorPendente"
         );
-
 
     const valorRecebido =
         document.getElementById(
             "valorRecebido"
         );
 
-
     const parciais =
         document.getElementById(
             "pedidosParciais"
         );
-
 
     const naoPagos =
         document.getElementById(
             "pedidosNaoPagos"
         );
 
-
     let totalVendido = 0;
-
     let totalRecebido = 0;
-
     let totalAberto = 0;
-
     let pedidosParciais = 0;
-
     let pedidosNaoPagos = 0;
-
 
     pedidos.forEach(
         function(pedido) {
@@ -345,30 +303,24 @@ function atualizarResumo() {
                     pedido
                 );
 
-
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
-
 
             const restante =
                 obterRestantePedido(
                     pedido
                 );
 
-
             totalVendido +=
                 total;
-
 
             totalRecebido +=
                 pago;
 
-
             totalAberto +=
                 restante;
-
 
             if (
                 total > 0 &&
@@ -379,7 +331,6 @@ function atualizarResumo() {
                 pedidosParciais++;
 
             }
-
 
             else if (
                 total > 0 &&
@@ -393,7 +344,6 @@ function atualizarResumo() {
         }
     );
 
-
     if (totalPedidos) {
 
         totalPedidos.innerText =
@@ -401,14 +351,12 @@ function atualizarResumo() {
 
     }
 
-
     if (totalUniformes) {
 
         totalUniformes.innerText =
             itens.length;
 
     }
-
 
     if (valorTotal) {
 
@@ -419,7 +367,6 @@ function atualizarResumo() {
 
     }
 
-
     if (valorRecebido) {
 
         valorRecebido.innerText =
@@ -428,7 +375,6 @@ function atualizarResumo() {
             );
 
     }
-
 
     if (valorPendente) {
 
@@ -439,14 +385,12 @@ function atualizarResumo() {
 
     }
 
-
     if (parciais) {
 
         parciais.innerText =
             pedidosParciais;
 
     }
-
 
     if (naoPagos) {
 
@@ -456,7 +400,6 @@ function atualizarResumo() {
     }
 
 }
-
 
 // ======================================================
 // PEDIDOS
@@ -469,9 +412,7 @@ function mostrarPedidos() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     if (
         pedidos.length === 0
@@ -491,9 +432,7 @@ function mostrarPedidos() {
 
     }
 
-
     let html = "";
-
 
     pedidos.forEach(
         function(pedido) {
@@ -503,24 +442,20 @@ function mostrarPedidos() {
                     pedido
                 );
 
-
             const total =
                 obterValorTotalPedido(
                     pedido
                 );
-
 
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
 
-
             const restante =
                 obterRestantePedido(
                     pedido
                 );
-
 
             html += `
 
@@ -533,7 +468,6 @@ function mostrarPedidos() {
 
                     </h3>
 
-
                     <p>
 
                         <strong>
@@ -543,7 +477,6 @@ function mostrarPedidos() {
                         ${pedido.data || ""}
 
                     </p>
-
 
                     <p>
 
@@ -555,7 +488,6 @@ function mostrarPedidos() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -565,7 +497,6 @@ function mostrarPedidos() {
                         ${pedido.quantidade || 0}
 
                     </p>
-
 
                     <p>
 
@@ -577,7 +508,6 @@ function mostrarPedidos() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -587,7 +517,6 @@ function mostrarPedidos() {
                         ${formatarMoeda(pago)}
 
                     </p>
-
 
                     <p>
 
@@ -599,7 +528,6 @@ function mostrarPedidos() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -609,7 +537,6 @@ function mostrarPedidos() {
                         ${pedido.parcelas || ""}
 
                     </p>
-
 
                     <p>
 
@@ -628,12 +555,10 @@ function mostrarPedidos() {
         }
     );
 
-
     area.innerHTML =
         html;
 
 }
-
 
 // ======================================================
 // MODELO
@@ -642,7 +567,6 @@ function mostrarPedidos() {
 function obterModelo(item) {
 
     if (!item) return "";
-
 
     const possibilidades = [
 
@@ -664,7 +588,6 @@ function obterModelo(item) {
 
     ];
 
-
     for (
         let i = 0;
         i < possibilidades.length;
@@ -673,7 +596,6 @@ function obterModelo(item) {
 
         const valor =
             possibilidades[i];
-
 
         if (
             valor !== undefined &&
@@ -689,11 +611,9 @@ function obterModelo(item) {
 
     }
 
-
     return "Não informado";
 
 }
-
 
 // ======================================================
 // UNIFORMES
@@ -706,9 +626,7 @@ function mostrarUniformes() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     if (
         itens.length === 0
@@ -728,16 +646,13 @@ function mostrarUniformes() {
 
     }
 
-
     let html = "";
-
 
     itens.forEach(
         function(item, index) {
 
             const modelo =
                 obterModelo(item);
-
 
             html += `
 
@@ -750,7 +665,6 @@ function mostrarUniformes() {
 
                     </h3>
 
-
                     <p>
 
                         <strong>
@@ -760,7 +674,6 @@ function mostrarUniformes() {
                         ${item.nome || ""}
 
                     </p>
-
 
                     <p>
 
@@ -772,7 +685,6 @@ function mostrarUniformes() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -782,7 +694,6 @@ function mostrarUniformes() {
                         ${item.categoria || ""}
 
                     </p>
-
 
                     <p>
 
@@ -794,7 +705,6 @@ function mostrarUniformes() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -804,7 +714,6 @@ function mostrarUniformes() {
                         ${modelo}
 
                     </p>
-
 
                     <p>
 
@@ -816,7 +725,6 @@ function mostrarUniformes() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -827,7 +735,6 @@ function mostrarUniformes() {
 
                     </p>
 
-
                     <p>
 
                         <strong>
@@ -837,7 +744,6 @@ function mostrarUniformes() {
                         ${item.tamanhoInferior || "N/A"}
 
                     </p>
-
 
                     <p>
 
@@ -860,12 +766,10 @@ function mostrarUniformes() {
         }
     );
 
-
     area.innerHTML =
         html;
 
 }
-
 
 // ======================================================
 // PAGAMENTOS
@@ -878,9 +782,7 @@ function mostrarPagamentos() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     if (
         pedidos.length === 0
@@ -900,9 +802,7 @@ function mostrarPagamentos() {
 
     }
 
-
     let html = "";
-
 
     pedidos.forEach(
         function(pedido, index) {
@@ -912,66 +812,59 @@ function mostrarPagamentos() {
                     pedido
                 );
 
-
             const pago =
                 obterValorPagoPedido(
                     pedido
                 );
-
 
             const restante =
                 obterRestantePedido(
                     pedido
                 );
 
-
             const status =
                 obterStatusPedido(
                     pedido
                 );
 
-
-            let classeStatus = '';
-
-            let iconeStatus = '';
-
+            let classeStatus = "";
+            let iconeStatus = "";
 
             if (
-                status === 'Pago' ||
-                status.includes('🟢')
+                status === "Pago" ||
+                status.includes("🟢")
             ) {
 
                 classeStatus =
-                    'pago';
+                    "pago";
 
                 iconeStatus =
-                    '🟢';
+                    "🟢";
 
             }
 
             else if (
-                status === 'Pagamento parcial' ||
-                status.includes('🟡')
+                status === "Pagamento parcial" ||
+                status.includes("🟡")
             ) {
 
                 classeStatus =
-                    'parcial';
+                    "parcial";
 
                 iconeStatus =
-                    '🟡';
+                    "🟡";
 
             }
 
             else {
 
                 classeStatus =
-                    'nao-pago';
+                    "nao-pago";
 
                 iconeStatus =
-                    '🔴';
+                    "🔴";
 
             }
-
 
             html += `
 
@@ -986,7 +879,6 @@ function mostrarPagamentos() {
 
                     </h3>
 
-
                     <div
                         class="pagamento-linha"
                     >
@@ -998,7 +890,6 @@ function mostrarPagamentos() {
                         ${pedido.responsavel || ""}
 
                     </div>
-
 
                     <div
                         class="pagamento-linha"
@@ -1012,7 +903,6 @@ function mostrarPagamentos() {
 
                     </div>
 
-
                     <div
                         class="pagamento-linha"
                     >
@@ -1025,7 +915,6 @@ function mostrarPagamentos() {
 
                     </div>
 
-
                     <div
                         class="pagamento-linha"
                     >
@@ -1037,11 +926,12 @@ function mostrarPagamentos() {
                         <span
                             id="restante-${index}"
                         >
+
                             ${formatarMoeda(restante)}
+
                         </span>
 
                     </div>
-
 
                     <div
                         class="pagamento-linha"
@@ -1055,12 +945,16 @@ function mostrarPagamentos() {
                             id="status-${index}"
                             class="pagamento-status ${classeStatus}"
                         >
+
                             ${iconeStatus}
-                            ${status.replace(/^[🟢🟡🔴]\s*/, '')}
+                            ${status.replace(
+                                /^[🟢🟡🔴]\s*/,
+                                ""
+                            )}
+
                         </span>
 
                     </div>
-
 
                     ${
                         restante > 0
@@ -1079,7 +973,6 @@ function mostrarPagamentos() {
 
                             </label>
 
-
                             <input
 
                                 type="number"
@@ -1095,7 +988,6 @@ function mostrarPagamentos() {
                                 placeholder="Ex.: 25,00"
 
                             >
-
 
                             <button
 
@@ -1151,12 +1043,10 @@ function mostrarPagamentos() {
         }
     );
 
-
     area.innerHTML =
         html;
 
 }
-
 
 // ======================================================
 // REGISTRAR PAGAMENTO
@@ -1169,7 +1059,6 @@ async function registrarPagamento(
     const pedido =
         pedidos[index];
 
-
     if (!pedido) {
 
         alert(
@@ -1180,12 +1069,10 @@ async function registrarPagamento(
 
     }
 
-
     const campo =
         document.getElementById(
             `pagamento-${index}`
         );
-
 
     if (!campo) {
 
@@ -1197,7 +1084,6 @@ async function registrarPagamento(
 
     }
 
-
     const valor =
         Number(
             String(
@@ -1205,7 +1091,6 @@ async function registrarPagamento(
             )
             .replace(",", ".")
         );
-
 
     if (
         !valor ||
@@ -1220,24 +1105,20 @@ async function registrarPagamento(
 
     }
 
-
     const total =
         obterValorTotalPedido(
             pedido
         );
-
 
     const pagoAtual =
         obterValorPagoPedido(
             pedido
         );
 
-
     const restanteAtual =
         obterRestantePedido(
             pedido
         );
-
 
     if (
         valor > restanteAtual
@@ -1251,10 +1132,8 @@ async function registrarPagamento(
 
     }
 
-
     const novoPago =
         pagoAtual + valor;
-
 
     const novoRestante =
         Math.max(
@@ -1262,19 +1141,16 @@ async function registrarPagamento(
             0
         );
 
-
     const novoStatus =
         novoRestante <= 0
             ? "Pago"
             : "Pagamento parcial";
-
 
     const botao =
         campo.parentElement
             ?.querySelector(
                 "button"
             );
-
 
     if (botao) {
 
@@ -1285,7 +1161,6 @@ async function registrarPagamento(
             "⏳ REGISTRANDO...";
 
     }
-
 
     try {
 
@@ -1311,7 +1186,6 @@ async function registrarPagamento(
 
         };
 
-
         const resposta =
             await fetch(
                 URL_APPS_SCRIPT,
@@ -1335,10 +1209,8 @@ async function registrarPagamento(
                 }
             );
 
-
         const dados =
             await resposta.json();
-
 
         if (
             !dados ||
@@ -1352,23 +1224,19 @@ async function registrarPagamento(
 
         }
 
-
         pedido.status =
             dados.status ||
             novoStatus;
-
 
         pedido.pago =
             Number(
                 dados.pago
             );
 
-
         pedido.restante =
             Number(
                 dados.restante
             );
-
 
         if (
             Number.isNaN(
@@ -1381,7 +1249,6 @@ async function registrarPagamento(
 
         }
 
-
         if (
             Number.isNaN(
                 pedido.restante
@@ -1393,17 +1260,13 @@ async function registrarPagamento(
 
         }
 
-
         atualizarResumo();
 
-
         mostrarPagamentos();
-
 
         alert(
             "Pagamento registrado com sucesso!"
         );
-
 
     }
 
@@ -1414,12 +1277,10 @@ async function registrarPagamento(
             erro
         );
 
-
         alert(
             "Não foi possível registrar o pagamento.\n\n" +
             erro.message
         );
-
 
         if (botao) {
 
@@ -1435,7 +1296,6 @@ async function registrarPagamento(
 
 }
 
-
 // ======================================================
 // PRODUÇÃO
 // ======================================================
@@ -1447,9 +1307,7 @@ function mostrarProducao() {
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     if (
         !itens ||
@@ -1471,17 +1329,12 @@ function mostrarProducao() {
 
     }
 
-
     const totalUniformes =
         itens.length;
 
-
     let totalCamisas = 0;
-
     let totalBabyLook = 0;
-
     let totalInferiores = 0;
-
 
     itens.forEach(
         function(item) {
@@ -1489,7 +1342,6 @@ function mostrarProducao() {
             const modelo =
                 obterModelo(item)
                     .toLowerCase();
-
 
             if (
                 modelo.includes("baby")
@@ -1505,14 +1357,12 @@ function mostrarProducao() {
 
             }
 
-
             const inferior =
                 String(
                     item.inferior || ""
                 )
                 .trim()
                 .toLowerCase();
-
 
             if (
                 inferior !== "" &&
@@ -1527,7 +1377,6 @@ function mostrarProducao() {
         }
     );
 
-
     let html = `
 
         <div class="card">
@@ -1535,7 +1384,6 @@ function mostrarProducao() {
             <h2>
                 🏭 Lista de Produção
             </h2>
-
 
             <p>
 
@@ -1547,7 +1395,6 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
 
                 <strong>
@@ -1558,7 +1405,6 @@ function mostrarProducao() {
 
             </p>
 
-
             <p>
 
                 <strong>
@@ -1568,7 +1414,6 @@ function mostrarProducao() {
                 ${totalBabyLook}
 
             </p>
-
 
             <p>
 
@@ -1582,13 +1427,11 @@ function mostrarProducao() {
 
         </div>
 
-
         <div class="card">
 
             <h3>
                 👕 Lista
             </h3>
-
 
             <div
                 style="
@@ -1645,11 +1488,9 @@ function mostrarProducao() {
 
                     </thead>
 
-
                     <tbody>
 
     `;
-
 
     itens.forEach(
         function(item) {
@@ -1657,18 +1498,14 @@ function mostrarProducao() {
             const nome =
                 item.nome || "";
 
-
             const numero =
                 item.numero || "";
-
 
             const funcao =
                 item.funcao || "";
 
-
             let modelo =
                 obterModelo(item);
-
 
             if (
                 modelo
@@ -1688,18 +1525,14 @@ function mostrarProducao() {
 
             }
 
-
             const tamanhoCamisa =
                 item.tamanhoCamisa || "";
-
 
             const inferior =
                 item.inferior || "Nenhum";
 
-
             const tamanhoInferior =
                 item.tamanhoInferior || "N/A";
-
 
             html += `
 
@@ -1717,7 +1550,6 @@ function mostrarProducao() {
 
                     </td>
 
-
                     <td
                         style="
                             padding:12px;
@@ -1725,19 +1557,22 @@ function mostrarProducao() {
                             font-weight:bold;
                         "
                     >
+
                         ${numero}
+
                     </td>
 
-
                     <td style="padding:12px;">
+
                         ${funcao}
+
                     </td>
 
-
                     <td style="padding:12px;">
+
                         ${modelo}
-                    </td>
 
+                    </td>
 
                     <td
                         style="
@@ -1745,14 +1580,16 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
-                        ${tamanhoCamisa}
-                    </td>
 
+                        ${tamanhoCamisa}
+
+                    </td>
 
                     <td style="padding:12px;">
-                        ${inferior}
-                    </td>
 
+                        ${inferior}
+
+                    </td>
 
                     <td
                         style="
@@ -1760,7 +1597,9 @@ function mostrarProducao() {
                             text-align:center;
                         "
                     >
+
                         ${tamanhoInferior}
+
                     </td>
 
                 </tr>
@@ -1769,7 +1608,6 @@ function mostrarProducao() {
 
         }
     );
-
 
     html += `
 
@@ -1780,7 +1618,6 @@ function mostrarProducao() {
             </div>
 
         </div>
-
 
         <div class="card">
 
@@ -1804,12 +1641,10 @@ function mostrarProducao() {
 
     `;
 
-
     area.innerHTML =
         html;
 
 }
-
 
 // ======================================================
 // EXPORTAR PRODUÇÃO
@@ -1830,13 +1665,10 @@ function exportarProducaoPlanilha() {
 
     }
 
-
     let csv = "";
-
 
     csv +=
         "TIPO;NOME;NÚMERO;FUNÇÃO;MODELO;TAMANHO;PEÇA INFERIOR;TAMANHO INFERIOR\n";
-
 
     itens.forEach(
         function(item) {
@@ -1875,7 +1707,6 @@ function exportarProducaoPlanilha() {
         }
     );
 
-
     const blob =
         new Blob(
             [
@@ -1888,51 +1719,41 @@ function exportarProducaoPlanilha() {
             }
         );
 
-
     const url =
         URL.createObjectURL(
             blob
         );
-
 
     const link =
         document.createElement(
             "a"
         );
 
-
     link.href =
         url;
 
-
     link.download =
         "lista-producao-volei-terapia.csv";
-
 
     document.body.appendChild(
         link
     );
 
-
     link.click();
-
 
     document.body.removeChild(
         link
     );
 
-
     URL.revokeObjectURL(
         url
     );
-
 
     alert(
         "Lista de produção exportada com sucesso!"
     );
 
 }
-
 
 // ======================================================
 // ESCAPAR CSV
@@ -1949,7 +1770,6 @@ function escaparCSV(valor) {
 
     }
 
-
     return String(valor)
         .replace(
             /"/g,
@@ -1962,150 +1782,273 @@ function escaparCSV(valor) {
 
 }
 
-
-// ======================================================
 // ======================================================
 // CONFIGURAÇÕES
 // ======================================================
-// ======================================================
 
+function mostrarConfiguracoes() {
 
-// ======================================================
-// NORMALIZAR CONFIGURAÇÕES
-// ======================================================
-
-function normalizarConfiguracoes(
-    lista
-) {
-
-    if (
-        !Array.isArray(lista)
-    ) {
-
-        return [];
-
-    }
-
-
-    return lista
-        .map(
-            function(config) {
-
-                if (
-                    !config
-                ) {
-
-                    return null;
-
-                }
-
-
-                const item =
-                    String(
-                        config.item ??
-                        config.nome ??
-                        config.nomeItem ??
-                        ""
-                    ).trim();
-
-
-                const valor =
-                    Number(
-                        String(
-                            config.valor ??
-                            ""
-                        )
-                        .replace(
-                            ",",
-                            "."
-                        )
-                    );
-
-
-                if (
-                    item === ""
-                ) {
-
-                    return null;
-
-                }
-
-
-                return {
-
-                    item:
-                        item,
-
-                    valor:
-                        Number.isFinite(
-                            valor
-                        )
-                            ? valor
-                            : 0
-
-                };
-
-            }
-        )
-        .filter(
-            function(config) {
-
-                return config !== null;
-
-            }
+    const area =
+        document.getElementById(
+            "conteudoAdmin"
         );
 
+    if (!area) return;
+
+    area.innerHTML = `
+
+        <div class="card">
+
+            <h2>
+                ⚙️ Configurações
+            </h2>
+
+            <p
+                style="
+                    color:#777;
+                "
+            >
+
+                Gerencie os valores e as principais
+                configurações do sistema.
+
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>
+                💰 Valores das peças
+            </h3>
+
+            <div
+                style="
+                    display:grid;
+                    gap:12px;
+                "
+            >
+
+                <div>
+
+                    <label>
+                        Camisa
+                    </label>
+
+                    <input
+                        id="configCamisa"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Baby Look
+                    </label>
+
+                    <input
+                        id="configBabyLook"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="75"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Calção masculino
+                    </label>
+
+                    <input
+                        id="configCalcaoMasc"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Calção feminino
+                    </label>
+
+                    <input
+                        id="configCalcaoFem"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Short Doll
+                    </label>
+
+                    <input
+                        id="configShortDoll"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="30"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+                <div>
+
+                    <label>
+                        Short Suplex
+                    </label>
+
+                    <input
+                        id="configShortSuplex"
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value="35"
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            padding:12px;
+                            border:1px solid #ccc;
+                            border-radius:10px;
+                            font-size:16px;
+                        "
+                    >
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <h3>
+                🏐 Configurações do sistema
+            </h3>
+
+            <label>
+                Nome do time
+            </label>
+
+            <input
+                id="configNomeTime"
+                type="text"
+                value="Vôlei Terapia"
+                style="
+                    width:100%;
+                    box-sizing:border-box;
+                    padding:12px;
+                    border:1px solid #ccc;
+                    border-radius:10px;
+                    font-size:16px;
+                "
+            >
+
+        </div>
+
+        <div class="card">
+
+            <button
+                type="button"
+                id="botaoSalvarConfiguracoes"
+                class="admin-button"
+                style="
+                    width:100%;
+                    background:#ff007f;
+                "
+                onclick="
+                    salvarConfiguracoes()
+                "
+            >
+
+                💾 SALVAR ALTERAÇÕES
+
+            </button>
+
+            <button
+                type="button"
+                class="admin-button"
+                style="
+                    width:100%;
+                    margin-top:10px;
+                    background:#555;
+                "
+                onclick="
+                    restaurarConfiguracoes()
+                "
+            >
+
+                🔄 RESTAURAR PADRÃO
+
+            </button>
+
+        </div>
+
+    `;
+
+    // Depois de criar os campos,
+    // busca os valores atuais na planilha.
+
+    carregarConfiguracoes();
+
 }
-
-
-// ======================================================
-// ENCONTRAR CONFIGURAÇÃO
-// ======================================================
-
-function obterValorConfiguracao(
-    nome
-) {
-
-    const nomeNormalizado =
-        String(
-            nome || ""
-        )
-        .trim()
-        .toLowerCase();
-
-
-    const encontrada =
-        configuracoes.find(
-            function(config) {
-
-                return (
-                    String(
-                        config.item || ""
-                    )
-                    .trim()
-                    .toLowerCase() ===
-                    nomeNormalizado
-                );
-
-            }
-        );
-
-
-    if (
-        !encontrada
-    ) {
-
-        return 0;
-
-    }
-
-
-    return Number(
-        encontrada.valor
-    ) || 0;
-
-}
-
 
 // ======================================================
 // CARREGAR CONFIGURAÇÕES DA PLANILHA
@@ -2121,16 +2064,13 @@ async function carregarConfiguracoes() {
                 "?acao=consultarConfiguracoes"
             );
 
-
         const dados =
             await resposta.json();
-
 
         console.log(
             "CONFIGURAÇÕES RECEBIDAS:",
             dados
         );
-
 
         if (
             !dados ||
@@ -2144,46 +2084,117 @@ async function carregarConfiguracoes() {
 
         }
 
+        const configuracoes =
+            dados.configuracoes || {};
 
-        /*
-         * O Apps Script pode retornar:
-         *
-         * dados.configuracoes
-         *
-         * ou
-         *
-         * dados.config
-         *
-         */
-
-
-        const listaRecebida =
-            Array.isArray(
-                dados.configuracoes
-            )
-                ? dados.configuracoes
-
-                : Array.isArray(
-                    dados.config
-                )
-                    ? dados.config
-
-                    : [];
-
-
-        configuracoes =
-            normalizarConfiguracoes(
-                listaRecebida
+        const configCamisa =
+            document.getElementById(
+                "configCamisa"
             );
 
+        const configBabyLook =
+            document.getElementById(
+                "configBabyLook"
+            );
 
-        console.log(
-            "CONFIGURAÇÕES NORMALIZADAS:",
-            configuracoes
-        );
+        const configCalcaoMasc =
+            document.getElementById(
+                "configCalcaoMasc"
+            );
 
+        const configCalcaoFem =
+            document.getElementById(
+                "configCalcaoFem"
+            );
 
-        return configuracoes;
+        const configShortDoll =
+            document.getElementById(
+                "configShortDoll"
+            );
+
+        const configShortSuplex =
+            document.getElementById(
+                "configShortSuplex"
+            );
+
+        const configNomeTime =
+            document.getElementById(
+                "configNomeTime"
+            );
+
+        if (configCamisa) {
+
+            configCamisa.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Camisa",
+                    75
+                );
+
+        }
+
+        if (configBabyLook) {
+
+            configBabyLook.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Baby Look",
+                    75
+                );
+
+        }
+
+        if (configCalcaoMasc) {
+
+            configCalcaoMasc.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Calção masculino",
+                    35
+                );
+
+        }
+
+        if (configCalcaoFem) {
+
+            configCalcaoFem.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Calção feminino",
+                    35
+                );
+
+        }
+
+        if (configShortDoll) {
+
+            configShortDoll.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Short Doll",
+                    30
+                );
+
+        }
+
+        if (configShortSuplex) {
+
+            configShortSuplex.value =
+                valorConfiguracao(
+                    configuracoes,
+                    "Suplex",
+                    35
+                );
+
+        }
+
+        if (configNomeTime) {
+
+            configNomeTime.value =
+                configuracoes["Nome do time"] ||
+                "Vôlei Terapia";
+
+        }
 
     }
 
@@ -2194,359 +2205,49 @@ async function carregarConfiguracoes() {
             erro
         );
 
-
-        alert(
-            "Não foi possível carregar os valores da aba Configurações.\n\n" +
-            erro.message
-        );
-
-
-        return [];
+        // Não quebra a tela.
+        // Mantém os valores padrão.
 
     }
 
 }
 
-
 // ======================================================
-// MOSTRAR CONFIGURAÇÕES
+// PEGAR VALOR DE CONFIGURAÇÃO
 // ======================================================
 
-async function mostrarConfiguracoes() {
-
-    const area =
-        document.getElementById(
-            "conteudoAdmin"
-        );
-
-
-    if (!area) return;
-
-
-    /*
-     * Primeiro mostra uma mensagem enquanto
-     * os valores são buscados na planilha.
-     */
-
-    area.innerHTML = `
-
-        <div class="card">
-
-            <h2>
-                ⚙️ Configurações
-            </h2>
-
-            <p
-                style="
-                    color:#777;
-                "
-            >
-
-                Carregando valores da planilha...
-
-            </p>
-
-        </div>
-
-    `;
-
-
-    await carregarConfiguracoes();
-
-
-    /*
-     * Se não houver nada na planilha,
-     * mostramos uma tela vazia.
-     */
+function valorConfiguracao(
+    configuracoes,
+    nome,
+    padrao
+) {
 
     if (
-        configuracoes.length === 0
+        configuracoes &&
+        Object.prototype.hasOwnProperty.call(
+            configuracoes,
+            nome
+        )
     ) {
 
-        area.innerHTML = `
+        const valor =
+            Number(
+                configuracoes[nome]
+            );
 
-            <div class="card">
+        if (
+            !Number.isNaN(valor)
+        ) {
 
-                <h2>
-                    ⚙️ Configurações
-                </h2>
+            return valor;
 
-
-                <p
-                    style="
-                        color:#777;
-                    "
-                >
-
-                    Nenhuma configuração encontrada
-                    na aba Configurações.
-
-                </p>
-
-
-                <p
-                    style="
-                        color:#777;
-                    "
-                >
-
-                    Confira se a aba possui:
-
-                    <br><br>
-
-                    <strong>
-                        A1 = Item
-                    </strong>
-
-                    <br>
-
-                    <strong>
-                        B1 = Valor
-                    </strong>
-
-                </p>
-
-            </div>
-
-
-            <div class="card">
-
-                <button
-                    type="button"
-                    class="admin-button"
-                    style="
-                        width:100%;
-                        background:#ff007f;
-                    "
-                    onclick="
-                        restaurarConfiguracoes()
-                    "
-                >
-
-                    🔄 RESTAURAR PADRÃO
-
-                </button>
-
-            </div>
-
-        `;
-
-        return;
+        }
 
     }
 
-
-    let html = `
-
-        <div class="card">
-
-            <h2>
-                ⚙️ Configurações
-            </h2>
-
-
-            <p
-                style="
-                    color:#777;
-                "
-            >
-
-                Os valores abaixo são carregados
-                diretamente da aba
-                <strong>Configurações</strong>
-                da planilha.
-
-            </p>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                💰 Valores das peças
-            </h3>
-
-
-            <div
-                style="
-                    display:grid;
-                    gap:12px;
-                "
-            >
-
-    `;
-
-
-    configuracoes.forEach(
-        function(config, index) {
-
-            const idCampo =
-                "configValor_" +
-                index;
-
-
-            html += `
-
-                <div>
-
-                    <label
-                        for="${idCampo}"
-                        style="
-                            display:block;
-                            margin-bottom:6px;
-                            font-weight:bold;
-                        "
-                    >
-
-                        ${config.item}
-
-                    </label>
-
-
-                    <input
-
-                        id="${idCampo}"
-
-                        class="campo-configuracao"
-
-                        data-index="${index}"
-
-                        type="number"
-
-                        min="0"
-
-                        step="0.01"
-
-                        value="${Number(
-                            config.valor
-                        ).toFixed(2)}"
-
-                        style="
-                            width:100%;
-                            box-sizing:border-box;
-                            padding:12px;
-                            border:1px solid #ccc;
-                            border-radius:10px;
-                            font-size:16px;
-                        "
-
-                    >
-
-                </div>
-
-            `;
-
-        }
-    );
-
-
-    html += `
-
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <h3>
-                🏐 Configurações do sistema
-            </h3>
-
-
-            <label
-                for="configNomeTime"
-                style="
-                    display:block;
-                    margin-bottom:6px;
-                    font-weight:bold;
-                "
-            >
-
-                Nome do time
-
-            </label>
-
-
-            <input
-
-                id="configNomeTime"
-
-                type="text"
-
-                value="Vôlei Terapia"
-
-                style="
-                    width:100%;
-                    box-sizing:border-box;
-                    padding:12px;
-                    border:1px solid #ccc;
-                    border-radius:10px;
-                    font-size:16px;
-                "
-
-            >
-
-        </div>
-
-
-        <div class="card">
-
-            <button
-
-                type="button"
-
-                class="admin-button"
-
-                style="
-                    width:100%;
-                    background:#ff007f;
-                "
-
-                onclick="
-                    salvarConfiguracoes()
-                "
-
-            >
-
-                💾 SALVAR ALTERAÇÕES
-
-            </button>
-
-
-            <button
-
-                type="button"
-
-                class="admin-button"
-
-                style="
-                    width:100%;
-                    margin-top:10px;
-                    background:#555;
-                "
-
-                onclick="
-                    restaurarConfiguracoes()
-                "
-
-            >
-
-                🔄 RESTAURAR PADRÃO
-
-            </button>
-
-        </div>
-
-    `;
-
-
-    area.innerHTML =
-        html;
+    return padrao;
 
 }
-
 
 // ======================================================
 // SALVAR CONFIGURAÇÕES
@@ -2554,142 +2255,198 @@ async function mostrarConfiguracoes() {
 
 async function salvarConfiguracoes() {
 
-    try {
-
-        /*
-         * Se a tela ainda não tiver carregado
-         * as configurações, não tenta salvar.
-         */
-
-        if (
-            !Array.isArray(
-                configuracoes
-            ) ||
-            configuracoes.length === 0
-        ) {
-
-            alert(
-                "Nenhuma configuração carregada para salvar."
-            );
-
-            return;
-
-        }
-
-
-        const novosValores = [];
-
-
-        configuracoes.forEach(
-            function(config, index) {
-
-                const campo =
-                    document.getElementById(
-                        "configValor_" +
-                        index
-                    );
-
-
-                if (!campo) {
-
-                    return;
-
-                }
-
-
-                const valor =
-                    Number(
-                        String(
-                            campo.value
-                        )
-                        .replace(
-                            ",",
-                            "."
-                        )
-                    );
-
-
-                novosValores.push({
-
-                    item:
-                        config.item,
-
-                    valor:
-                        Number.isFinite(
-                            valor
-                        )
-                            ? Number(
-                                valor.toFixed(2)
-                            )
-                            : 0
-
-                });
-
-            }
+    const botao =
+        document.getElementById(
+            "botaoSalvarConfiguracoes"
         );
 
+    const configCamisa =
+        document.getElementById(
+            "configCamisa"
+        );
 
-        if (
-            novosValores.length === 0
-        ) {
+    const configBabyLook =
+        document.getElementById(
+            "configBabyLook"
+        );
 
-            alert(
-                "Nenhum valor foi encontrado para salvar."
-            );
+    const configCalcaoMasc =
+        document.getElementById(
+            "configCalcaoMasc"
+        );
 
-            return;
+    const configCalcaoFem =
+        document.getElementById(
+            "configCalcaoFem"
+        );
 
-        }
+    const configShortDoll =
+        document.getElementById(
+            "configShortDoll"
+        );
 
+    const configShortSuplex =
+        document.getElementById(
+            "configShortSuplex"
+        );
 
-        const nomeTimeCampo =
-            document.getElementById(
-                "configNomeTime"
-            );
+    const configNomeTime =
+        document.getElementById(
+            "configNomeTime"
+        );
 
+    if (
+        !configCamisa ||
+        !configBabyLook ||
+        !configCalcaoMasc ||
+        !configCalcaoFem ||
+        !configShortDoll ||
+        !configShortSuplex ||
+        !configNomeTime
+    ) {
 
-        const nomeTime =
-            nomeTimeCampo
-                ? String(
-                    nomeTimeCampo.value || ""
-                ).trim()
-                : "Vôlei Terapia";
+        alert(
+            "Os campos de configuração não foram encontrados."
+        );
 
+        return;
 
-        const botao =
-            document.querySelector(
-                'button[onclick="salvarConfiguracoes()"]'
-            );
+    }
 
+    const valorCamisa =
+        Number(
+            String(
+                configCamisa.value
+            ).replace(",", ".")
+        );
 
-        if (botao) {
+    const valorBabyLook =
+        Number(
+            String(
+                configBabyLook.value
+            ).replace(",", ".")
+        );
 
-            botao.disabled =
-                true;
+    const valorCalcaoMasc =
+        Number(
+            String(
+                configCalcaoMasc.value
+            ).replace(",", ".")
+        );
 
-            botao.innerText =
-                "⏳ SALVANDO...";
+    const valorCalcaoFem =
+        Number(
+            String(
+                configCalcaoFem.value
+            ).replace(",", ".")
+        );
 
-        }
+    const valorShortDoll =
+        Number(
+            String(
+                configShortDoll.value
+            ).replace(",", ".")
+        );
 
+    const valorShortSuplex =
+        Number(
+            String(
+                configShortSuplex.value
+            ).replace(",", ".")
+        );
 
-        /*
-         * Envia para o Apps Script.
-         *
-         * O Apps Script deverá receber:
-         *
-         * acao: "salvarConfiguracoes"
-         *
-         * configuracoes: [
-         *   {
-         *      item: "Camisa",
-         *      valor: 75
-         *   }
-         * ]
-         *
-         * nomeTime: "Vôlei Terapia"
-         */
+    const nomeTime =
+        String(
+            configNomeTime.value || ""
+        ).trim();
 
+    if (
+        Number.isNaN(valorCamisa) ||
+        Number.isNaN(valorBabyLook) ||
+        Number.isNaN(valorCalcaoMasc) ||
+        Number.isNaN(valorCalcaoFem) ||
+        Number.isNaN(valorShortDoll) ||
+        Number.isNaN(valorShortSuplex)
+    ) {
+
+        alert(
+            "Digite valores válidos para todas as peças."
+        );
+
+        return;
+
+    }
+
+    if (
+        valorCamisa < 0 ||
+        valorBabyLook < 0 ||
+        valorCalcaoMasc < 0 ||
+        valorCalcaoFem < 0 ||
+        valorShortDoll < 0 ||
+        valorShortSuplex < 0
+    ) {
+
+        alert(
+            "Os valores não podem ser negativos."
+        );
+
+        return;
+
+    }
+
+    const configuracoes = {
+
+        "Camisa":
+            Number(
+                valorCamisa.toFixed(2)
+            ),
+
+        "Baby Look":
+            Number(
+                valorBabyLook.toFixed(2)
+            ),
+
+        "Calção masculino":
+            Number(
+                valorCalcaoMasc.toFixed(2)
+            ),
+
+        "Calção feminino":
+            Number(
+                valorCalcaoFem.toFixed(2)
+            ),
+
+        "Short Doll":
+            Number(
+                valorShortDoll.toFixed(2)
+            ),
+
+        "Suplex":
+            Number(
+                valorShortSuplex.toFixed(2)
+            ),
+
+        "Nome do time":
+            nomeTime
+
+    };
+
+    console.log(
+        "CONFIGURAÇÕES QUE SERÃO SALVAS:",
+        configuracoes
+    );
+
+    if (botao) {
+
+        botao.disabled =
+            true;
+
+        botao.innerText =
+            "⏳ SALVANDO...";
+
+    }
+
+    try {
 
         const corpo = {
 
@@ -2697,19 +2454,9 @@ async function salvarConfiguracoes() {
                 "salvarConfiguracoes",
 
             configuracoes:
-                novosValores,
-
-            nomeTime:
-                nomeTime
+                configuracoes
 
         };
-
-
-        console.log(
-            "ENVIANDO CONFIGURAÇÕES:",
-            corpo
-        );
-
 
         const resposta =
             await fetch(
@@ -2734,16 +2481,32 @@ async function salvarConfiguracoes() {
                 }
             );
 
-
-        const dados =
-            await resposta.json();
-
+        const texto =
+            await resposta.text();
 
         console.log(
-            "RESPOSTA AO SALVAR CONFIGURAÇÕES:",
-            dados
+            "RESPOSTA DO APPS SCRIPT:",
+            texto
         );
 
+        let dados;
+
+        try {
+
+            dados =
+                JSON.parse(
+                    texto
+                );
+
+        }
+
+        catch (erroJSON) {
+
+            throw new Error(
+                "O Apps Script não retornou uma resposta JSON válida."
+            );
+
+        }
 
         if (
             !dados ||
@@ -2752,34 +2515,19 @@ async function salvarConfiguracoes() {
 
             throw new Error(
                 dados?.message ||
-                "O Apps Script não confirmou o salvamento."
+                "As configurações não foram salvas."
             );
 
         }
 
-
-        /*
-         * Atualiza o array local.
-         */
-
-        configuracoes =
-            normalizarConfiguracoes(
-                novosValores
-            );
-
-
         alert(
-            "Configurações salvas com sucesso!"
+            "✅ Configurações salvas com sucesso!"
         );
 
+        // Recarrega da planilha para confirmar
+        // que os valores realmente foram gravados.
 
-        /*
-         * Reabre a tela para confirmar
-         * os valores que ficaram salvos.
-         */
-
-        await mostrarConfiguracoes();
-
+        await carregarConfiguracoes();
 
     }
 
@@ -2790,18 +2538,14 @@ async function salvarConfiguracoes() {
             erro
         );
 
-
         alert(
-            "Não foi possível salvar as configurações.\n\n" +
+            "❌ Não foi possível salvar as configurações.\n\n" +
             erro.message
         );
 
+    }
 
-        const botao =
-            document.querySelector(
-                'button[onclick="salvarConfiguracoes()"]'
-            );
-
+    finally {
 
         if (botao) {
 
@@ -2817,18 +2561,16 @@ async function salvarConfiguracoes() {
 
 }
 
-
 // ======================================================
-// RESTAURAR CONFIGURAÇÕES
+// RESTAURAR CONFIGURAÇÕES PADRÃO
 // ======================================================
 
-async function restaurarConfiguracoes() {
+function restaurarConfiguracoes() {
 
     const confirmar =
         confirm(
             "Deseja restaurar os valores padrão?"
         );
-
 
     if (!confirmar) {
 
@@ -2836,333 +2578,91 @@ async function restaurarConfiguracoes() {
 
     }
 
-
-    /*
-     * Estes são os valores padrão.
-     *
-     * Se você adicionar novos itens na planilha,
-     * eles não serão apagados por esta função.
-     * Os itens existentes abaixo serão apenas
-     * recolocados nos valores padrão.
-     */
-
-    const padroes = {
-
-        "camisa":
-            75,
-
-        "baby look":
-            75,
-
-        "calção masculino":
-            35,
-
-        "calcão masculino":
-            35,
-
-        "calção feminino":
-            35,
-
-        "calcão feminino":
-            35,
-
-        "short doll":
-            30,
-
-        "suplex":
-            35,
-
-        "short suplex":
-            35
-
-    };
-
-
-    try {
-
-        const novosValores =
-            configuracoes.map(
-                function(config) {
-
-                    const nome =
-                        String(
-                            config.item || ""
-                        )
-                        .trim()
-                        .toLowerCase();
-
-
-                    let valor =
-                        Number(
-                            config.valor
-                        ) || 0;
-
-
-                    if (
-                        Object.prototype.hasOwnProperty.call(
-                            padroes,
-                            nome
-                        )
-                    ) {
-
-                        valor =
-                            padroes[nome];
-
-                    }
-
-
-                    return {
-
-                        item:
-                            config.item,
-
-                        valor:
-                            valor
-
-                    };
-
-                }
-            );
-
-
-        const botao =
-            document.querySelector(
-                'button[onclick="restaurarConfiguracoes()"]'
-            );
-
-
-        if (botao) {
-
-            botao.disabled =
-                true;
-
-            botao.innerText =
-                "⏳ RESTAURANDO...";
-
-        }
-
-
-        const corpo = {
-
-            acao:
-                "salvarConfiguracoes",
-
-            configuracoes:
-                novosValores,
-
-            nomeTime:
-                "Vôlei Terapia"
-
-        };
-
-
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT,
-                {
-
-                    method:
-                        "POST",
-
-                    headers: {
-
-                        "Content-Type":
-                            "text/plain;charset=utf-8"
-
-                    },
-
-                    body:
-                        JSON.stringify(
-                            corpo
-                        )
-
-                }
-            );
-
-
-        const dados =
-            await resposta.json();
-
-
-        if (
-            !dados ||
-            dados.result !== "success"
-        ) {
-
-            throw new Error(
-                dados?.message ||
-                "Não foi possível restaurar os valores."
-            );
-
-        }
-
-
-        configuracoes =
-            normalizarConfiguracoes(
-                novosValores
-            );
-
-
-        alert(
-            "Valores padrão restaurados com sucesso!"
+    const configCamisa =
+        document.getElementById(
+            "configCamisa"
         );
 
+    const configBabyLook =
+        document.getElementById(
+            "configBabyLook"
+        );
 
-        await mostrarConfiguracoes();
+    const configCalcaoMasc =
+        document.getElementById(
+            "configCalcaoMasc"
+        );
 
+    const configCalcaoFem =
+        document.getElementById(
+            "configCalcaoFem"
+        );
+
+    const configShortDoll =
+        document.getElementById(
+            "configShortDoll"
+        );
+
+    const configShortSuplex =
+        document.getElementById(
+            "configShortSuplex"
+        );
+
+    const configNomeTime =
+        document.getElementById(
+            "configNomeTime"
+        );
+
+    if (configCamisa) {
+
+        configCamisa.value =
+            75;
 
     }
 
-    catch (erro) {
+    if (configBabyLook) {
 
-        console.error(
-            "ERRO AO RESTAURAR CONFIGURAÇÕES:",
-            erro
-        );
+        configBabyLook.value =
+            75;
 
+    }
 
-        alert(
-            "Não foi possível restaurar as configurações.\n\n" +
-            erro.message
-        );
+    if (configCalcaoMasc) {
+
+        configCalcaoMasc.value =
+            35;
+
+    }
+
+    if (configCalcaoFem) {
+
+        configCalcaoFem.value =
+            35;
+
+    }
+
+    if (configShortDoll) {
+
+        configShortDoll.value =
+            30;
+
+    }
+
+    if (configShortSuplex) {
+
+        configShortSuplex.value =
+            35;
+
+    }
+
+    if (configNomeTime) {
+
+        configNomeTime.value =
+            "Vôlei Terapia";
 
     }
 
 }
-
-
-// ======================================================
-// PEGAR VALOR DE UMA PEÇA
-// ======================================================
-
-function obterValorPeca(
-    nomePeca
-) {
-
-    return obterValorConfiguracao(
-        nomePeca
-    );
-
-}
-
-
-// ======================================================
-// FUNÇÕES DE ATALHO DOS VALORES
-// ======================================================
-
-function obterValorCamisa() {
-
-    return obterValorPeca(
-        "Camisa"
-    );
-
-}
-
-
-function obterValorBabyLook() {
-
-    return obterValorPeca(
-        "Baby Look"
-    );
-
-}
-
-
-function obterValorCalcaoMasculino() {
-
-    return obterValorPeca(
-        "Calção masculino"
-    );
-
-}
-
-
-function obterValorCalcaoFeminino() {
-
-    return obterValorPeca(
-        "Calção feminino"
-    );
-
-}
-
-
-function obterValorShortDoll() {
-
-    return obterValorPeca(
-        "Short Doll"
-    );
-
-}
-
-
-function obterValorSuplex() {
-
-    let valor =
-        obterValorPeca(
-            "Suplex"
-        );
-
-
-    if (
-        valor <= 0
-    ) {
-
-        valor =
-            obterValorPeca(
-                "Short Suplex"
-            );
-
-    }
-
-
-    return valor;
-
-}
-
-
-// ======================================================
-// MOSTRAR VALORES CARREGADOS NO CONSOLE
-// ======================================================
-
-function mostrarValoresConfiguracaoNoConsole() {
-
-    console.log(
-        "VALOR CAMISA:",
-        obterValorCamisa()
-    );
-
-
-    console.log(
-        "VALOR BABY LOOK:",
-        obterValorBabyLook()
-    );
-
-
-    console.log(
-        "VALOR CALÇÃO MASCULINO:",
-        obterValorCalcaoMasculino()
-    );
-
-
-    console.log(
-        "VALOR CALÇÃO FEMININO:",
-        obterValorCalcaoFeminino()
-    );
-
-
-    console.log(
-        "VALOR SHORT DOLL:",
-        obterValorShortDoll()
-    );
-
-
-    console.log(
-        "VALOR SUPLEX:",
-        obterValorSuplex()
-    );
-
-}
-
 
 // ======================================================
 // MENSAGEM
@@ -3177,9 +2677,7 @@ function mostrarMensagem(
             "conteudoAdmin"
         );
 
-
     if (!area) return;
-
 
     area.innerHTML = `
 
@@ -3192,7 +2690,6 @@ function mostrarMensagem(
     `;
 
 }
-
 
 // ======================================================
 // FORMATAR MOEDA
@@ -3218,7 +2715,6 @@ function formatarMoeda(
 
 }
 
-
 // ======================================================
 // VOLTAR AO INÍCIO
 // ======================================================
@@ -3229,7 +2725,6 @@ function voltarInicio() {
         "index.html";
 
 }
-
 
 // ======================================================
 // INICIAR ADMIN
