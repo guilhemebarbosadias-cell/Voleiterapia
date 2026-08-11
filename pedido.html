@@ -1,213 +1,112 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-let pedido = [];
 
 <head>
-let categoriaSelecionada = "";
-let uniformeSelecionado = "";
-let funcaoSelecionada = "";
-let numeroSelecionado = "";
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-let numerosBloqueadosFeminino = [];
 
+<title>Pedido de Uniforme - Vôlei Terapia</title>
 <title>Pedido de Uniforme - Equipe VôleiTerapia</title>
 
 <link rel="stylesheet" href="style.css">
-// ======================================================
-// URL DO GOOGLE APPS SCRIPT / WEB APP
-// ======================================================
 
 </head>
-const URL_APPS_SCRIPT =
-"https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
 
 <body>
-// ======================================================
-// VALORES
-// ======================================================
 
-const valores = {
 
 <header>
-    camisa: 55,
 
 <div class="logo">
 Vôlei<span>Terapia</span>
 </div>
-    babyLook: 55,
 
 <p>Pedido de Uniforme</p>
-    camisaInfantil: 50,
 
 </header>
-    calcaoMasc: 45,
 
-    calcaoFem: 45,
 
-    shortDoll: 45,
 
 <div class="container">
-    shortSuplex: 73,
 
-    shortInfantil: 40
 
-};
 
 <h1>
 Solicitação de Uniforme
 </h1>
 
-// ======================================================
-// BUSCAR CONFIGURAÇÕES DA PLANILHA
-// ======================================================
 
-async function buscarConfiguracoes(){
 
-    try{
 
 <div class="card">
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT +
-                "?acao=configuracoes"
-            );
 
 <h2>
 Responsável pelo pedido
 </h2>
 
-        const dados =
-            await resposta.json();
 
 <label>
 Nome completo
 </label>
 
-        console.log(
-            "CONFIGURAÇÕES RECEBIDAS:",
-            dados
-        );
 
 <input
 id="responsavel"
 type="text"
 placeholder="Digite seu nome">
 
-        if(
-            !dados ||
-            dados.result !== "success"
-        ){
 
 </div>
-            throw new Error(
-                dados?.message ||
-                "Não foi possível carregar as configurações."
-            );
-
-        }
 
 
-        const configuracoes =
-            dados.configuracoes || {};
+
 
 
 <div class="card">
-        // ==================================================
-        // CAMISA
-        // ==================================================
 
-        if(
-            configuracoes["Camisa"] !== undefined
-        ){
 
 <h2>
 Adicionar uniforme
 </h2>
-            const valor =
-                Number(
-                    configuracoes["Camisa"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
 <button
 class="btn btn-black"
 onclick="abrirItem()">
-                valores.camisa =
-                    valor;
 
 + ADICIONAR ITEM
-            }
 
 </button>
-        }
 
 
 </div>
-        // ==================================================
-        // BABY LOOK
-        // ==================================================
 
-        if(
-            configuracoes["Baby Look"] !== undefined
-        ){
 
-            const valor =
-                Number(
-                    configuracoes["Baby Look"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
 <div
 id="configuracao"
 class="area"
 style="display:none;">
-                valores.babyLook =
-                    valor;
 
-            }
 
-        }
 
 <h2>
 Configurar jogador
 </h2>
 
-        // ==================================================
-        // CAMISA INFANTIL
-        // ==================================================
 
-        if(
-            configuracoes["Camisa Infantil"] !== undefined
-        ){
 
-            const valor =
-                Number(
-                    configuracoes["Camisa Infantil"]
-                );
 
 <label>
 Tipo de uniforme
 </label>
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.camisaInfantil =
-                    valor;
 
-            }
 
 <div class="opcoes grupoUniforme">
-        }
 
 <div class="opcao"
 onclick="selecionarUniforme('Oficial',this)">
@@ -218,1907 +117,197 @@ Oficial
 onclick="selecionarUniforme('Adicional',this)">
 Adicional
 </div>
-        // ==================================================
-        // CALÇÃO MASCULINO
-        // ==================================================
 
 </div>
-        if(
-            configuracoes["Calção masculino"] !== undefined
-        ){
 
-            const valor =
-                Number(
-                    configuracoes["Calção masculino"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.calcaoMasc =
-                    valor;
 
-            }
 
 <label>
 Função do uniforme
 </label>
-        }
 
 
-        // ==================================================
-        // CALÇÃO FEMININO
-        // ==================================================
 
 <div class="opcoes grupoFuncao">
-        if(
-            configuracoes["Calção feminino"] !== undefined
-        ){
 
 <div class="opcao"
 onclick="selecionarFuncao('Normal',this)">
 Normal
 </div>
-            const valor =
-                Number(
-                    configuracoes["Calção feminino"]
-                );
 
 <div class="opcao"
 onclick="selecionarFuncao('Líbero',this)">
 Líbero
 </div>
-            if(
-                !Number.isNaN(valor)
-            ){
 
 </div>
 <label>
 Categoria
 </label>
-                valores.calcaoFem =
-                    valor;
 
-            }
 
-        }
 
 <div class="opcoes grupoCategoria">
 
-        // ==================================================
-        // SHORT DOLL
-        // ==================================================
 
 <div
 class="opcao"
 onclick="selecionarCategoria('Masculino',this)">
-        if(
-            configuracoes["Short Doll"] !== undefined
-        ){
 
 Masculino
-            const valor =
-                Number(
-                    configuracoes["Short Doll"]
-                );
 
 </div>
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.shortDoll =
-                    valor;
 
-            }
 
 <div
 class="opcao"
 onclick="selecionarCategoria('Feminino',this)">
-        }
 
 Feminino
 
 </div>
-        // ==================================================
-        // SHORT SUPLEX
-        // ==================================================
 
-        if(
-            configuracoes["Short Suplex"] !== undefined
-        ){
 
 </div>
-            const valor =
-                Number(
-                    configuracoes["Short Suplex"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.shortSuplex =
-                    valor;
 
-            }
 
-        }
 
 <div id="produtos"></div>
-        else if(
-            configuracoes["Suplex"] !== undefined
-        ){
 
-            const valor =
-                Number(
-                    configuracoes["Suplex"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.shortSuplex =
-                    valor;
 
-            }
 
 <label>
 Nome para personalização
 </label>
-        }
 
 
-        // ==================================================
-        // SHORT INFANTIL
-        // ==================================================
 
 <input
 id="nomePersonalizado"
 type="text"
 placeholder="Nome na camisa">
-        if(
-            configuracoes["Short Infantil"] !== undefined
-        ){
 
-            const valor =
-                Number(
-                    configuracoes["Short Infantil"]
-                );
 
-            if(
-                !Number.isNaN(valor)
-            ){
 
-                valores.shortInfantil =
-                    valor;
 
-            }
 
 <label>
 Número da camisa
 </label>
-        }
 
 
-        console.log(
-            "VALORES ATUAIS DO SISTEMA:",
-            valores
-        );
 
 
 <div
 id="mapaNumero"
 class="numero">
-        return true;
 
 </div>
 
-    }catch(error){
-
-        console.error(
-            "Erro ao buscar configurações:",
-            error
-        );
 
 
-        return false;
+
 
 <button
 class="btn"
 onclick="adicionarItemPedido()">
-    }
 
 Adicionar ao pedido
-}
 
 </button>
 
-// ======================================================
-// BUSCAR NÚMEROS FEMININOS
-// ======================================================
 
-async function buscarNumerosOficiais(){
 
-    try{
 
 </div>
-        const resposta =
-            await fetch(
-                URL_APPS_SCRIPT
-            );
 
 
-        const dados =
-            await resposta.json();
 
 
-        if(
-            dados.result === "success"
-        ){
 
-            numerosBloqueadosFeminino =
-                dados.feminino || [];
 
 <div class="card">
-        }else{
 
-            numerosBloqueadosFeminino =
-                [];
 
 <h2>
 Itens do pedido
 </h2>
-        }
 
 
-    }catch(error){
 
 <div
 id="listaItens"
 class="area">
-        console.error(
-            "Erro ao buscar números femininos:",
-            error
-        );
 
 Nenhum item adicionado.
 
 </div>
-        numerosBloqueadosFeminino =
-            [];
 
-    }
 
-}
 
 </div>
 
-// ======================================================
-// ABRIR CONFIGURAÇÃO
-// ======================================================
 
-async function abrirItem(){
 
-    const configuracao =
-        document.getElementById(
-            "configuracao"
-        );
 
 
 <div class="card">
-    if(configuracao){
 
-        configuracao.style.display =
-            "block";
 
 <h2>
 Resumo do pedido
 </h2>
-    }
 
 
-    await buscarConfiguracoes();
 
 <div
 id="resumo"
 class="resumo">
-    await buscarNumerosOficiais();
 
 Nenhum pedido.
-    gerarMapaNumeros();
 
 </div>
-}
 
 
 </div>
 <button
 class="btn"
 onclick="finalizarPedido()">
-// ======================================================
-// SELECIONAR OFICIAL / ADICIONAL
-// ======================================================
 
 FINALIZAR PEDIDO
-function selecionarUniforme(
-    tipo,
-    botao
-){
 
 </button>
-    uniformeSelecionado =
-        tipo;
 
 
-    document
-        .querySelectorAll(
-            ".grupoUniforme .opcao"
-        )
-        .forEach(
-            btn => {
 
-                btn.classList.remove(
-                    "ativo"
-                );
 
 </div>
-            }
-        );
 
 
-    if(botao){
 
-        botao.classList.add(
-            "ativo"
-        );
 
-    }
 
 <footer>
 
+      Equipe VôleiTerapia - Guariba SP -Técnico Guilherme Dias 
          Equipe VôleiTerapia - Guariba SP -Técnico Guilherme 
-    gerarMapaNumeros();
 
 </footer>
-}
 
 
-// ======================================================
-// SELECIONAR NORMAL / LÍBERO
-// ======================================================
 
-function selecionarFuncao(
-    funcao,
-    botao
-){
 
-    funcaoSelecionada =
-        funcao;
 
 <script src="script.js"></script>
 
-    document
-        .querySelectorAll(
-            ".grupoFuncao .opcao"
-        )
-        .forEach(
-            btn => {
 
 </body>
-                btn.classList.remove(
-                    "ativo"
-                );
 
 </html>
-            }
-        );
-
-
-    if(botao){
-
-        botao.classList.add(
-            "ativo"
-        );
-
-    }
-
-}
-
-
-// ======================================================
-// SELECIONAR CATEGORIA
-// ======================================================
-
-function selecionarCategoria(
-    categoria,
-    botao
-){
-
-    categoriaSelecionada =
-        categoria;
-
-
-    document
-        .querySelectorAll(
-            ".grupoCategoria .opcao"
-        )
-        .forEach(
-            btn => {
-
-                btn.classList.remove(
-                    "ativo"
-                );
-
-            }
-        );
-
-
-    if(botao){
-
-        botao.classList.add(
-            "ativo"
-        );
-
-    }
-
-
-    mostrarOpcoesUniforme();
-
-    gerarMapaNumeros();
-
-}
-
-
-// ======================================================
-// MOSTRAR PRODUTOS
-// ======================================================
-
-function mostrarOpcoesUniforme(){
-
-    const area =
-        document.getElementById(
-            "produtos"
-        );
-
-
-    if(!area){
-
-        return;
-
-    }
-
-
-    let html = "";
-
-
-    // ==================================================
-    // MASCULINO
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Masculino"
-    ){
-
-        html = `
-
-        <div class="card">
-
-            <label>
-                Modelo da camisa
-            </label>
-
-            <select id="modeloCamisa">
-
-                <option>
-                    Camisa
-                </option>
-
-            </select>
-
-
-            <label>
-                Tamanho da camisa
-            </label>
-
-            <select id="tamanhoCamisa">
-
-                <option>PP</option>
-                <option>P</option>
-                <option>M</option>
-                <option>G</option>
-                <option>GG</option>
-                <option>XGG</option>
-
-            </select>
-
-
-            <label>
-                Adicionar calção?
-            </label>
-
-
-            <select
-                id="usaInferior"
-                onchange="mostrarInferior()">
-
-                <option value="nao">
-                    Não
-                </option>
-
-                <option value="sim">
-                    Sim
-                </option>
-
-            </select>
-
-
-            <div id="inferior"></div>
-
-        </div>
-
-        `;
-
-    }
-
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Feminino"
-    ){
-
-        html = `
-
-        <div class="card">
-
-            <label>
-                Modelo da camisa
-            </label>
-
-            <select id="modeloCamisa">
-
-                <option>
-                    Baby Look
-                </option>
-
-                <option>
-                    Camisa
-                </option>
-
-            </select>
-
-
-            <label>
-                Tamanho da camisa
-            </label>
-
-            <select id="tamanhoCamisa">
-
-                <option>PP</option>
-                <option>P</option>
-                <option>M</option>
-                <option>G</option>
-                <option>GG</option>
-                <option>XGG</option>
-
-            </select>
-
-
-            <label>
-                Adicionar peça inferior?
-            </label>
-
-
-            <select
-                id="usaInferior"
-                onchange="mostrarInferior()">
-
-                <option value="nao">
-                    Não
-                </option>
-
-                <option value="sim">
-                    Sim
-                </option>
-
-            </select>
-
-
-            <div id="inferior"></div>
-
-        </div>
-
-        `;
-
-    }
-
-
-    // ==================================================
-    // INFANTIL
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Infantil"
-    ){
-
-        html = `
-
-        <div class="card">
-
-            <label>
-                Modelo da camisa
-            </label>
-
-            <select id="modeloCamisa">
-
-                <option>
-                    Camisa Infantil
-                </option>
-
-            </select>
-
-
-            <label>
-                Tamanho da camisa
-            </label>
-
-            <select id="tamanhoCamisa">
-
-                <option>RN</option>
-                <option>1</option>
-                <option>2</option>
-                <option>3</option>
-                <option>4</option>
-                <option>6</option>
-                <option>8</option>
-                <option>10</option>
-                <option>12</option>
-                <option>14</option>
-
-            </select>
-
-
-            <label>
-                Adicionar peça inferior?
-            </label>
-
-
-            <select
-                id="usaInferior"
-                onchange="mostrarInferior()">
-
-                <option value="nao">
-                    Não
-                </option>
-
-                <option value="sim">
-                    Sim
-                </option>
-
-            </select>
-
-
-            <div id="inferior"></div>
-
-        </div>
-
-        `;
-
-    }
-
-
-    area.innerHTML =
-        html;
-
-}
-
-
-// ======================================================
-// MOSTRAR PEÇA INFERIOR
-// ======================================================
-
-function mostrarInferior(){
-
-    const area =
-        document.getElementById(
-            "inferior"
-        );
-
-
-    const campoUsa =
-        document.getElementById(
-            "usaInferior"
-        );
-
-
-    if(
-        !area ||
-        !campoUsa
-    ){
-
-        return;
-
-    }
-
-
-    const usa =
-        campoUsa.value;
-
-
-    if(
-        usa === "nao"
-    ){
-
-        area.innerHTML =
-            "";
-
-        return;
-
-    }
-
-
-    let html = "";
-
-
-    // ==================================================
-    // MASCULINO
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Masculino"
-    ){
-
-        html = `
-
-        <label>
-            Tipo de calção
-        </label>
-
-        <select id="tipoInferior">
-
-            <option value="calcaoMasc">
-                Calção masculino
-            </option>
-
-        </select>
-
-
-        <label>
-            Tamanho do calção
-        </label>
-
-        <select id="tamanhoInferior">
-
-            <option>PP</option>
-            <option>P</option>
-            <option>M</option>
-            <option>G</option>
-            <option>GG</option>
-
-        </select>
-
-        `;
-
-    }
-
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Feminino"
-    ){
-
-        html = `
-
-        <label>
-            Tipo de peça
-        </label>
-
-        <select id="tipoInferior">
-
-            <option value="calcaoFem">
-                Calção feminino
-            </option>
-
-            <option value="shortDoll">
-                Short Doll
-            </option>
-
-            <option value="shortSuplex">
-                Short Suplex
-            </option>
-
-        </select>
-
-
-        <label>
-            Tamanho
-        </label>
-
-        <select id="tamanhoInferior">
-
-            <option>PP</option>
-            <option>P</option>
-            <option>M</option>
-            <option>G</option>
-            <option>GG</option>
-
-        </select>
-
-        `;
-
-    }
-
-
-    // ==================================================
-    // INFANTIL
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Infantil"
-    ){
-
-        html = `
-
-        <label>
-            Tipo de peça
-        </label>
-
-        <select id="tipoInferior">
-
-            <option value="shortInfantil">
-                Short Infantil
-            </option>
-
-        </select>
-
-
-        <label>
-            Tamanho
-        </label>
-
-        <select id="tamanhoInferior">
-
-            <option>RN</option>
-            <option>1</option>
-            <option>2</option>
-            <option>3</option>
-            <option>4</option>
-            <option>6</option>
-            <option>8</option>
-            <option>10</option>
-            <option>12</option>
-            <option>14</option>
-
-        </select>
-
-        `;
-
-    }
-
-
-    area.innerHTML =
-        html;
-
-}
-
-
-// ======================================================
-// MAPA DE NÚMEROS
-// BLOQUEIO SOMENTE FEMININO + OFICIAL
-// ======================================================
-
-function gerarMapaNumeros(){
-
-    const mapa =
-        document.getElementById(
-            "mapaNumero"
-        );
-
-
-    if(!mapa){
-
-        return;
-
-    }
-
-
-    mapa.innerHTML =
-        "";
-
-
-    for(
-        let i = 0;
-        i <= 99;
-        i++
-    ){
-
-        const numero =
-            i
-                .toString()
-                .padStart(
-                    2,
-                    "0"
-                );
-
-
-        const botao =
-            document.createElement(
-                "button"
-            );
-
-
-        botao.type =
-            "button";
-
-
-        botao.innerText =
-            numero;
-
-
-        let bloqueado =
-            false;
-
-
-        if(
-            uniformeSelecionado ===
-            "Oficial" &&
-            categoriaSelecionada ===
-            "Feminino"
-        ){
-
-            bloqueado =
-                numerosBloqueadosFeminino
-                    .includes(
-                        numero
-                    );
-
-        }
-
-
-        if(bloqueado){
-
-            botao.disabled =
-                true;
-
-
-            botao.classList.add(
-                "bloqueado"
-            );
-
-
-            botao.style.opacity =
-                "0.35";
-
-
-            botao.style.filter =
-                "grayscale(100%)";
-
-
-            botao.style.cursor =
-                "not-allowed";
-
-        }
-
-
-        botao.onclick =
-            function(){
-
-                if(
-                    botao.disabled
-                ){
-
-                    return;
-
-                }
-
-
-                document
-                    .querySelectorAll(
-                        "#mapaNumero button"
-                    )
-                    .forEach(
-                        btn => {
-
-                            btn.classList.remove(
-                                "ativo"
-                            );
-
-                        }
-                    );
-
-
-                botao.classList.add(
-                    "ativo"
-                );
-
-
-                numeroSelecionado =
-                    numero;
-
-            };
-
-
-        mapa.appendChild(
-            botao
-        );
-
-    }
-
-}
-
-
-// ======================================================
-// CALCULAR VALOR
-// ======================================================
-
-function calcularValor(){
-
-    let total = 0;
-
-
-    const modelo =
-        document.getElementById(
-            "modeloCamisa"
-        );
-
-
-    // ==================================================
-    // CAMISA
-    // ==================================================
-
-    if(
-        categoriaSelecionada ===
-        "Infantil"
-    ){
-
-        total =
-            valores.camisaInfantil;
-
-    }
-
-    else if(
-        modelo &&
-        modelo.value ===
-        "Baby Look"
-    ){
-
-        total =
-            valores.babyLook;
-
-    }
-
-    else{
-
-        total =
-            valores.camisa;
-
-    }
-
-
-    // ==================================================
-    // PEÇA INFERIOR
-    // ==================================================
-
-    const usa =
-        document.getElementById(
-            "usaInferior"
-        );
-
-
-    if(
-        usa &&
-        usa.value ===
-        "sim"
-    ){
-
-        const tipo =
-            document.getElementById(
-                "tipoInferior"
-            );
-
-
-        if(
-            tipo
-        ){
-
-            if(
-                tipo.value ===
-                "calcaoMasc"
-            ){
-
-                total +=
-                    valores.calcaoMasc;
-
-            }
-
-
-            if(
-                tipo.value ===
-                "calcaoFem"
-            ){
-
-                total +=
-                    valores.calcaoFem;
-
-            }
-
-
-            if(
-                tipo.value ===
-                "shortDoll"
-            ){
-
-                total +=
-                    valores.shortDoll;
-
-            }
-
-
-            if(
-                tipo.value ===
-                "shortSuplex"
-            ){
-
-                total +=
-                    valores.shortSuplex;
-
-            }
-
-
-            if(
-                tipo.value ===
-                "shortInfantil"
-            ){
-
-                total +=
-                    valores.shortInfantil;
-
-            }
-
-        }
-
-    }
-
-
-    return total;
-
-}
-
-
-// ======================================================
-// ADICIONAR ITEM AO PEDIDO
-// ======================================================
-
-function adicionarItemPedido(){
-
-    const campoNome =
-        document.getElementById(
-            "nomePersonalizado"
-        );
-
-
-    const nome =
-        campoNome
-            ? campoNome.value.trim()
-            : "";
-
-
-    if(
-        uniformeSelecionado ===
-        ""
-    ){
-
-        alert(
-            "Selecione Oficial ou Adicional."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        funcaoSelecionada ===
-        ""
-    ){
-
-        alert(
-            "Selecione Normal ou Líbero."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        categoriaSelecionada ===
-        ""
-    ){
-
-        alert(
-            "Selecione uma categoria."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        numeroSelecionado ===
-        ""
-    ){
-
-        alert(
-            "Selecione o número."
-        );
-
-        return;
-
-    }
-
-
-    if(
-        nome === ""
-    ){
-
-        alert(
-            "Digite o nome."
-        );
-
-        return;
-
-    }
-
-
-    const modelo =
-        document.getElementById(
-            "modeloCamisa"
-        );
-
-
-    const tamanhoCamisa =
-        document.getElementById(
-            "tamanhoCamisa"
-        );
-
-
-    if(
-        !modelo ||
-        !tamanhoCamisa
-    ){
-
-        alert(
-            "Selecione a categoria novamente."
-        );
-
-        return;
-
-    }
-
-
-    const item = {
-
-        id:
-            pedido.length + 1,
-
-        nome:
-            nome.toUpperCase(),
-
-        uniforme:
-            uniformeSelecionado,
-
-        funcao:
-            funcaoSelecionada,
-
-        categoria:
-            categoriaSelecionada,
-
-        numero:
-            numeroSelecionado,
-
-        modelo:
-            modelo.value,
-
-        tamanhoCamisa:
-            tamanhoCamisa.value,
-
-        inferior:
-            "Nenhum",
-
-        tamanhoInferior:
-            "N/A",
-
-        valor:
-            calcularValor()
-
-    };
-
-
-    const usa =
-        document.getElementById(
-            "usaInferior"
-        );
-
-
-    if(
-        usa &&
-        usa.value ===
-        "sim"
-    ){
-
-        const tipoInferior =
-            document.getElementById(
-                "tipoInferior"
-            );
-
-
-        const tamanhoInferior =
-            document.getElementById(
-                "tamanhoInferior"
-            );
-
-
-        if(
-            tipoInferior &&
-            tamanhoInferior
-        ){
-
-            item.inferior =
-                tipoInferior
-                    .options[
-                        tipoInferior
-                            .selectedIndex
-                    ]
-                    .text;
-
-
-            item.tamanhoInferior =
-                tamanhoInferior.value;
-
-        }
-
-    }
-
-
-    pedido.push(
-        item
-    );
-
-
-    mostrarPedido();
-
-
-    limparItem();
-
-}
-
-
-// ======================================================
-// MOSTRAR PEDIDO
-// ======================================================
-
-function mostrarPedido(){
-
-    const lista =
-        document.getElementById(
-            "listaItens"
-        );
-
-
-    if(!lista){
-
-        return;
-
-    }
-
-
-    lista.innerHTML =
-        "";
-
-
-    let total =
-        0;
-
-
-    pedido.forEach(
-        function(item,index){
-
-            total +=
-                item.valor;
-
-
-            lista.innerHTML += `
-
-            <div class="card">
-
-                <strong>
-                    Jogador ${index + 1}
-                </strong>
-
-                <p>
-                    Nome: ${item.nome}
-                </p>
-
-                <p>
-                    Número: ${item.numero}
-                </p>
-
-                <p>
-                    Uniforme: ${item.uniforme}
-                </p>
-
-                <p>
-                    Função: ${item.funcao}
-                </p>
-
-                <p>
-                    Categoria: ${item.categoria}
-                </p>
-
-                <p>
-                    Camisa: ${item.modelo}
-                </p>
-
-                <p>
-                    Tamanho:
-                    ${item.tamanhoCamisa}
-                </p>
-
-                <p>
-                    Peça inferior:
-                    ${item.inferior}
-                </p>
-
-                <p>
-                    Tamanho inferior:
-                    ${item.tamanhoInferior}
-                </p>
-
-                <p>
-                    Valor:
-                    R$ ${Number(
-                        item.valor || 0
-                    ).toFixed(2)}
-                </p>
-
-            </div>
-
-            `;
-
-        }
-    );
-
-
-    mostrarResumo(
-        total
-    );
-
-}
-
-
-// ======================================================
-// MOSTRAR RESUMO
-// ======================================================
-
-function mostrarResumo(
-    total
-){
-
-    const resumo =
-        document.getElementById(
-            "resumo"
-        );
-
-
-    if(!resumo){
-
-        return;
-
-    }
-
-
-    const parcela =
-        total / 3;
-
-
-    resumo.innerHTML = `
-
-        <strong>
-            VÔLEI TERAPIA
-        </strong>
-
-        <br><br>
-
-        Quantidade de uniformes:
-        ${pedido.length}
-
-        <br><br>
-
-        Valor total:
-
-        <strong>
-            R$ ${total.toFixed(2)}
-        </strong>
-
-        <br><br>
-
-        Pagamento:
-
-        <br>
-
-        3 parcelas de:
-
-        <strong>
-            R$ ${parcela.toFixed(2)}
-        </strong>
-
-    `;
-
-}
-
-
-// ======================================================
-// LIMPAR ITEM
-// ======================================================
-
-function limparItem(){
-
-    const campoNome =
-        document.getElementById(
-            "nomePersonalizado"
-        );
-
-
-    if(campoNome){
-
-        campoNome.value =
-            "";
-
-    }
-
-
-    numeroSelecionado =
-        "";
-
-
-    document
-        .querySelectorAll(
-            "#mapaNumero button"
-        )
-        .forEach(
-            btn => {
-
-                btn.classList.remove(
-                    "ativo"
-                );
-
-            }
-        );
-
-}
-
-
-// ======================================================
-// GERAR CÓDIGO DO PEDIDO
-// ======================================================
-
-function gerarCodigoPedido(){
-
-    let numero =
-        localStorage.getItem(
-            "codigoVT"
-        ) || 0;
-
-
-    numero++;
-
-
-    localStorage.setItem(
-        "codigoVT",
-        numero
-    );
-
-
-    return "VT" + numero;
-
-}
-
-
-// ======================================================
-// FINALIZAR PEDIDO
-// ======================================================
-
-async function finalizarPedido(){
-
-    if(
-        pedido.length === 0
-    ){
-
-        alert(
-            "Adicione pelo menos um uniforme."
-        );
-
-        return;
-
-    }
-
-
-    const codigo =
-        gerarCodigoPedido();
-
-
-    const dataAtual =
-        new Date()
-            .toLocaleDateString(
-                "pt-BR"
-            );
-
-
-    const valorTotalGeral =
-        pedido.reduce(
-            (acc,item) =>
-                acc + Number(
-                    item.valor || 0
-                ),
-            0
-        );
-
-
-    const campoResponsavel =
-        document.getElementById(
-            "responsavel"
-        );
-
-
-    let nomeResponsavel =
-        campoResponsavel
-            ? campoResponsavel.value.trim()
-            : "Não informado";
-
-
-    if(
-        nomeResponsavel === ""
-    ){
-
-        nomeResponsavel =
-            "Não informado";
-
-    }
-
-
-    const dadosEnvio = {
-
-        idPedido:
-            codigo,
-
-        data:
-            dataAtual,
-
-        responsavel:
-            nomeResponsavel,
-
-        quantidade:
-            pedido.length,
-
-        valorTotal:
-            valorTotalGeral,
-
-        parcelas:
-            "3x de R$ " +
-            (
-                valorTotalGeral / 3
-            ).toFixed(2),
-
-        pago:
-            "Não",
-
-        itens:
-            pedido
-
-    };
-
-
-    const dadosLocal = {
-
-        codigo:
-            codigo,
-
-        responsavel:
-            nomeResponsavel,
-
-        data:
-            dataAtual,
-
-        itens:
-            pedido
-
-    };
-
-
-    localStorage.setItem(
-        codigo,
-        JSON.stringify(
-            dadosLocal
-        )
-    );
-
-
-    try{
-
-        await fetch(
-
-            URL_APPS_SCRIPT,
-
-            {
-
-                method:
-                    "POST",
-
-                mode:
-                    "no-cors",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json"
-
-                },
-
-                body:
-                    JSON.stringify(
-                        dadosEnvio
-                    )
-
-            }
-
-        );
-
-
-        alert(
-            "Pedido " +
-            codigo +
-            " enviado com sucesso!"
-        );
-
-
-        pedido = [];
-
-        categoriaSelecionada =
-            "";
-
-        uniformeSelecionado =
-            "";
-
-        funcaoSelecionada =
-            "";
-
-        numeroSelecionado =
-            "";
-
-
-        const lista =
-            document.getElementById(
-                "listaItens"
-            );
-
-
-        if(lista){
-
-            lista.innerHTML =
-                "Nenhum item adicionado.";
-
-        }
-
-
-        const resumo =
-            document.getElementById(
-                "resumo"
-            );
-
-
-        if(resumo){
-
-            resumo.innerHTML =
-                "Nenhum pedido.";
-
-        }
-
-
-        const configuracao =
-            document.getElementById(
-                "configuracao"
-            );
-
-
-        if(configuracao){
-
-            configuracao.style.display =
-                "none";
-
-        }
-
-
-        if(campoResponsavel){
-
-            campoResponsavel.value =
-                "";
-
-        }
-
-
-        document
-            .querySelectorAll(
-                ".opcao"
-            )
-            .forEach(
-                btn => {
-
-                    btn.classList.remove(
-                        "ativo"
-                    );
-
-                }
-            );
-
-
-        numeroSelecionado =
-            "";
-
-
-    }catch(error){
-
-        console.error(
-            "Erro ao enviar pedido:",
-            error
-        );
-
-
-        alert(
-            "Não foi possível enviar o pedido. " +
-            "O pedido foi salvo localmente."
-        );
-
-    }
-
-}
-
-
-// ======================================================
-// CARREGAR VALORES AO ABRIR A PÁGINA
-// ======================================================
-
-document.addEventListener(
-    "DOMContentLoaded",
-    async function(){
-
-        console.log(
-            "Carregando configurações da planilha..."
-        );
-
-
-        await buscarConfiguracoes();
-
-
-        console.log(
-            "Valores carregados:",
-            valores
-        );
-
-    }
-);
