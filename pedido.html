@@ -1,46 +1,64 @@
-
+<!DOCTYPE html>
+<html lang="pt-BR">
 let pedido = [];
 
+<head>
 let categoriaSelecionada = "";
 let uniformeSelecionado = "";
 let funcaoSelecionada = "";
 let numeroSelecionado = "";
 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 let numerosBloqueadosFeminino = [];
 
+<title>Pedido de Uniforme - Equipe VôleiTerapia</title>
 
+<link rel="stylesheet" href="style.css">
 // ======================================================
 // URL DO GOOGLE APPS SCRIPT / WEB APP
 // ======================================================
 
+</head>
 const URL_APPS_SCRIPT =
 "https://script.google.com/macros/s/AKfycbwoTbeb_jXc1UcgYPFvjVIQmmZ3_yi4sK7Nd2Obyj4S6eXsnRCZeyNKZ02s9S9V66Px/exec";
 
 
+<body>
 // ======================================================
 // VALORES
 // ======================================================
 
 const valores = {
 
+<header>
     camisa: 55,
 
+<div class="logo">
+Vôlei<span>Terapia</span>
+</div>
     babyLook: 55,
 
+<p>Pedido de Uniforme</p>
     camisaInfantil: 50,
 
+</header>
     calcaoMasc: 45,
 
     calcaoFem: 45,
 
     shortDoll: 45,
 
+<div class="container">
     shortSuplex: 73,
 
     shortInfantil: 40
 
 };
 
+<h1>
+Solicitação de Uniforme
+</h1>
 
 // ======================================================
 // BUSCAR CONFIGURAÇÕES DA PLANILHA
@@ -50,28 +68,40 @@ async function buscarConfiguracoes(){
 
     try{
 
+<div class="card">
         const resposta =
             await fetch(
                 URL_APPS_SCRIPT +
                 "?acao=configuracoes"
             );
 
+<h2>
+Responsável pelo pedido
+</h2>
 
         const dados =
             await resposta.json();
 
+<label>
+Nome completo
+</label>
 
         console.log(
             "CONFIGURAÇÕES RECEBIDAS:",
             dados
         );
 
+<input
+id="responsavel"
+type="text"
+placeholder="Digite seu nome">
 
         if(
             !dados ||
             dados.result !== "success"
         ){
 
+</div>
             throw new Error(
                 dados?.message ||
                 "Não foi possível carregar as configurações."
@@ -84,6 +114,7 @@ async function buscarConfiguracoes(){
             dados.configuracoes || {};
 
 
+<div class="card">
         // ==================================================
         // CAMISA
         // ==================================================
@@ -92,6 +123,9 @@ async function buscarConfiguracoes(){
             configuracoes["Camisa"] !== undefined
         ){
 
+<h2>
+Adicionar uniforme
+</h2>
             const valor =
                 Number(
                     configuracoes["Camisa"]
@@ -101,14 +135,20 @@ async function buscarConfiguracoes(){
                 !Number.isNaN(valor)
             ){
 
+<button
+class="btn btn-black"
+onclick="abrirItem()">
                 valores.camisa =
                     valor;
 
++ ADICIONAR ITEM
             }
 
+</button>
         }
 
 
+</div>
         // ==================================================
         // BABY LOOK
         // ==================================================
@@ -126,6 +166,10 @@ async function buscarConfiguracoes(){
                 !Number.isNaN(valor)
             ){
 
+<div
+id="configuracao"
+class="area"
+style="display:none;">
                 valores.babyLook =
                     valor;
 
@@ -133,6 +177,9 @@ async function buscarConfiguracoes(){
 
         }
 
+<h2>
+Configurar jogador
+</h2>
 
         // ==================================================
         // CAMISA INFANTIL
@@ -147,6 +194,9 @@ async function buscarConfiguracoes(){
                     configuracoes["Camisa Infantil"]
                 );
 
+<label>
+Tipo de uniforme
+</label>
             if(
                 !Number.isNaN(valor)
             ){
@@ -156,13 +206,23 @@ async function buscarConfiguracoes(){
 
             }
 
+<div class="opcoes grupoUniforme">
         }
 
+<div class="opcao"
+onclick="selecionarUniforme('Oficial',this)">
+Oficial
+</div>
 
+<div class="opcao"
+onclick="selecionarUniforme('Adicional',this)">
+Adicional
+</div>
         // ==================================================
         // CALÇÃO MASCULINO
         // ==================================================
 
+</div>
         if(
             configuracoes["Calção masculino"] !== undefined
         ){
@@ -181,6 +241,9 @@ async function buscarConfiguracoes(){
 
             }
 
+<label>
+Função do uniforme
+</label>
         }
 
 
@@ -188,19 +251,32 @@ async function buscarConfiguracoes(){
         // CALÇÃO FEMININO
         // ==================================================
 
+<div class="opcoes grupoFuncao">
         if(
             configuracoes["Calção feminino"] !== undefined
         ){
 
+<div class="opcao"
+onclick="selecionarFuncao('Normal',this)">
+Normal
+</div>
             const valor =
                 Number(
                     configuracoes["Calção feminino"]
                 );
 
+<div class="opcao"
+onclick="selecionarFuncao('Líbero',this)">
+Líbero
+</div>
             if(
                 !Number.isNaN(valor)
             ){
 
+</div>
+<label>
+Categoria
+</label>
                 valores.calcaoFem =
                     valor;
 
@@ -208,20 +284,26 @@ async function buscarConfiguracoes(){
 
         }
 
+<div class="opcoes grupoCategoria">
 
         // ==================================================
         // SHORT DOLL
         // ==================================================
 
+<div
+class="opcao"
+onclick="selecionarCategoria('Masculino',this)">
         if(
             configuracoes["Short Doll"] !== undefined
         ){
 
+Masculino
             const valor =
                 Number(
                     configuracoes["Short Doll"]
                 );
 
+</div>
             if(
                 !Number.isNaN(valor)
             ){
@@ -231,9 +313,14 @@ async function buscarConfiguracoes(){
 
             }
 
+<div
+class="opcao"
+onclick="selecionarCategoria('Feminino',this)">
         }
 
+Feminino
 
+</div>
         // ==================================================
         // SHORT SUPLEX
         // ==================================================
@@ -242,6 +329,7 @@ async function buscarConfiguracoes(){
             configuracoes["Short Suplex"] !== undefined
         ){
 
+</div>
             const valor =
                 Number(
                     configuracoes["Short Suplex"]
@@ -258,6 +346,7 @@ async function buscarConfiguracoes(){
 
         }
 
+<div id="produtos"></div>
         else if(
             configuracoes["Suplex"] !== undefined
         ){
@@ -276,6 +365,9 @@ async function buscarConfiguracoes(){
 
             }
 
+<label>
+Nome para personalização
+</label>
         }
 
 
@@ -283,6 +375,10 @@ async function buscarConfiguracoes(){
         // SHORT INFANTIL
         // ==================================================
 
+<input
+id="nomePersonalizado"
+type="text"
+placeholder="Nome na camisa">
         if(
             configuracoes["Short Infantil"] !== undefined
         ){
@@ -301,6 +397,9 @@ async function buscarConfiguracoes(){
 
             }
 
+<label>
+Número da camisa
+</label>
         }
 
 
@@ -310,8 +409,12 @@ async function buscarConfiguracoes(){
         );
 
 
+<div
+id="mapaNumero"
+class="numero">
         return true;
 
+</div>
 
     }catch(error){
 
@@ -323,10 +426,15 @@ async function buscarConfiguracoes(){
 
         return false;
 
+<button
+class="btn"
+onclick="adicionarItemPedido()">
     }
 
+Adicionar ao pedido
 }
 
+</button>
 
 // ======================================================
 // BUSCAR NÚMEROS FEMININOS
@@ -336,6 +444,7 @@ async function buscarNumerosOficiais(){
 
     try{
 
+</div>
         const resposta =
             await fetch(
                 URL_APPS_SCRIPT
@@ -353,22 +462,31 @@ async function buscarNumerosOficiais(){
             numerosBloqueadosFeminino =
                 dados.feminino || [];
 
+<div class="card">
         }else{
 
             numerosBloqueadosFeminino =
                 [];
 
+<h2>
+Itens do pedido
+</h2>
         }
 
 
     }catch(error){
 
+<div
+id="listaItens"
+class="area">
         console.error(
             "Erro ao buscar números femininos:",
             error
         );
 
+Nenhum item adicionado.
 
+</div>
         numerosBloqueadosFeminino =
             [];
 
@@ -376,6 +494,7 @@ async function buscarNumerosOficiais(){
 
 }
 
+</div>
 
 // ======================================================
 // ABRIR CONFIGURAÇÃO
@@ -389,32 +508,47 @@ async function abrirItem(){
         );
 
 
+<div class="card">
     if(configuracao){
 
         configuracao.style.display =
             "block";
 
+<h2>
+Resumo do pedido
+</h2>
     }
 
 
     await buscarConfiguracoes();
 
+<div
+id="resumo"
+class="resumo">
     await buscarNumerosOficiais();
 
+Nenhum pedido.
     gerarMapaNumeros();
 
+</div>
 }
 
 
+</div>
+<button
+class="btn"
+onclick="finalizarPedido()">
 // ======================================================
 // SELECIONAR OFICIAL / ADICIONAL
 // ======================================================
 
+FINALIZAR PEDIDO
 function selecionarUniforme(
     tipo,
     botao
 ){
 
+</button>
     uniformeSelecionado =
         tipo;
 
@@ -430,6 +564,7 @@ function selecionarUniforme(
                     "ativo"
                 );
 
+</div>
             }
         );
 
@@ -442,9 +577,12 @@ function selecionarUniforme(
 
     }
 
+<footer>
 
+         Equipe VôleiTerapia - Guariba SP -Técnico Guilherme 
     gerarMapaNumeros();
 
+</footer>
 }
 
 
@@ -460,6 +598,7 @@ function selecionarFuncao(
     funcaoSelecionada =
         funcao;
 
+<script src="script.js"></script>
 
     document
         .querySelectorAll(
@@ -468,10 +607,12 @@ function selecionarFuncao(
         .forEach(
             btn => {
 
+</body>
                 btn.classList.remove(
                     "ativo"
                 );
 
+</html>
             }
         );
 
@@ -741,7 +882,6 @@ function mostrarOpcoesUniforme(){
                 <option>10</option>
                 <option>12</option>
                 <option>14</option>
-                <option>16</option>
 
             </select>
 
@@ -962,7 +1102,6 @@ function mostrarInferior(){
             <option>10</option>
             <option>12</option>
             <option>14</option>
-            <option>16</option>
 
         </select>
 
