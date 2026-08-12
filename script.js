@@ -7,6 +7,12 @@ let numeroSelecionado = "";
 
 let numerosBloqueadosFeminino = [];
 
+// ======================================================
+// PROTEÇÃO CONTRA ENVIO DUPLICADO
+// ======================================================
+
+let enviandoPedido = false;
+
 
 // ======================================================
 // URL DO GOOGLE APPS SCRIPT / WEB APP
@@ -18,10 +24,6 @@ const URL_APPS_SCRIPT =
 
 // ======================================================
 // VALORES
-// ======================================================
-// Os valores começam com estes padrões.
-// Assim que a página abrir, eles serão substituídos
-// pelos valores da aba "Configurações" da planilha.
 // ======================================================
 
 const valores = {
@@ -83,10 +85,6 @@ async function buscarConfiguracoes(){
             dados.configuracoes || {};
 
 
-        // ==================================================
-        // CAMISA
-        // ==================================================
-
         if(
             configuracoes["Camisa"] !== undefined
         ){
@@ -107,10 +105,6 @@ async function buscarConfiguracoes(){
 
         }
 
-
-        // ==================================================
-        // BABY LOOK
-        // ==================================================
 
         if(
             configuracoes["Baby Look"] !== undefined
@@ -133,10 +127,6 @@ async function buscarConfiguracoes(){
         }
 
 
-        // ==================================================
-        // CALÇÃO MASCULINO
-        // ==================================================
-
         if(
             configuracoes["Calção masculino"] !== undefined
         ){
@@ -157,10 +147,6 @@ async function buscarConfiguracoes(){
 
         }
 
-
-        // ==================================================
-        // CALÇÃO FEMININO
-        // ==================================================
 
         if(
             configuracoes["Calção feminino"] !== undefined
@@ -183,10 +169,6 @@ async function buscarConfiguracoes(){
         }
 
 
-        // ==================================================
-        // SHORT DOLL
-        // ==================================================
-
         if(
             configuracoes["Short Doll"] !== undefined
         ){
@@ -207,14 +189,6 @@ async function buscarConfiguracoes(){
 
         }
 
-
-        // ==================================================
-        // SHORT SUPLEX
-        // ==================================================
-
-        // O Apps Script pode retornar "Short Suplex"
-        // ou "Suplex", dependendo do nome existente
-        // na aba Configurações.
 
         if(
             configuracoes["Short Suplex"] !== undefined
@@ -350,14 +324,9 @@ async function abrirItem(){
     }
 
 
-    // Busca os preços atualizados
-    // sempre que abrir a configuração.
-
     await buscarConfiguracoes();
 
-
     await buscarNumerosOficiais();
-
 
     gerarMapaNumeros();
 
@@ -484,7 +453,6 @@ function selecionarCategoria(
 
     mostrarOpcoesUniforme();
 
-
     gerarMapaNumeros();
 
 }
@@ -531,10 +499,6 @@ function mostrarOpcoesUniforme(){
 
     let html = "";
 
-
-    // ==================================================
-    // MASCULINO
-    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -589,10 +553,6 @@ function mostrarOpcoesUniforme(){
 
     }
 
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -705,10 +665,6 @@ function mostrarInferior(){
     let html = "";
 
 
-    // ==================================================
-    // MASCULINO
-    // ==================================================
-
     if(
         categoriaSelecionada ===
         "Masculino"
@@ -747,10 +703,6 @@ function mostrarInferior(){
 
     }
 
-
-    // ==================================================
-    // FEMININO
-    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -807,7 +759,6 @@ function mostrarInferior(){
 
 // ======================================================
 // MAPA DE NÚMEROS
-// BLOQUEIO SOMENTE FEMININO + OFICIAL
 // ======================================================
 
 function gerarMapaNumeros(){
@@ -862,10 +813,6 @@ function gerarMapaNumeros(){
             false;
 
 
-        // ==================================================
-        // SOMENTE FEMININO OFICIAL
-        // ==================================================
-
         if(
             uniformeSelecionado ===
             "Oficial" &&
@@ -881,10 +828,6 @@ function gerarMapaNumeros(){
 
         }
 
-
-        // ==================================================
-        // VISUAL BLOQUEADO
-        // ==================================================
 
         if(bloqueado){
 
@@ -910,10 +853,6 @@ function gerarMapaNumeros(){
 
         }
 
-
-        // ==================================================
-        // SELECIONAR NÚMERO
-        // ==================================================
 
         botao.onclick =
             function(){
@@ -972,10 +911,6 @@ function calcularValor(){
         valores.camisa;
 
 
-    // ==================================================
-    // MODELO DA CAMISA
-    // ==================================================
-
     const modelo =
         document.getElementById(
             "modeloCamisa"
@@ -1000,10 +935,6 @@ function calcularValor(){
 
     }
 
-
-    // ==================================================
-    // PEÇA INFERIOR
-    // ==================================================
 
     const usa =
         document.getElementById(
@@ -1527,6 +1458,17 @@ function gerarCodigoPedido(){
 
 async function finalizarPedido(){
 
+    // ==================================================
+    // IMPEDIR DUPLO CLIQUE / DUPLO ENVIO
+    // ==================================================
+
+    if(enviandoPedido){
+
+        return;
+
+    }
+
+
     if(
         pedido.length === 0
     ){
@@ -1536,6 +1478,31 @@ async function finalizarPedido(){
         );
 
         return;
+
+    }
+
+
+    // ==================================================
+    // BLOQUEAR ENVIO IMEDIATAMENTE
+    // ==================================================
+
+    enviandoPedido =
+        true;
+
+
+    const botaoFinalizar =
+        document.getElementById(
+            "btnFinalizar"
+        );
+
+
+    if(botaoFinalizar){
+
+        botaoFinalizar.disabled =
+            true;
+
+        botaoFinalizar.textContent =
+            "ENVIANDO PEDIDO...";
 
     }
 
@@ -1772,6 +1739,25 @@ async function finalizarPedido(){
             "Erro ao enviar pedido:",
             error
         );
+
+
+        // ==================================================
+        // LIBERAR NOVAMENTE EM CASO DE ERRO
+        // ==================================================
+
+        enviandoPedido =
+            false;
+
+
+        if(botaoFinalizar){
+
+            botaoFinalizar.disabled =
+                false;
+
+            botaoFinalizar.textContent =
+                "FINALIZAR PEDIDO";
+
+        }
 
 
         alert(
