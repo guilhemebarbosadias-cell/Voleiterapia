@@ -24,6 +24,14 @@ let carregamentoInicial = null;
 
 
 // ======================================================
+// CONTROLE ESPECÍFICO DOS NÚMEROS
+// ======================================================
+
+let numerosCarregados = false;
+let carregamentoNumeros = null;
+
+
+// ======================================================
 // URL DO GOOGLE APPS SCRIPT / WEB APP
 // ======================================================
 
@@ -298,7 +306,8 @@ async function buscarNumerosOficiais(){
 
         const resposta =
             await fetch(
-                URL_APPS_SCRIPT
+                URL_APPS_SCRIPT +
+                "?acao=numeros"
             );
 
 
@@ -311,7 +320,23 @@ async function buscarNumerosOficiais(){
         ){
 
             numerosBloqueadosFeminino =
-                dados.feminino || [];
+                (dados.feminino || [])
+                    .map(
+                        numero =>
+                            String(numero)
+                                .padStart(2,"0")
+                    );
+
+
+            numerosCarregados =
+                true;
+
+
+            console.log(
+                "NÚMEROS FEMININOS BLOQUEADOS:",
+                numerosBloqueadosFeminino
+            );
+
 
             return true;
 
@@ -319,6 +344,11 @@ async function buscarNumerosOficiais(){
 
             numerosBloqueadosFeminino =
                 [];
+
+
+            numerosCarregados =
+                false;
+
 
             return false;
 
@@ -335,6 +365,11 @@ async function buscarNumerosOficiais(){
 
         numerosBloqueadosFeminino =
             [];
+
+
+        numerosCarregados =
+            false;
+
 
         return false;
 
@@ -437,6 +472,39 @@ async function carregarDadosIniciais(){
 
 
 // ======================================================
+// CARREGAR SOMENTE OS NÚMEROS
+// ======================================================
+
+async function carregarNumerosRapido(){
+
+    if(
+        numerosCarregados
+    ){
+
+        return true;
+
+    }
+
+
+    if(
+        carregamentoNumeros
+    ){
+
+        return await carregamentoNumeros;
+
+    }
+
+
+    carregamentoNumeros =
+        buscarNumerosOficiais();
+
+
+    return await carregamentoNumeros;
+
+}
+
+
+// ======================================================
 // ABRIR CONFIGURAÇÃO
 // ======================================================
 
@@ -456,39 +524,39 @@ async function abrirItem(){
     }
 
 
-    const carregou =
-        await carregarDadosIniciais();
-
-
-    if(
-        !carregou
-    ){
-
-        const mapa =
-            document.getElementById(
-                "mapaNumero"
-            );
-
-
-        if(mapa){
-
-            mapa.innerHTML =
-                `
-                <p>
-                    Não foi possível carregar os números.
-                    Verifique sua conexão e tente novamente.
-                </p>
-                `;
-
-        }
-
-
-        return;
-
-    }
-
+    // ==================================================
+    // MOSTRA O MAPA IMEDIATAMENTE
+    // ==================================================
 
     gerarMapaNumeros();
+
+
+    // ==================================================
+    // CARREGA OS DADOS EM SEGUNDO PLANO
+    // ==================================================
+
+    carregarDadosIniciais()
+        .then(
+            function(){
+
+                gerarMapaNumeros();
+
+            }
+        );
+
+
+    // ==================================================
+    // GARANTE QUE OS NÚMEROS SEJAM ATUALIZADOS
+    // ==================================================
+
+    carregarNumerosRapido()
+        .then(
+            function(){
+
+                gerarMapaNumeros();
+
+            }
+        );
 
 }
 
@@ -954,8 +1022,17 @@ function gerarMapaNumeros(){
     }
 
 
+    // ==================================================
+    // FEMININO + OFICIAL
+    // PRECISA AGUARDAR OS NÚMEROS
+    // ==================================================
+
     if(
-        !dadosIniciaisCarregados
+        uniformeSelecionado ===
+        "Oficial" &&
+        categoriaSelecionada ===
+        "Feminino" &&
+        !numerosCarregados
     ){
 
         mapa.innerHTML =
@@ -964,6 +1041,17 @@ function gerarMapaNumeros(){
                 Carregando números disponíveis...
             </p>
             `;
+
+
+        carregarNumerosRapido()
+            .then(
+                function(){
+
+                    gerarMapaNumeros();
+
+                }
+            );
+
 
         return;
 
