@@ -7,11 +7,20 @@ let numeroSelecionado = "";
 
 let numerosBloqueadosFeminino = [];
 
+
 // ======================================================
 // PROTEÇÃO CONTRA ENVIO DUPLICADO
 // ======================================================
 
 let enviandoPedido = false;
+
+
+// ======================================================
+// CONTROLE DE CARREGAMENTO INICIAL
+// ======================================================
+
+let dadosIniciaisCarregados = false;
+let carregamentoInicial = null;
 
 
 // ======================================================
@@ -85,6 +94,10 @@ async function buscarConfiguracoes(){
             dados.configuracoes || {};
 
 
+        // ==================================================
+        // CAMISA
+        // ==================================================
+
         if(
             configuracoes["Camisa"] !== undefined
         ){
@@ -105,6 +118,10 @@ async function buscarConfiguracoes(){
 
         }
 
+
+        // ==================================================
+        // BABY LOOK
+        // ==================================================
 
         if(
             configuracoes["Baby Look"] !== undefined
@@ -127,6 +144,10 @@ async function buscarConfiguracoes(){
         }
 
 
+        // ==================================================
+        // CALÇÃO MASCULINO
+        // ==================================================
+
         if(
             configuracoes["Calção masculino"] !== undefined
         ){
@@ -147,6 +168,10 @@ async function buscarConfiguracoes(){
 
         }
 
+
+        // ==================================================
+        // CALÇÃO FEMININO
+        // ==================================================
 
         if(
             configuracoes["Calção feminino"] !== undefined
@@ -169,6 +194,10 @@ async function buscarConfiguracoes(){
         }
 
 
+        // ==================================================
+        // SHORT DOLL
+        // ==================================================
+
         if(
             configuracoes["Short Doll"] !== undefined
         ){
@@ -189,6 +218,10 @@ async function buscarConfiguracoes(){
 
         }
 
+
+        // ==================================================
+        // SHORT SUPLEX
+        // ==================================================
 
         if(
             configuracoes["Short Suplex"] !== undefined
@@ -280,10 +313,14 @@ async function buscarNumerosOficiais(){
             numerosBloqueadosFeminino =
                 dados.feminino || [];
 
+            return true;
+
         }else{
 
             numerosBloqueadosFeminino =
                 [];
+
+            return false;
 
         }
 
@@ -299,7 +336,102 @@ async function buscarNumerosOficiais(){
         numerosBloqueadosFeminino =
             [];
 
+        return false;
+
     }
+
+}
+
+
+// ======================================================
+// CARREGAR DADOS INICIAIS
+// ======================================================
+
+async function carregarDadosIniciais(){
+
+    if(
+        dadosIniciaisCarregados
+    ){
+
+        return true;
+
+    }
+
+
+    if(
+        carregamentoInicial
+    ){
+
+        return await carregamentoInicial;
+
+    }
+
+
+    carregamentoInicial =
+        (async function(){
+
+            try{
+
+                const resultados =
+                    await Promise.all([
+
+                        buscarConfiguracoes(),
+
+                        buscarNumerosOficiais()
+
+                    ]);
+
+
+                const configuracoesOK =
+                    resultados[0];
+
+                const numerosOK =
+                    resultados[1];
+
+
+                if(
+                    configuracoesOK &&
+                    numerosOK
+                ){
+
+                    dadosIniciaisCarregados =
+                        true;
+
+
+                    console.log(
+                        "DADOS INICIAIS CARREGADOS COM SUCESSO."
+                    );
+
+
+                    return true;
+
+                }
+
+
+                console.error(
+                    "Não foi possível carregar todos os dados iniciais."
+                );
+
+
+                return false;
+
+
+            }catch(error){
+
+                console.error(
+                    "Erro ao carregar dados iniciais:",
+                    error
+                );
+
+
+                return false;
+
+            }
+
+        })();
+
+
+    return await carregamentoInicial;
 
 }
 
@@ -324,9 +456,37 @@ async function abrirItem(){
     }
 
 
-    await buscarConfiguracoes();
+    const carregou =
+        await carregarDadosIniciais();
 
-    await buscarNumerosOficiais();
+
+    if(
+        !carregou
+    ){
+
+        const mapa =
+            document.getElementById(
+                "mapaNumero"
+            );
+
+
+        if(mapa){
+
+            mapa.innerHTML =
+                `
+                <p>
+                    Não foi possível carregar os números.
+                    Verifique sua conexão e tente novamente.
+                </p>
+                `;
+
+        }
+
+
+        return;
+
+    }
+
 
     gerarMapaNumeros();
 
@@ -453,6 +613,7 @@ function selecionarCategoria(
 
     mostrarOpcoesUniforme();
 
+
     gerarMapaNumeros();
 
 }
@@ -499,6 +660,10 @@ function mostrarOpcoesUniforme(){
 
     let html = "";
 
+
+    // ==================================================
+    // MASCULINO
+    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -553,6 +718,10 @@ function mostrarOpcoesUniforme(){
 
     }
 
+
+    // ==================================================
+    // FEMININO
+    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -665,6 +834,10 @@ function mostrarInferior(){
     let html = "";
 
 
+    // ==================================================
+    // MASCULINO
+    // ==================================================
+
     if(
         categoriaSelecionada ===
         "Masculino"
@@ -703,6 +876,10 @@ function mostrarInferior(){
 
     }
 
+
+    // ==================================================
+    // FEMININO
+    // ==================================================
 
     if(
         categoriaSelecionada ===
@@ -759,6 +936,7 @@ function mostrarInferior(){
 
 // ======================================================
 // MAPA DE NÚMEROS
+// BLOQUEIO SOMENTE FEMININO + OFICIAL
 // ======================================================
 
 function gerarMapaNumeros(){
@@ -770,6 +948,22 @@ function gerarMapaNumeros(){
 
 
     if(!mapa){
+
+        return;
+
+    }
+
+
+    if(
+        !dadosIniciaisCarregados
+    ){
+
+        mapa.innerHTML =
+            `
+            <p>
+                Carregando números disponíveis...
+            </p>
+            `;
 
         return;
 
@@ -813,6 +1007,10 @@ function gerarMapaNumeros(){
             false;
 
 
+        // ==================================================
+        // SOMENTE FEMININO OFICIAL
+        // ==================================================
+
         if(
             uniformeSelecionado ===
             "Oficial" &&
@@ -828,6 +1026,10 @@ function gerarMapaNumeros(){
 
         }
 
+
+        // ==================================================
+        // VISUAL BLOQUEADO
+        // ==================================================
 
         if(bloqueado){
 
@@ -853,6 +1055,10 @@ function gerarMapaNumeros(){
 
         }
 
+
+        // ==================================================
+        // SELECIONAR NÚMERO
+        // ==================================================
 
         botao.onclick =
             function(){
@@ -911,6 +1117,10 @@ function calcularValor(){
         valores.camisa;
 
 
+    // ==================================================
+    // MODELO DA CAMISA
+    // ==================================================
+
     const modelo =
         document.getElementById(
             "modeloCamisa"
@@ -935,6 +1145,10 @@ function calcularValor(){
 
     }
 
+
+    // ==================================================
+    // PEÇA INFERIOR
+    // ==================================================
 
     const usa =
         document.getElementById(
@@ -1459,10 +1673,12 @@ function gerarCodigoPedido(){
 async function finalizarPedido(){
 
     // ==================================================
-    // IMPEDIR DUPLO CLIQUE / DUPLO ENVIO
+    // IMPEDIR DUPLO CLIQUE
     // ==================================================
 
-    if(enviandoPedido){
+    if(
+        enviandoPedido
+    ){
 
         return;
 
@@ -1483,7 +1699,7 @@ async function finalizarPedido(){
 
 
     // ==================================================
-    // BLOQUEAR ENVIO IMEDIATAMENTE
+    // TRAVAR IMEDIATAMENTE
     // ==================================================
 
     enviandoPedido =
@@ -1733,6 +1949,25 @@ async function finalizarPedido(){
             "";
 
 
+        // ==================================================
+        // LIBERAR BOTÃO APÓS CONCLUSÃO
+        // ==================================================
+
+        enviandoPedido =
+            false;
+
+
+        if(botaoFinalizar){
+
+            botaoFinalizar.disabled =
+                false;
+
+            botaoFinalizar.textContent =
+                "FINALIZAR PEDIDO";
+
+        }
+
+
     }catch(error){
 
         console.error(
@@ -1771,7 +2006,7 @@ async function finalizarPedido(){
 
 
 // ======================================================
-// CARREGAR VALORES AO ABRIR A PÁGINA
+// CARREGAR DADOS AO ABRIR A PÁGINA
 // ======================================================
 
 document.addEventListener(
@@ -1779,16 +2014,22 @@ document.addEventListener(
     async function(){
 
         console.log(
-            "Carregando configurações da planilha..."
+            "Carregando configurações e números da planilha..."
         );
 
 
-        await buscarConfiguracoes();
+        await carregarDadosIniciais();
 
 
         console.log(
             "Valores carregados:",
             valores
+        );
+
+
+        console.log(
+            "Números femininos bloqueados:",
+            numerosBloqueadosFeminino
         );
 
     }
